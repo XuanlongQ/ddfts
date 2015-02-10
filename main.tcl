@@ -24,163 +24,113 @@ proc finish {} {
 }
 
 
+#server group: sg
+set sg 1
+#server number sn
+set sn 4
+
+set color 0
+
+for {set i 0} {$i < $sg} {incr i 1} {
+	#
+	#Create Nodes
+	#
+	set rack($i) [$ns node]
+      		puts "rack([expr $i]): [$rack($i) id]"
+	for {set j 0} {$j < $sn} {incr j 1} {
+		set server($i,$j) [$ns node]
+      			puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
+		$ns duplex-link $rack($i) $server($i,$j) 1000Mb .2ms DropTail
+		$ns queue-limit $rack($i) $server($i,$j) 10
+		$ns duplex-link-op $server($i,$j) $rack($i) queuePos 0.5
+	}
+}
+
+
+#query flow: 2KB-20KB
+
+#short message flow: update controll state on the workers 100KB-1MB
 #
-#Create Nodes
+for {set i 0} {$i < $sg} {incr i 1} {
+	for {set j 0} {$j < $sn} {incr j 1} {
+		for {set k 0} {$k < $sn} {incr k 1} {
+			
+			if {$k == $j} {
+				continue
+			}
+
+			set mf_tcp($i,$j,$k) [new Agent/TCP]
+			$ns attach-agent $server($i,$j) $mf_tcp($i,$j,$k)
+			set mf_sink($i,$j,$k) [new Agent/TCPSink]
+			$ns attach-agent $server($i,$k) $mf_sink($i,$j,$k)
+			$ns connect $mf_tcp($i,$j,$k) $mf_sink($i,$j,$k)
+			$mf_tcp($i,$j,$k) set fid_ $color
+
+			#ftp
+			set mf_ftp($i,$j,$k) [new Application/FTP]
+			$mf_ftp($i,$j,$k) attach-agent $mf_tcp($i,$j,$k)
+			$mf_ftp($i,$j,$k) set type_ FTP
+		}
+		incr color 1
+	}
+}
+
+
+
+#large flow: copy fresh data to workers 1MB-100MB
 #
+for {set i 0} {$i < $sg} {incr i 1} {
+	for {set j 0} {$j < $sn} {incr j 1} {
 
-set rack1 [$ns node]
-      puts "rack1: [$rack1 id]"
-set s1 [$ns node]
-      puts "s1: [$s1 id]"
-set s2 [$ns node]
-      puts "s2: [$s2 id]"
-set s3 [$ns node]
-      puts "s3: [$s3 id]"
-set s4 [$ns node]
-      puts "s4: [$s4 id]"
+		set lf_tcp($i,$j) [new Agent/TCP]
+		$ns attach-agent $server($i,$j) $lf_tcp($i,$j)
+		set lf_sink($i,$j) [new Agent/TCPSink]
+		set jj [expr ($j + 1) % $sn]
+		$ns attach-agent $server($i,$jj) $lf_sink($i,$j)
+		$ns connect $lf_tcp($i,$j) $lf_sink($i,$j)
+		$lf_tcp($i,$j) set fid_ $color
+		#incr color 1
 
+		#ftp
+		set lf_ftp($i,$j) [new Application/FTP]
+		$lf_ftp($i,$j) attach-agent $lf_tcp($i,$j)
+		$lf_ftp($i,$j) set type_ FTP
+	}
+}
 
-#
-#Setup Connections
-#
-
-$ns duplex-link $s2 $rack1 1000Mb 2ms DropTail
-
-$ns duplex-link $s3 $rack1 1000Mb 2ms DropTail
-
-$ns duplex-link $s4 $rack1 1000Mb 2ms DropTail
-
-$ns duplex-link $rack1 $s1 1000Mb 2ms DropTail
-
-
-
-#
-#Set up Transportation Level Connections
-#
-
-#s1
-set sink5 [new Agent/TCPSink]
-$ns attach-agent $s1 $sink5
-
-set sink6 [new Agent/TCPSink]
-$ns attach-agent $s1 $sink6
-
-set sink7 [new Agent/TCPSink]
-$ns attach-agent $s1 $sink7
-
-set sink10 [new Agent/TCPSink]
-$ns attach-agent $s1 $sink10
-
-set sink8 [new Agent/TCPSink]
-$ns attach-agent $s1 $sink8
-
-set s1_s2_ftp1_sink [new Agent/TCPSink]
-$ns attach-agent $s1 $s1_s2_ftp1_sink
-
-#s2
-set s2_prt_tcp [new Agent/TCP/Reno]
-$ns attach-agent $s2 $s2_prt_tcp
-
-set s2_ftp_tcp [new Agent/TCP/Reno]
-$ns attach-agent $s2 $s2_ftp_tcp
-
-#s3
-set s3_prt_tcp [new Agent/TCP/Reno]
-$ns attach-agent $s3 $s3_prt_tcp
-
-set s3_ftp_tcp [new Agent/TCP/Reno]
-$ns attach-agent $s3 $s3_ftp_tcp
-
-#s4
-set s4_ftp_tcp [new Agent/TCP/Reno]
-$ns attach-agent $s4 $s4_ftp_tcp
-
-set s4_prt_tcp [new Agent/TCP/Reno]
-$ns attach-agent $s4 $s4_prt_tcp
-
-
-
-#
-#Setup traffic sources
-#
-
-#pareto
-
-#s2
-set s2_prt1 [new Application/Traffic/Pareto]
-    $s2_prt1 set packetSize_ 500
-$s2_prt1 attach-agent $s2_prt_tcp
-
-set s2_prt2 [new Application/Traffic/Pareto]
-    $s2_prt2 set packetSize_ 500
-$s2_prt2 attach-agent $s2_prt_tcp
-
-#s3
-set s3_prt1 [new Application/Traffic/Pareto]
-    $s3_prt1 set packetSize_ 500
-$s3_prt1 attach-agent $s3_prt_tcp
-
-set s3_prt2 [new Application/Traffic/Pareto]
-    $s3_prt2 set packetSize_ 500
-$s3_prt2 attach-agent $s3_prt_tcp
-
-#s4
-set s4_prt1 [new Application/Traffic/Pareto]
-    $s4_prt1 set packetSize_ 500
-$s4_prt1 attach-agent $s4_prt_tcp
-
-set s4_prt2 [new Application/Traffic/Pareto]
-    $s4_prt2 set packetSize_ 500
-$s4_prt2 attach-agent $s4_prt_tcp
-
-#ftp
-
-#s2
-set ftp0 [new Application/FTP]
-$ftp0 attach-agent $s2_ftp_tcp
-
-#s3
-set ftp1 [new Application/FTP]
-$ftp1 attach-agent $s3_ftp_tcp
-
-#s4
-set ftp2 [new Application/FTP]
-$ftp2 attach-agent $s4_ftp_tcp
-
-$ns connect $s2_ftp_tcp $s1_s2_ftp1_sink
-$s2_ftp_tcp set fid_ 0
-$ns connect $s4_ftp_tcp $sink6
-$s4_ftp_tcp set fid_ 2
-$ns connect $s3_ftp_tcp $sink5
-$s3_ftp_tcp set fid_ 1
-$ns connect $s2_prt_tcp $sink7
-$s2_prt_tcp set fid_ 3
-$ns connect $s3_prt_tcp $sink8
-$s3_prt_tcp set fid_ 4
-$ns connect $s4_prt_tcp $sink10
-$s4_prt_tcp set fid_ 5
 
 #
 #Start up the sources
 #
+#query flow
+for {set i 0} {$i < $sg} {incr i 1} {
+	for {set j 0} {$j < $sn} {incr j 1} {
+		#$ns at 0.1 "$lf_ftp([expr $i],[expr $j]) start"
+		#$ns at 4.9 "$lf_ftp([expr $i],[expr $j]) stop"
+	}
+}
 
-$ns at 0.1 "$ftp0 start"
-$ns at 5 "$ftp0 stop"
-$ns at 0.2 "$ftp1 start"
-$ns at 5.1 "$ftp1 stop"
-$ns at 0.3 "$ftp2 start"
-$ns at 5.2 "$ftp2 stop"
-$ns at 5.5 "$s2_prt1 start"
-$ns at 5.6 "$s2_prt2 start"
-$ns at 5.7 "$s3_prt1 start"
-$ns at 5.8 "$s3_prt2 start"
-$ns at 5.9 "$s4_prt1 start"
-$ns at 6 "$s4_prt2 start"
-$ns at 10 "$s2_prt1 stop"
-$ns at 10.3 "$s2_prt2 stop"
-$ns at 10.6 "$s3_prt1 stop"
-$ns at 10.9 "$s3_prt2 stop"
-$ns at 11.2 "$s4_prt1 stop"
-$ns at 11.5 "$s4_prt2 stop"
-$ns at 12.0 "finish"
+#message flow
+set count 0
+for {set i 0} {$i < $sg} {incr i 1} {
+	for {set j 0} {$j < $sn} {incr j 1} {
+		for {set k 0} {$k < $sn} {incr k 1} {
+			if {$k == $j} {
+				continue
+			}
+			$ns at [expr 0.1 + 0.3 * $count] "$mf_ftp([expr $i],[expr $j],[expr $k]) send 50000"
+		}
+		incr count 1
+	}
+}
+
+#large flow
+for {set i 0} {$i < $sg} {incr i 1} {
+	for {set j 0} {$j < $sn} {incr j 1} {
+		$ns at 0.0 "$lf_ftp([expr $i],[expr $j]) start"
+		$ns at 5.0 "$lf_ftp([expr $i],[expr $j]) stop"
+	}
+}
+$ns at 10.0 "finish"
+
 $ns run
