@@ -19,7 +19,7 @@ proc finish {} {
 	puts "Simulation completed."
 	close $nf
 	close $f
-	exec nam out.nam &
+	#exec nam out.nam &
 	exit 0
 }
 
@@ -40,7 +40,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
 	for {set j 0} {$j < $sn} {incr j 1} {
 		set server($i,$j) [$ns node]
       			puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
-		$ns duplex-link $rack($i) $server($i,$j) 1000Mb .2ms DropTail
+		$ns duplex-link $rack($i) $server($i,$j) 10Mb .2ms DropTail
 		$ns queue-limit $rack($i) $server($i,$j) 10
 		$ns duplex-link-op $server($i,$j) $rack($i) queuePos 0.5
 	}
@@ -49,7 +49,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
 
 #query flow: 2KB-20KB
 
-#short message flow: update controll state on the workers 100KB-1MB
+#short message flow: update control state on the workers 100KB-1MB
 #
 for {set i 0} {$i < $sg} {incr i 1} {
 	for {set j 0} {$j < $sn} {incr j 1} {
@@ -65,13 +65,13 @@ for {set i 0} {$i < $sg} {incr i 1} {
 			$ns attach-agent $server($i,$k) $mf_sink($i,$j,$k)
 			$ns connect $mf_tcp($i,$j,$k) $mf_sink($i,$j,$k)
 			$mf_tcp($i,$j,$k) set fid_ $color
+			incr color 1
 
 			#ftp
 			set mf_ftp($i,$j,$k) [new Application/FTP]
 			$mf_ftp($i,$j,$k) attach-agent $mf_tcp($i,$j,$k)
 			$mf_ftp($i,$j,$k) set type_ FTP
 		}
-		incr color 1
 	}
 }
 
@@ -89,7 +89,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
 		$ns attach-agent $server($i,$jj) $lf_sink($i,$j)
 		$ns connect $lf_tcp($i,$j) $lf_sink($i,$j)
 		$lf_tcp($i,$j) set fid_ $color
-		#incr color 1
+		incr color 1
 
 		#ftp
 		set lf_ftp($i,$j) [new Application/FTP]
@@ -118,7 +118,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
 			if {$k == $j} {
 				continue
 			}
-			$ns at [expr 0.1 + 0.3 * $count] "$mf_ftp([expr $i],[expr $j],[expr $k]) send 50000"
+			$ns at [expr 0.1 + 0.09 * $count] "$mf_ftp([expr $i],[expr $j],[expr $k]) send 50000"
 		}
 		incr count 1
 	}
@@ -128,7 +128,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
 for {set i 0} {$i < $sg} {incr i 1} {
 	for {set j 0} {$j < $sn} {incr j 1} {
 		$ns at 0.0 "$lf_ftp([expr $i],[expr $j]) start"
-		$ns at 5.0 "$lf_ftp([expr $i],[expr $j]) stop"
+		$ns at 3.0 "$lf_ftp([expr $i],[expr $j]) stop"
 	}
 }
 $ns at 10.0 "finish"
