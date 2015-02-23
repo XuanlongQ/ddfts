@@ -30,3 +30,6 @@
 #tcl auto created
 *.nam
 *.tr
+#
+*.log
+*.pt

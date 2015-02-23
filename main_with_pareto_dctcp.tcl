@@ -1,3 +1,14 @@
+set N 8
+set B 250
+set K 65
+set RTT 0.0001
+
+set simulationTime 1.0
+
+set startMeasurementTime 1
+set stopMeasurementTime 2
+set flowClassifyTime 0.001
+
 #uniform distribution random
 proc udr {min max} {
 	set rng [new RNG]
@@ -48,15 +59,64 @@ proc start_flow {i} {
 		puts "flow $i\[[$src id]->[$dst id]\] start at $start and the size is $size"
 	}
 }
+##############
+set sourceAlg DC-TCP-Sack
+set switchAlg RED
+set lineRate 10Gb
+set inputLineRate 11Gb
+
+set DCTCP_g_ 0.0625
+set ackRatio 1 
+set packetSize 1460
+##############
 # Creating New Simulator
 set ns [new Simulator]
 
+#######################
+Agent/TCP set ecn_ 1
+Agent/TCP set old_ecn_ 1
+Agent/TCP set packetSize_ $packetSize
+Agent/TCP/FullTcp set segsize_ $packetSize
+Agent/TCP set window_ 1256
+Agent/TCP set slow_start_restart_ false
+Agent/TCP set tcpTick_ 0.01
+Agent/TCP set minrto_ 0.2 ; # minRTO = 200ms
+Agent/TCP set windowOption_ 0
+
+
+if {[string compare $sourceAlg "DC-TCP-Sack"] == 0} {
+    #Agent/TCP set dctcp_ true
+    #Agent/TCP set dctcp_g_ $DCTCP_g_;
+}
+Agent/TCP/FullTcp set segsperack_ $ackRatio; 
+Agent/TCP/FullTcp set spa_thresh_ 3000;
+Agent/TCP/FullTcp set interval_ 0.04 ; #delayed ACK interval = 40ms
+
+Queue set limit_ 1000
+
+Queue/RED set bytes_ false
+Queue/RED set queue_in_bytes_ true
+Queue/RED set mean_pktsize_ $packetSize
+Queue/RED set setbit_ true
+Queue/RED set gentle_ false
+Queue/RED set q_weight_ 1.0
+Queue/RED set mark_p_ 1.0
+Queue/RED set thresh_ [expr $K]
+Queue/RED set maxthresh_ [expr $K]
+			 
+DelayLink set avoidReordering_ true
+
+#####################################
 $ns color 0 Blue
 $ns color 1 Red
 $ns color 2 Green
 $ns color 3 Yellow
 $ns color 4 Purple
 $ns color 5 White
+$ns color 6 Orange
+$ns color 7 Violet
+$ns color 8 Brown
+$ns color 9 Black
 
 # Setting up the traces
 set f [open out.tr w]
@@ -184,8 +244,9 @@ puts "short flow count = $t_sfc"
 #set flow's Transmission Layer
 #
 for {set i 0} {$i < $sfc} {incr i 1} {
-	set sf_tcp($i) [new Agent/TCP]
-	set sf_sink($i) [new Agent/TCPSink]
+	set sf_tcp($i) [new Agent/TCP/FullTcp/Sack]
+	set sf_sink($i) [new Agent/TCP/FullTcp/Sack]
+	$sf_sink($i) listen
 }
 
 
