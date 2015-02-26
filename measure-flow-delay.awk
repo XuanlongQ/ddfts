@@ -35,6 +35,7 @@ END {
        end = end_time[flow_id];
        packet_duration = end - start;
 
-       if ( start < end ) printf("%f %f\n", start, packet_duration);
+       #if ( start < end ) printf("%f %f\n", start, packet_duration);
+       if ( start < end ) printf("%f\n", packet_duration);
    }
 }

@@ -85,8 +85,9 @@ Agent/TCP set windowOption_ 0
 
 
 if {[string compare $sourceAlg "DC-TCP-Sack"] == 0} {
-    #Agent/TCP set dctcp_ true
-    #Agent/TCP set dctcp_g_ $DCTCP_g_;
+    Agent/TCP set dctcp_ true
+    Agent/TCP set dctcp_ false
+    Agent/TCP set dctcp_g_ $DCTCP_g_;
 }
 Agent/TCP/FullTcp set segsperack_ $ackRatio; 
 Agent/TCP/FullTcp set spa_thresh_ 3000;
@@ -129,7 +130,8 @@ proc finish {} {
 	#puts "Simulation completed."
 	close $nf
 	close $f
-	exec nam out.nam &
+	#exec nam out.nam &
+	exec awk -f measure-flow-delay.awk out.tr > flow-delay-2.pt
 	exit 0
 }
 
@@ -173,8 +175,10 @@ for {set i 0} {$i < $sg} {incr i 1} {
 	for {set j 0} {$j < $sc} {incr j 1} {
 		set server($i,$j) [$ns node]
       			#puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
-		$ns duplex-link $rack($i) $server($i,$j) 1000Mb .002ms DropTail
-		$ns queue-limit $rack($i) $server($i,$j) 1000
+		$ns simplex-link $rack($i) $server($i,$j) 1000Mb .002ms RED
+		$ns simplex-link $server($i,$j) $rack($i) 1000Mb .002ms DropTail
+		$ns queue-limit $rack($i) $server($i,$j) 50
+		$ns queue-limit $server($i,$j) $rack($i) 1000
 		$ns duplex-link-op $server($i,$j) $rack($i) queuePos 0.5
 	}
 }

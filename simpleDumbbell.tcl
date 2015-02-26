@@ -36,6 +36,7 @@ Agent/TCP set windowOption_ 0
 
 
 if {[string compare $sourceAlg "DC-TCP-Sack"] == 0} {
+    puts "hello, world!"
     Agent/TCP set dctcp_ true
     Agent/TCP set dctcp_g_ $DCTCP_g_;
 }
@@ -92,6 +93,7 @@ proc myTrace {file} {
     
     $qfile instvar parrivals_ pdepartures_ pdrops_ bdepartures_
   
+#now cwnd0 cwnd1 ... cwnd$N alpha0 alpha1 ... alpha$N (parr-pdep-pdro) pdro
     puts -nonewline $file "$now $cwnd(0)"
     for {set i 1} {$i < $N} {incr i} {
 	puts -nonewline $file " $cwnd($i)"
@@ -107,6 +109,7 @@ proc myTrace {file} {
 }
 
 proc throughputTrace {file} {
+#now all flow0 flow1 flow2 ... flow$N
     global ns throughputSamplingInterval qfile flowstats N flowClassifyTime
     
     set now [$ns now]
