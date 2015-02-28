@@ -56,7 +56,7 @@ proc start_flow {i} {
 	
 	if { $start > 0 && $size > 0} {
 		$ns at $start "$ftp send $size"
-		puts "flow $i\[[$src id]->[$dst id]\] start at $start and the size is $size"
+		#puts "flow $i\[[$src id]->[$dst id]\] start at $start and the size is $size"
 	}
 }
 ##############
@@ -85,7 +85,7 @@ Agent/TCP set windowOption_ 0
 
 
 if {[string compare $sourceAlg "DC-TCP-Sack"] == 0} {
-    Agent/TCP set dctcp_ true
+    #Agent/TCP set dctcp_ true
     Agent/TCP set dctcp_ false
     Agent/TCP set dctcp_g_ $DCTCP_g_;
 }
@@ -120,8 +120,8 @@ $ns color 8 Brown
 $ns color 9 Black
 
 # Setting up the traces
-set f [open out.tr w]
-set nf [open out.nam w]
+set f [open out/out.tr w]
+set nf [open out/out.nam w]
 $ns namtrace-all $nf
 $ns trace-all $f
 proc finish {} { 
@@ -131,7 +131,8 @@ proc finish {} {
 	close $nf
 	close $f
 	#exec nam out.nam &
-	exec awk -f measure-flow-delay.awk out.tr > flow-delay-2.pt
+	exec awk -f measure-flow-delay.awk out/out.tr > out/flow-delay.dat
+	exec python plot_flow_delay.py out/flow-delay.dat
 	exit 0
 }
 
@@ -177,7 +178,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
       			#puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
 		$ns simplex-link $rack($i) $server($i,$j) 1000Mb .002ms RED
 		$ns simplex-link $server($i,$j) $rack($i) 1000Mb .002ms DropTail
-		$ns queue-limit $rack($i) $server($i,$j) 50
+		$ns queue-limit $rack($i) $server($i,$j) 250
 		$ns queue-limit $server($i,$j) $rack($i) 1000
 		$ns duplex-link-op $server($i,$j) $rack($i) queuePos 0.5
 	}
@@ -268,6 +269,6 @@ for {set i 0} {$i < $sfc} {incr i 1} {
 
 #large flow: copy fresh data to workers 1MB-100MB
 
-$ns at 5.0 "finish"
+$ns at 10.0 "finish"
 
 $ns run
