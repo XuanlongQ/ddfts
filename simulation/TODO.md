@@ -11,7 +11,7 @@
     OUTPUT:out/$test_id/plt
 ###
 1. simulation.tcl
-    INPUT: enable_dctcp, RTT, queue_size
+    INPUT: test_id enable_dctcp, RTT, queue_size
     OUTPUT: e.g. false_17_250.tr, false_17_250.nam 
 
 2. measure_flow_delay.awk

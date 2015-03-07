@@ -17,10 +17,10 @@ incr i
 set queue_limit [lindex $argv $i]
 	puts "queue_limit=$queue_limit"
 incr i
-set output "out/$tid/tcl/${dctcp}_${RTT}_$queue_limit"
-set out_tr_file_name "${output}.tr"
+set output_dir "out/$tid/tcl"
+set out_tr_file_name "${output_dir}/${dctcp}_${RTT}_${queue_limit}.tr"
 	puts "out tr file name: $out_tr_file_name"
-set out_nam_file_name "${output}.nam"
+set out_nam_file_name "${output_dir}/${dctcp}_${RTT}_${queue_limit}.nam"
 	puts "out nam file name: $out_nam_file_name"
 
 ##############
@@ -29,6 +29,7 @@ set ns [new Simulator]
 
 #######################
 # Setting up the traces
+exec mkdir -p $output_dir
 set f [open $out_tr_file_name w]
 set nf [open $out_nam_file_name w]
 $ns namtrace-all $nf
@@ -40,8 +41,8 @@ proc finish {} {
 	close $nf
 	close $f
 	#exec nam out.nam &
-	exec awk -f measure_flow_delay.awk $out_tr_file_name > out/flow_delay.dat
-	exec python plot_flow_delay.py out/flow_delay.dat
+	#exec awk -f measure_flow_delay.awk $out_tr_file_name > out/flow_delay.dat
+	#exec python plot_flow_delay.py out/flow_delay.dat
 	exit 0
 }
 
