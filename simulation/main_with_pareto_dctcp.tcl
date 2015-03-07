@@ -1,3 +1,25 @@
+##############
+# Creating New Simulator
+set ns [new Simulator]
+
+#######################
+# Setting up the traces
+set f [open out/out.tr w]
+set nf [open out/out.nam w]
+$ns namtrace-all $nf
+$ns trace-all $f
+proc finish {} { 
+	global ns nf f
+	$ns flush-trace
+	#puts "Simulation completed."
+	close $nf
+	close $f
+	#exec nam out.nam &
+	exec awk -f measure-flow-delay.awk out/out.tr > out/flow-delay.dat
+	exec python plot_flow_delay.py out/flow-delay.dat
+	exit 0
+}
+
 set N 8
 set B 250
 set K 65
@@ -68,11 +90,7 @@ set inputLineRate 11Gb
 set DCTCP_g_ 0.0625
 set ackRatio 1 
 set packetSize 1460
-##############
-# Creating New Simulator
-set ns [new Simulator]
 
-#######################
 Agent/TCP set ecn_ 1
 Agent/TCP set old_ecn_ 1
 Agent/TCP set packetSize_ $packetSize
@@ -85,8 +103,8 @@ Agent/TCP set windowOption_ 0
 
 
 if {[string compare $sourceAlg "DC-TCP-Sack"] == 0} {
-    #Agent/TCP set dctcp_ true
-    Agent/TCP set dctcp_ false
+    Agent/TCP set dctcp_ true
+    #Agent/TCP set dctcp_ false
     Agent/TCP set dctcp_g_ $DCTCP_g_;
 }
 Agent/TCP/FullTcp set segsperack_ $ackRatio; 
@@ -119,22 +137,6 @@ $ns color 7 Violet
 $ns color 8 Brown
 $ns color 9 Black
 
-# Setting up the traces
-set f [open out/out.tr w]
-set nf [open out/out.nam w]
-$ns namtrace-all $nf
-$ns trace-all $f
-proc finish {} { 
-	global ns nf f
-	$ns flush-trace
-	#puts "Simulation completed."
-	close $nf
-	close $f
-	#exec nam out.nam &
-	exec awk -f measure-flow-delay.awk out/out.tr > out/flow-delay.dat
-	exec python plot_flow_delay.py out/flow-delay.dat
-	exit 0
-}
 
 #flow
 #fid, start, end, size, src, dst, 
