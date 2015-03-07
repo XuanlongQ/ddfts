@@ -34,3 +34,5 @@
 *.log
 *.pt
 out
+#python
+*.pyc
