@@ -1,22 +1,47 @@
+set my_argc 4 
+if {$::argc < $my_argc} {
+	puts "argc = $argc, but we need $my_argc arguments"
+	exit
+}
+#test id
+set i 0
+set tid [lindex $argv $i]
+	puts "test_id=$tid"
+incr i
+set dctcp [lindex $argv $i]
+	puts "dctcp=$dctcp"
+incr i
+set RTT [lindex $argv $i]
+	puts "RTT=$RTT"
+incr i
+set queue_limit [lindex $argv $i]
+	puts "queue_limit=$queue_limit"
+incr i
+set output "out/$tid/tcl/${dctcp}_${RTT}_$queue_limit"
+set out_tr_file_name "${output}.tr"
+	puts "out tr file name: $out_tr_file_name"
+set out_nam_file_name "${output}.nam"
+	puts "out nam file name: $out_nam_file_name"
+
 ##############
 # Creating New Simulator
 set ns [new Simulator]
 
 #######################
 # Setting up the traces
-set f [open out/out.tr w]
-set nf [open out/out.nam w]
+set f [open $out_tr_file_name w]
+set nf [open $out_nam_file_name w]
 $ns namtrace-all $nf
 $ns trace-all $f
 proc finish {} { 
-	global ns nf f
+	global ns nf f out_tr_file_name
 	$ns flush-trace
 	#puts "Simulation completed."
 	close $nf
 	close $f
 	#exec nam out.nam &
-	exec awk -f measure-flow-delay.awk out/out.tr > out/flow-delay.dat
-	exec python plot_flow_delay.py out/flow-delay.dat
+	exec awk -f measure_flow_delay.awk $out_tr_file_name > out/flow_delay.dat
+	exec python plot_flow_delay.py out/flow_delay.dat
 	exit 0
 }
 
