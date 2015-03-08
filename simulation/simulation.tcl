@@ -129,7 +129,7 @@ Agent/TCP set windowOption_ 0
 
 
 if {[string compare $sourceAlg "DC-TCP-Sack"] == 0} {
-    Agent/TCP set dctcp_ true
+    Agent/TCP set dctcp_ $dctcp
     #Agent/TCP set dctcp_ false
     Agent/TCP set dctcp_g_ $DCTCP_g_;
 }
