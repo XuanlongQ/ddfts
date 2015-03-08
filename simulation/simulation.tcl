@@ -1,3 +1,4 @@
+set namtrace false
 set my_argc 4 
 if {$::argc < $my_argc} {
 	puts "argc = $argc, but we need $my_argc arguments"
@@ -31,18 +32,22 @@ set ns [new Simulator]
 # Setting up the traces
 exec mkdir -p $output_dir
 set f [open $out_tr_file_name w]
-set nf [open $out_nam_file_name w]
-$ns namtrace-all $nf
 $ns trace-all $f
+if { $namtrace } {
+	set nf [open $out_nam_file_name w]
+	$ns namtrace-all $nf
+}
 proc finish {} { 
-	global ns nf f out_tr_file_name
+	global ns f namtrace
+	
 	$ns flush-trace
 	#puts "Simulation completed."
-	close $nf
 	close $f
+	if { $namtrace } {
+		global nf
+		close $nf
+	}
 	#exec nam out.nam &
-	#exec awk -f measure_flow_delay.awk $out_tr_file_name > out/flow_delay.dat
-	#exec python plot_flow_delay.py out/flow_delay.dat
 	exit 0
 }
 
@@ -206,7 +211,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
       			#puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
 		$ns simplex-link $rack($i) $server($i,$j) 1000Mb .002ms RED
 		$ns simplex-link $server($i,$j) $rack($i) 1000Mb .002ms DropTail
-		$ns queue-limit $rack($i) $server($i,$j) 250
+		$ns queue-limit $rack($i) $server($i,$j) $queue_limit
 		$ns queue-limit $server($i,$j) $rack($i) 1000
 		$ns duplex-link-op $server($i,$j) $rack($i) queuePos 0.5
 	}

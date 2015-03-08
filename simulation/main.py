@@ -5,11 +5,10 @@ dctcp = ('true', 'false')
 RTT = (13, 17)
 queue_limit = (128, 250)
 
-'''
-dctcp = ('true', 'false')
+dctcp = ('false',)
 RTT = (17,)
-queue_limit = (250,)
-'''
+#queue_limit = (250,)
+queue_limit = (128, 256, 512, 1024)
 
 dl = len(dctcp)
 rl = len(RTT) 

@@ -55,7 +55,7 @@ def plot_flow_delay(input_file_name_list, **kwargs):
 
     plt.ylabel('CDF')
 
-    plt.legend(loc = 'upper left')
+    plt.legend(loc = 'lower right')
 
     plt.show()
 
