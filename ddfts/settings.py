@@ -12,7 +12,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/tmp/ddfts/database.db',                      # Or path to database file if using sqlite3.
+        'NAME': '/tmp/ddfts.db',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -85,12 +85,10 @@ STATICFILES_FINDERS = (
 SECRET_KEY = '#3+k2g8)w%#rc71uqke$x*&amp;xu1b166gfk71u8uxhmq-d$3atwf'
 
 # List of callables that know how to import templates from various sources.
-import os.path
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
-    os.path.join(os.path.dirname(__file__), 'templates'),
 )
 
 MIDDLEWARE_CLASSES = (
@@ -108,10 +106,12 @@ ROOT_URLCONF = 'ddfts.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'ddfts.wsgi.application'
 
+import os.path
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(os.path.dirname(__file__), 'templates'),
 )
 
 INSTALLED_APPS = (

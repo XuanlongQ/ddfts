@@ -5,5 +5,6 @@ from django.shortcuts import render_to_response, render
 
 def home(request):
     print 'show home'
-    return render(request, 'show/index.html', {'png_lsit':'png_list'} )
+    print render(request, 'show/index.html', {'app_name':'Show'} )
+    return render(request, 'show/index.html', {'app_name':'Show'} )
     #return render_to_response('show/index.html',)

@@ -36,3 +36,5 @@
 out
 #python
 *.pyc
+#vi
+*.swp
