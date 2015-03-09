@@ -6,7 +6,7 @@ dctcp_list = ('true', 'false')
 RTT_list = (13, 17)
 queue_limit_list = (128, 250)
 RTT_list = (13,)
-queue_limit_list = (128,)
+#queue_limit_list = (128,)
 
 import time
 now = time.strftime('%y%m%d-%H%M%S', time.localtime(time.time()))
@@ -15,32 +15,28 @@ out_dir = 'out/%s'%tid
 
 import commands
 (status, output) = commands.getstatusoutput('rm -rf out')
-DEBUG and print status, output
-tcl_out_dir = '%s/tcl'%out_dir
-(status, output) = commands.getstatusoutput('mkdir -p %s'%(tcl_out_dir))
-DEBUG and print status, output
-awk_out_dir = '%s/awk'%out_dir
-(status, output) = commands.getstatusoutput('mkdir -p %s'%(awk_out_dir))
-DEBUG and print status, output
-plt_out_dir = '%s/plt'%out_dir
-(status, output) = commands.getstatusoutput('mkdir -p %s'%(plt_out_dir))
-DEBUG and print status, output
+print status, output
+(status, output) = commands.getstatusoutput('mkdir -p %s/tcl'%(out_dir))
+print status, output
+(status, output) = commands.getstatusoutput('mkdir -p %s/awk'%(out_dir))
+print status, output
+(status, output) = commands.getstatusoutput('mkdir -p %s/plt'%(out_dir))
+print status, output
 
 
 from plot_flow_delay import plot_flow_delay
 for RTT in RTT_list:
     for queue_limit in queue_limit_list:
         plt_input_list = []
-        plt_output = RTT + '_' + queue_limit + '.png'
+        plt_output =  '%s/plt/%d_%d.png'%(out_dir, RTT, queue_limit) 
         label_dict = {}
         for dctcp in dctcp_list:
-            sim_args = '%s/%s_%s_%s'%(tcl_out_dir, dctcp, RTT, queue_limit)
+            sim_args = '%s_%s_%s'%(dctcp, RTT, queue_limit)
 
-            tcl_output = sim_args + '.tr'
-            DEBUG and print tcl_output
-            awk_output =  + '.dat'
-            DEBUG and print awk_output
-            DEBUG and print plt_output
+            tcl_output = '%s/tcl/%s.tr'%(out_dir, sim_args) 
+            print tcl_output
+            awk_output = '%s/awk/%s.dat'%(out_dir, sim_args)
+            print awk_output
 
             plt_input = awk_output
             plt_input_list += [ plt_input, ]
@@ -56,3 +52,9 @@ for RTT in RTT_list:
             print status, output
         #plot flow delay using python
         plot_flow_delay(plt_input_list, label_dict = label_dict, plt_output = plt_output)
+
+        #remove tcl output bucause it's to big!!
+        (status, output) = commands.getstatusoutput('rm -rf %s/tcl'%(out_dir))
+        print status, output
+        (status, output) = commands.getstatusoutput('mkdir -p %s/tcl'%(out_dir))
+        print status, output
