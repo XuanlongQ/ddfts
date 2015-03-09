@@ -12,7 +12,7 @@ def home(request):
 def get_image_dict():
     import os.path
     PROJECT_DIR = os.path.abspath(os.path.dirname(__name__))
-    out_dir = '%s/simulation/out/'%(PROJECT_DIR)
+    out_dir = '%s/sim/simulation/out/'%(PROJECT_DIR)
     print out_dir
     if not os.path.exists(out_dir):
         print 'out_dir does not exist'
@@ -24,7 +24,7 @@ def get_image_dict():
         if not os.path.exists(plt_dir):
             continue
         print plt_dir
-        image_list = [ '%s/%s'%(plt_dir, image) for image in os.listdir(plt_dir) if image.endswith('.png')]
+        image_list = [ '/static/%s/plt/%s'%(test_id, image) for image in os.listdir(plt_dir) if image.endswith('.png')]
         #print 'image_list ', image_list
         image_dict[test_id] = image_list
     return image_dict
