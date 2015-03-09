@@ -5,7 +5,7 @@
 	</head>
 	<body>
 		<h1>Hello, This is {{app_name}} APP!</h1>
-        <img src="/static/incast.png">
+        <!-- <img src="/static/13_250.png"> -->
         <hr/>
         <div class="test_list">
         {% for test_id, image_list in image_dict.iteritems %}
@@ -14,6 +14,7 @@
 			{% for image in image_list %}
             <div class="image">
                 <h2>{{image}}</h2>
+                <img src="{{image}}">
             </div>
 			{% endfor %}
             </div>

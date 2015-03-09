@@ -4,7 +4,7 @@
 DEBUG = True
 dctcp_list = ('true', 'false')
 RTT_list = (13, 17)
-queue_limit_list = (128, 250)
+queue_limit_list = [i for i in xrange(10, 10000, 10)]
 RTT_list = (13,)
 #queue_limit_list = (128,)
 
@@ -14,8 +14,8 @@ tid = 'T-%s'%now
 out_dir = 'out/%s'%tid
 
 import commands
-(status, output) = commands.getstatusoutput('rm -rf out')
-print status, output
+#(status, output) = commands.getstatusoutput('rm -rf out')
+#print status, output
 (status, output) = commands.getstatusoutput('mkdir -p %s/tcl'%(out_dir))
 print status, output
 (status, output) = commands.getstatusoutput('mkdir -p %s/awk'%(out_dir))
