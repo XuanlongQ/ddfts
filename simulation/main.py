@@ -47,7 +47,7 @@ for dctcp, RTT, queue_limit in zip(dctcp_list, RTT_list, queue_limit_list):
     print output_tr
     output_dat = '%s/%s_%s_%s.dat'%(awk_out_dir, dctcp, RTT, queue_limit)
     print output_dat
-    output_plt = '%s/%s_%s_%s.jpg'%(plt_out_dir, dctcp, RTT, queue_limit)
+    output_plt = '%s/%s_%s_%s.png'%(plt_out_dir, dctcp, RTT, queue_limit)
     print output_plt
 
     input_plt = '%s/%s_%s_%s.dat'%(awk_out_dir, dctcp, RTT, queue_limit)

@@ -5,5 +5,19 @@
 	</head>
 	<body>
 		<h1>Hello, This is {{app_name}} APP!</h1>
+        <img src="/static/incast.png">
+        <hr/>
+        <div class="test_list">
+        {% for test_id, image_list in image_dict.iteritems %}
+            <div class="test">
+            <h1>{{test_id}}</h1>
+			{% for image in image_list %}
+            <div class="image">
+                <h2>{{image}}</h2>
+            </div>
+			{% endfor %}
+            </div>
+	    {% endfor %}
+        </div>
 	</body>
 </html>
