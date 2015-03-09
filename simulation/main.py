@@ -5,10 +5,10 @@ dctcp = ('true', 'false')
 RTT = (13, 17)
 queue_limit = (128, 250)
 
-dctcp = ('false',)
+#dctcp = ('false',)
 RTT = (17,)
-#queue_limit = (250,)
-queue_limit = (128, 256, 512, 1024)
+queue_limit = (250,)
+#queue_limit = (128, 256, 512, 1024)
 
 dl = len(dctcp)
 rl = len(RTT) 
@@ -66,7 +66,7 @@ print '-------------------------------'
 for input_plt in input_plt_list:
     print input_plt
 from plot_flow_delay import plot_flow_delay
-plot_flow_delay(input_plt_list, label_dict = label_dict, output = output_plt)
+plot_flow_delay(input_plt_list, label_dict = label_dict, output_plt = output_plt)
 
 #(status, output) = commands.getstatusoutput('python plot_flow_delay.py %s'%(output_dat))
 #print status, output

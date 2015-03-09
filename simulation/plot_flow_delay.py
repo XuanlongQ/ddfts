@@ -22,7 +22,8 @@ def get_flow_delay_cdf(input_file_name):
         pdf.append(len(np.array(filter(lambda a: a <= bins[i] and a > bins[i-1], flow_delay_list)))*1.0/n)
 
     cdf = [ len(np.array(filter(lambda a: a <= bi, flow_delay_list)))*1.0/n for bi in flow_delay_list ]
-    return (flow_delay_list, cdf)
+    #return (bins, pdf)
+    return flow_delay_list, cdf, bins, pdf
 
 #kwargs: label_dict['input_file_name'] output_file_name
 def plot_flow_delay(input_file_name_list, **kwargs):
@@ -42,7 +43,7 @@ def plot_flow_delay(input_file_name_list, **kwargs):
             label_dict[input_file_name] = 'Test%03d'%(i+1)
 
     for i, input_file_name in zip(xrange(l), input_file_name_list):
-            flow_delay_list, cdf = get_flow_delay_cdf(input_file_name)
+            flow_delay_list, cdf, bins, pdf  = get_flow_delay_cdf(input_file_name)
             label = label_dict[input_file_name]
             color = color_list[i]
             plt.plot(flow_delay_list, cdf, color=color, linewidth=2.5, linestyle='-', label=label)
@@ -57,19 +58,20 @@ def plot_flow_delay(input_file_name_list, **kwargs):
 
     plt.legend(loc = 'lower right')
 
+    if 'output_plt' in kwargs:
+        output = kwargs['output_plt']
+        plt.savefig(output, dip=72)
+
     plt.show()
 
 if __name__ == '__main__':
     #read input file name (and output file name)
     #print len(sys.argv)
-    input_file_name_1 = 'tmp/flow-delay-01.dat'
-    input_file_name_2 = 'tmp/flow-delay-02.dat'
-    if len(sys.argv) >= 2:
-        input_file_name_1 = sys.argv[1]
+    input_plt = [ 'tmp/flow-delay-%02d.dat'%i for i in (1,2) ]
+    
+    import commands
+    (status, output) = commands.getstatusoutput('mkdir -p out/tmp')
+    print status, output
+    output_plt  = 'out/tmp/flow-delay.png'
 
-    output_file_name = 'out/tmp/flow-delay.jpg'
-    if len(sys.argv) >= 3:
-        output_file_name = sys.argv[2]
-
-    input_file_name = [input_file_name_1, input_file_name_2]
-    plot_flow_delay(input_file_name, output = output_file_name)
+    plot_flow_delay(input_plt, output_plt = output_plt)
