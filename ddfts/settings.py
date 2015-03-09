@@ -1,5 +1,6 @@
 # Django settings for ddfts project.
 
+DEBUG = False
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -61,8 +62,9 @@ MEDIA_URL = ''
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
 import os.path
-STATIC_ROOT = ('%s/show/static'%(os.path.abspath(os.path.dirname(__name__)),)).replace('\\', '/')
-print 'STATIC_ROOT: ', STATIC_ROOT
+STATIC_ROOT = ''
+#STATIC_ROOT = ('%s/show/static'%(os.path.abspath(os.path.dirname(__name__)),)).replace('\\', '/')
+#print 'STATIC_ROOT: ', STATIC_ROOT
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -73,7 +75,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    ('%s/statics'%(os.path.abspath(os.path.dirname(__name__)),)).replace('\\', '/'),
+    #('%s/statics'%(os.path.abspath(os.path.dirname(__name__)),)).replace('\\', '/'),
 )
 
 # List of finder classes that know how to find static files in
@@ -128,7 +130,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'show',
+    'sim',
 )
 
 # A sample logging configuration. The only tangible logging
