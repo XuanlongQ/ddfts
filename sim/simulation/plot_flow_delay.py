@@ -58,8 +58,8 @@ def plot_flow_delay(input_file_name_list, **kwargs):
 
     plt.legend(loc = 'lower right')
 
-    if 'output_plt' in kwargs:
-        output = kwargs['output_plt']
+    if 'plt_output' in kwargs:
+        output = kwargs['plt_output']
         plt.savefig(output, dip=72)
 
     plt.show()
@@ -72,6 +72,6 @@ if __name__ == '__main__':
     import commands
     (status, output) = commands.getstatusoutput('mkdir -p out/tmp')
     print status, output
-    output_plt  = 'out/tmp/flow-delay.png'
+    plt_output  = 'out/tmp/flow-delay.png'
 
-    plot_flow_delay(input_plt, output_plt = output_plt)
+    plot_flow_delay(input_plt, plt_output = plt_output)
