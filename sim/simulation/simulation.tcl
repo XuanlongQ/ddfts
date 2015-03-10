@@ -54,7 +54,7 @@ proc finish {} {
 set N 8
 set B 250
 set K 65
-set RTT 0.0001
+#set RTT 0.0001
 
 set simulationTime 1.0
 
@@ -199,6 +199,7 @@ set sfc [expr 200*$sg*$sc]
 #large flow count
 set lfc 100
 
+puts "link delay: [expr 0.001*${RTT}/4]"
 #set topology
 for {set i 0} {$i < $sg} {incr i 1} {
 	#
@@ -209,8 +210,8 @@ for {set i 0} {$i < $sg} {incr i 1} {
 	for {set j 0} {$j < $sc} {incr j 1} {
 		set server($i,$j) [$ns node]
       			#puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
-		$ns simplex-link $rack($i) $server($i,$j) 1000Mb .002ms RED
-		$ns simplex-link $server($i,$j) $rack($i) 1000Mb .002ms DropTail
+		$ns simplex-link $rack($i) $server($i,$j) 1000Mb [expr 0.001*${RTT}/4]ms RED
+		$ns simplex-link $server($i,$j) $rack($i) 1000Mb [expr 0.001*${RTT}/4]ms DropTail
 		$ns queue-limit $rack($i) $server($i,$j) $queue_limit
 		$ns queue-limit $server($i,$j) $rack($i) 1000
 		$ns duplex-link-op $server($i,$j) $rack($i) queuePos 0.5

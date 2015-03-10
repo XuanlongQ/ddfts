@@ -4,9 +4,9 @@
 DEBUG = True
 dctcp_list = ('true', 'false')
 RTT_list = (13, 17)
-queue_limit_list = [i for i in xrange(50, 10000, 10)]
-RTT_list = (13,)
-#queue_limit_list = (128,)
+queue_limit_list = [i for i in xrange(70, 1000, 10)]
+RTT_list = [i for i in xrange(10, 100, 1)]
+queue_limit_list = (128,)
 
 import time
 now = time.strftime('%y%m%d-%H%M%S', time.localtime(time.time()))
