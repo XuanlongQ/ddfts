@@ -35,6 +35,10 @@ def plot_flow_delay(input_file_name_list, **kwargs):
     while len(color_list) < l:
         color_list += color_list
 
+    linestyle_list = (':', '--', '-', )
+    while len(linestyle_list) < l:
+        linestyle_list += linestyle_list
+
     label_dict = {}
     if 'label_dict' in kwargs:
         label_dict = kwargs['label_dict']
@@ -46,7 +50,9 @@ def plot_flow_delay(input_file_name_list, **kwargs):
             flow_delay_list, cdf, bins, pdf  = get_flow_delay_cdf(input_file_name)
             label = label_dict[input_file_name]
             color = color_list[i]
-            plt.plot(flow_delay_list, cdf, color=color, linewidth=2.5, linestyle='-', label=label)
+            linestyle = linestyle_list[i]
+            #print 'linestyle = ' + linestyle
+            plt.plot(flow_delay_list, cdf, color=color, linewidth=2.5, linestyle=linestyle, label=label)
 
     plt.xlim([-1, 10])
 
@@ -62,7 +68,8 @@ def plot_flow_delay(input_file_name_list, **kwargs):
         output = kwargs['plt_output']
         plt.savefig(output, dip=72)
 
-    plt.show()
+    #plt.show()
+    plt.clf()
 
 if __name__ == '__main__':
     #read input file name (and output file name)

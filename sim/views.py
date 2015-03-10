@@ -25,6 +25,15 @@ def get_image_dict():
             continue
         print plt_dir
         image_list = [ '/static/%s/plt/%s'%(test_id, image) for image in os.listdir(plt_dir) if image.endswith('.png')]
+        image_list = sorted(image_list, reverse_cmp)
         #print 'image_list ', image_list
         image_dict[test_id] = image_list
     return image_dict
+
+def reverse_cmp(x, y):
+    b = 1
+    if x > y:
+        return -b
+    if x < y:
+        return b
+    return 0
