@@ -1,5 +1,5 @@
-set namtrace false
-set my_argc 4 
+set my_argc 3
+#argv: test_id, dctcp, tcl_output
 if {$::argc < $my_argc} {
 	puts "argc = $argc, but we need $my_argc arguments"
 	exit
@@ -12,17 +12,12 @@ incr i
 set dctcp [lindex $argv $i]
 	puts "dctcp=$dctcp"
 incr i
-set RTT [lindex $argv $i]
-	puts "RTT=$RTT"
+set tcl_output [lindex $argv $i]
+	puts "tcl_output=$tcl_output"
 incr i
-set queue_limit [lindex $argv $i]
-	puts "queue_limit=$queue_limit"
-incr i
-set output_dir "out/$tid/tcl"
-set out_tr_file_name "${output_dir}/${dctcp}_${RTT}_${queue_limit}.tr"
-	puts "out tr file name: $out_tr_file_name"
-set out_nam_file_name "${output_dir}/${dctcp}_${RTT}_${queue_limit}.nam"
-	puts "out nam file name: $out_nam_file_name"
+
+set RTT 200
+set queue_limit 250
 
 ##############
 # Creating New Simulator
@@ -30,37 +25,16 @@ set ns [new Simulator]
 
 #######################
 # Setting up the traces
-exec mkdir -p $output_dir
-set f [open $out_tr_file_name w]
+set f [open $tcl_output w]
 $ns trace-all $f
-if { $namtrace } {
-	set nf [open $out_nam_file_name w]
-	$ns namtrace-all $nf
-}
 proc finish {} { 
 	global ns f namtrace
 	
 	$ns flush-trace
-	#puts "Simulation completed."
+	puts "Simulation completed."
 	close $f
-	if { $namtrace } {
-		global nf
-		close $nf
-	}
-	#exec nam out.nam &
 	exit 0
 }
-
-set N 8
-set B 250
-set K 65
-#set RTT 0.0001
-
-set simulationTime 1.0
-
-set startMeasurementTime 1
-set stopMeasurementTime 2
-set flowClassifyTime 0.001
 
 #uniform distribution random
 proc udr {min max} {
@@ -135,7 +109,6 @@ Agent/TCP set windowOption_ 0
 
 if {[string compare $sourceAlg "DC-TCP-Sack"] == 0} {
     Agent/TCP set dctcp_ $dctcp
-    #Agent/TCP set dctcp_ false
     Agent/TCP set dctcp_g_ $DCTCP_g_;
 }
 Agent/TCP/FullTcp set segsperack_ $ackRatio; 
@@ -151,6 +124,7 @@ Queue/RED set setbit_ true
 Queue/RED set gentle_ false
 Queue/RED set q_weight_ 1.0
 Queue/RED set mark_p_ 1.0
+set K 65
 Queue/RED set thresh_ [expr $K]
 Queue/RED set maxthresh_ [expr $K]
 			 
@@ -199,7 +173,6 @@ set sfc [expr 200*$sg*$sc]
 #large flow count
 set lfc 100
 
-puts "link delay: [expr 0.001*${RTT}/4]"
 #set topology
 for {set i 0} {$i < $sg} {incr i 1} {
 	#
@@ -210,10 +183,10 @@ for {set i 0} {$i < $sg} {incr i 1} {
 	for {set j 0} {$j < $sc} {incr j 1} {
 		set server($i,$j) [$ns node]
       			#puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
-		$ns simplex-link $rack($i) $server($i,$j) 1000Mb [expr 0.001*${RTT}/4]ms RED
-		$ns simplex-link $server($i,$j) $rack($i) 1000Mb [expr 0.001*${RTT}/4]ms DropTail
+		$ns simplex-link $rack($i) $server($i,$j) 1000Mb .020ms RED
+		$ns simplex-link $server($i,$j) $rack($i) 1000Mb .020ms DropTail
 		$ns queue-limit $rack($i) $server($i,$j) $queue_limit
-		$ns queue-limit $server($i,$j) $rack($i) 1000
+		$ns queue-limit $server($i,$j) $rack($i) $queue_limit
 		$ns duplex-link-op $server($i,$j) $rack($i) queuePos 0.5
 	}
 }

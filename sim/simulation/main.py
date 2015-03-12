@@ -3,10 +3,8 @@
 #ns simulation.tcl T001 true 17 250
 DEBUG = True
 dctcp_list = ('true', 'false')
-RTT_list = (13, 17)
-queue_limit_list = [i for i in xrange(70, 1000, 10)]
-RTT_list = [i for i in xrange(10, 100, 1)]
-queue_limit_list = (128,)
+RTT_list = (200,)
+queue_limit_list = (250,)
 
 import time
 now = time.strftime('%y%m%d-%H%M%S', time.localtime(time.time()))
@@ -44,7 +42,7 @@ for RTT in RTT_list:
 
             #simulate network using tcl
             #run tcl script
-            (status, output) = commands.getstatusoutput('ns simulation.tcl %s %s %s %s'%(tid, dctcp, RTT, queue_limit))
+            (status, output) = commands.getstatusoutput('ns simulation.tcl %s %s %s'%(tid, dctcp, tcl_output))
             print 'network simulation generate: ' + tcl_output
             #print status, output
             #calculate flow delay using awk
