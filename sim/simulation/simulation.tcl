@@ -57,20 +57,23 @@ proc prr {avg shape} {
 	return $r
 
 }
-proc start_flow {i} {
+proc start_flow {i t} {
 
 	global ns
 	global sf_fid sf_src sf_dst sf_size sf_start sf_end sf_tcp sf_sink sf_ftp
+    global ${t}f_fid
+    global ${t}f_src ${t}f_dst ${t}f_size
+    global ${t}f_start ${t}f_end
+    global ${t}f_tcp ${t}f_sink ${t}f_ftp
 
-	set fid $sf_fid($i)
-	set src $sf_src($i)
-	set dst $sf_dst($i)
-	set size $sf_size($i)
-	set start $sf_start($i)
-	set end $sf_end($i)
-	set tcp $sf_tcp($i)
-	set sink $sf_sink($i)
-	set ftp $sf_ftp($i)
+	eval "set fid \$${t}f_fid($i)"
+	eval "set src \$${t}f_src($i)"
+	eval "set dst \$${t}f_dst($i)"
+	eval "set size \$${t}f_size($i)"
+	eval "set start \$${t}f_start($i)"
+	eval "set tcp \$${t}f_tcp($i)"
+	eval "set sink \$${t}f_sink($i)"
+	eval "set ftp \$${t}f_ftp($i)"
 
 	$ns attach-agent $src $tcp
 	$ns attach-agent $dst $sink
@@ -145,9 +148,9 @@ $ns color 9 Black
 
 #flow
 #fid, start, end, size, src, dst, 
-#query flow: 2-20KB
+#query flow: 1.6-2KB
 #qf_
-#short (message) flow: 20KB-1MB
+#short (message) flow: 50KB-1MB
 #sf_
 #large flow: 1MB-100MB
 #lf_
@@ -160,11 +163,11 @@ set sc 4
 #flow count fc
 set fc 0
 
+#simulation end time
+set sim_end_time 10.0
+
 #time unit: second
 set t_unit 0.001
-
-#short flow start_time
-set sf_start_off 0.005
 
 #query flow count qfc
 set qfc [expr 2000*$sg*$sc]
@@ -191,91 +194,18 @@ for {set i 0} {$i < $sg} {incr i 1} {
 	}
 }
 
+#query traffic
+source query_flow.tcl
+setup_query_flow
+
 #short (message) flow: update control state on the workers 100KB-1MB
-
-#set short (message) flow id
-for {set i 0} {$i < $sfc} {incr i 1} {
-	set sf_fid($i) $fc
-	incr fc 1
-}
-#set flow's src & dst
-set r1 [udr 0 $sg]
-set r2 [udr 0 $sc]
-for {set i 0} {$i < $sfc} {incr i 1} {
-	set src "[expr int([$r1 value])],[expr int([$r2 value])]"
-	set dst "[expr int([$r1 value])],[expr int([$r2 value])]"
-	while {$src == $dst} {
-		set dst "[expr int([$r1 value])],[expr int([$r2 value])]"
-	}
-	#puts "short flow $i, src: $src, dst:$dst"
-	set sf_src($i) $server($src)
-	set sf_dst($i) $server($dst)
-
-}
-
-#
-#set short (message) flow's size
-#
-set r3 [udr 20 1001]
-for {set i 0} {$i < $sfc} {incr i 1} {
-	set sf_size($i) [expr int([expr [$r3 value]*1000])]
-	#puts "flow $i, flow size: [expr $sf_size($i)]"
-}
-#
-#set flow's start & end time
-#
-#time count = 0.1s/t_unit = 100
-set t_count [expr int(0.1/$t_unit)]
-set avg [expr $sfc*1.0/$t_count]
-#puts "avg = $avg"
-set shape 5
-set r4 [prr $avg $shape]
-#count of short flows that has start time
-set t_sfc 0
-set t_start_time [expr $sf_start_off + 0.0]
-for {set i 0} {$i < 100} {incr i 1} {
-	#t_sfc: count of short flows that start at time $t_unit*$i
-	set t1_sfc $t_sfc
-	set t2_sfc [expr int([$r4 value] + 0.5)]
-	#puts "pareto random = $t2_sfc"
-	set t_sfc [expr $t1_sfc + $t2_sfc]
-	for {set j $t1_sfc} {$j < $t_sfc} {incr j 1} {
-		set t_start($j) $t_start_time
-	}
-	set t_start_time [expr $t_start_time + $t_unit]
-}
-for {set i 0} {$i < $sfc} {incr i 1} {
-	set sf_start($i) -1
-	set sf_end($i) -1
-	if {$i < $t_sfc} {
-		set sf_start($i) $t_start($i)
-	}
-}
-puts "short flow count = $t_sfc"
-#
-#set flow's Transmission Layer
-#
-for {set i 0} {$i < $sfc} {incr i 1} {
-	set sf_tcp($i) [new Agent/TCP/FullTcp/Sack]
-	set sf_sink($i) [new Agent/TCP/FullTcp/Sack]
-	$sf_sink($i) listen
-}
-
-
-#
-#set flow's Application Layer
-#
-for {set i 0} {$i < $sfc} {incr i 1} {
-	set sf_ftp($i) [new Application/FTP]
-}
-
-for {set i 0} {$i < $sfc} {incr i 1} {
-	#puts "short flow $i start at $sf_start($i)"
-	start_flow $i 
-}
+source short_flow.tcl
+setup_short_flow
 
 #large flow: copy fresh data to workers 1MB-100MB
+source large_flow.tcl
+setup_large_flow
 
-$ns at 10.0 "finish"
+$ns at $sim_end_time "finish"
 
 $ns run
