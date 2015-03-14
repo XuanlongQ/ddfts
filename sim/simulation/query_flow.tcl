@@ -1,5 +1,6 @@
 #query flow: 1.6-2KB
 proc setup_query_flow {} {
+        global ftpPkgSize
         global sg sc server
         global qfc fc
         global qf_fid qf_src qf_dst qf_size qf_start qf_end
@@ -45,9 +46,9 @@ proc setup_query_flow {} {
         #
         #set short (message) flow's size
         #
-        set r3 [udr 20 1001]
+        set r3 [udr 1.6 2]
         for {set i 0} {$i < $qfc} {incr i 1} {
-            set qf_size($i) [expr int([expr [$r3 value]*1000])]
+            set qf_size($i) [expr int([expr [$r3 value]*$ftpPkgSize])]
             #puts "flow $i, flow size: [expr $qf_size($i)]"
         }
         #
@@ -74,7 +75,7 @@ proc setup_query_flow {} {
         }
 
         for {set i 0} {$i < $qfc} {incr i 1} {
-            puts "query flow $i start at $qf_start($i)"
+            #puts "query flow $i start at $qf_start($i)"
             start_flow $i q
         }
 }

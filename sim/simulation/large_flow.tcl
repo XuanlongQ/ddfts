@@ -1,5 +1,6 @@
 #large flow: copy fresh data to workers 1MB-100MB
 proc setup_large_flow {} {
+        global ftpPkgSize
         global lfc fc
         global lf_fid lf_src lf_dst lf_size lf_start lf_end
         global sg sc server
@@ -45,9 +46,9 @@ proc setup_large_flow {} {
         #
         #set large flow's size
         #
-        set r3 [udr 20 1001]
+        set r3 [udr 1000 50001]
         for {set i 0} {$i < $lfc} {incr i 1} {
-            set lf_size($i) [expr int([expr [$r3 value]*1000])]
+            set lf_size($i) [expr int([$r3 value])*$ftpPkgSize]
             #puts "flow $i, flow size: [expr $lf_size($i)]"
         }
         #
@@ -74,7 +75,7 @@ proc setup_large_flow {} {
         }
 
         for {set i 0} {$i < $lfc} {incr i 1} {
-            puts "large flow $i start at $lf_start($i)"
+            #puts "large flow $i start at $lf_start($i)"
             start_flow $i l
         }
 }

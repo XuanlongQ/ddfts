@@ -1,5 +1,6 @@
 #short (message) flow: update control state on the workers 100KB-1MB
 proc setup_short_flow {} {
+        global ftpPkgSize
         global sfc fc
         global sf_fid sf_src sf_dst sf_size sf_start sf_end
         global sg sc server
@@ -47,7 +48,7 @@ proc setup_short_flow {} {
         #
         set r3 [udr 20 1001]
         for {set i 0} {$i < $sfc} {incr i 1} {
-            set sf_size($i) [expr int([expr [$r3 value]*1000])]
+            set sf_size($i) [expr int([$r3 value])*$ftpPkgSize]
             #puts "flow $i, flow size: [expr $sf_size($i)]"
         }
         #
@@ -74,7 +75,7 @@ proc setup_short_flow {} {
         }
 
         for {set i 0} {$i < $sfc} {incr i 1} {
-            puts "short flow $i start at $sf_start($i)"
+            #puts "short flow $i start at $sf_start($i)"
             start_flow $i s
         }
 }
