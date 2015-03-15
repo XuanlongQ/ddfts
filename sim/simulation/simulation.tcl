@@ -33,17 +33,8 @@ proc finish {} {
 	close $f
 	exit 0
 }
-###enable dctcp#####################
-set sourceAlg DC-TCP-Sack
-set switchAlg RED
-
-set DCTCP_g_ 0.0625
-set ackRatio 1 
-set packetSize 1460
-set ftpPkgSize 1000
-if { $dctcp } {
-    source enable_dctcp.tcl
-}
+###setup tcp#####################
+source setup_tcp.tcl
 ####################################
 $ns color 0 Blue
 $ns color 1 Red

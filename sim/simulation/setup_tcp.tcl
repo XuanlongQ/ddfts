@@ -1,4 +1,8 @@
-puts "enable dctcp!!!"
+set DCTCP_g_ 0.0625
+set ackRatio 1 
+set packetSize 1460
+set ftpPkgSize 1000
+
 Agent/TCP set ecn_ 1
 Agent/TCP set old_ecn_ 1
 Agent/TCP set packetSize_ $packetSize
@@ -10,7 +14,8 @@ Agent/TCP set minrto_ 0.2 ; # minRTO = 200ms
 Agent/TCP set windowOption_ 0
 
 
-if {[string compare $sourceAlg "DC-TCP-Sack"] == 0} {
+if { $dctcp } {
+    puts "enable dctcp!!!"
     Agent/TCP set dctcp_ $dctcp
     Agent/TCP set dctcp_g_ $DCTCP_g_;
 }
