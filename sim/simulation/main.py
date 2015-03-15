@@ -47,7 +47,8 @@ for RTT in RTT_list:
             #print status, output
             #calculate flow delay using awk
             #run awk script
-            (status, output) = commands.getstatusoutput('awk -f measure_flow_delay.awk %s > %s'%(tcl_output, awk_output))
+            #using python script now
+            (status, output) = commands.getstatusoutput('python analyse_flow.py %s > %s'%(tcl_output, awk_output))
             print 'calculate flow delay: ' + awk_output
             #print status, output
         #plot flow delay using python

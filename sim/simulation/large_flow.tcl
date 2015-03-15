@@ -20,8 +20,11 @@ proc setup_large_flow {} {
             incr i
             set lat_list($i) [expr [$r value] + $lat_list($ii)]
         }
-        set lfc [expr $i+1]
-        #puts "lfc=$lfc"
+        set lfc [expr $i]
+        if { $lat_list($i) < $sim_end_time } {
+            incr lfc
+        }
+        puts "large flow count: = $lfc"
 
         #set large flow id
         for {set i 0} {$i < $lfc} {incr i 1} {

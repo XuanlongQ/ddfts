@@ -20,8 +20,11 @@ proc setup_short_flow {} {
             incr i
             set sat_list($i) [expr [$r value] + $sat_list($ii)]
         }
-        set sfc [expr $i+1]
-        #puts "sfc=$sfc"
+        set sfc [expr $i]
+        if { $sat_list($i) < $sim_end_time } {
+            incr sfc
+        }
+        puts "short flow count: = $sfc"
 
         #set short (message) flow id
         for {set i 0} {$i < $sfc} {incr i 1} {

@@ -7,22 +7,25 @@ proc setup_query_flow {} {
         global qf_tcp qf_sink qf_ftp
         global udr prr
         global sim_end_time
-        #1. use $prr to generate short flow arrival time list
-        #sat_list[]
+        #1. use $prr to generate query flow arrival time list
+        #qat_list[]
         #set avg according CDF of time between background flows(@DCTCP)
         set avg 0.1
         set shape 5
         set r [prr $avg $shape]
-        set sat_list(0) 0.03
+        set qat_list(0) 0.03
         set i 0
-        while { $sat_list($i) < $sim_end_time } {
+        while { $qat_list($i) < $sim_end_time } {
             set ii $i
             incr i
-            set sat_list($i) [expr [$r value] + $sat_list($ii)]
+            set qat_list($i) [expr [$r value] + $qat_list($ii)]
         }
-        set qfc [expr $i+1]
-        #puts "qfc=$qfc"
-
+        set qfc [expr $i]
+        if { $qat_list($i) < $sim_end_time } {
+            incr qfc
+        }
+        puts "query flow count: = $qfc"
+        
         #set query flow id
         for {set i 0} {$i < $qfc} {incr i 1} {
             set qf_fid($i) $fc
@@ -55,7 +58,7 @@ proc setup_query_flow {} {
         #set flow's start //& end time
         #
         for {set i 0} {$i < $qfc} {incr i 1} {
-            set qf_start($i) $sat_list($i)
+            set qf_start($i) $qat_list($i)
         }
         #
         #set flow's Transmission Layer
