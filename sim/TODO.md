@@ -1,9 +1,10 @@
 [S] Solved
 [C] to be Continue
 . simulation query traffic and background flow in simulation.tcl
-    [s] framework setup
-    [c] unit test, parament reconfiguration
-. awk out.tr: flow delay, flow packet-drop, flow throughtput
+    [S] framework setup
+    [C] unit test, parament reconfiguration
+. analyse flow out.tr: flow delay, flow packet-drop, flow throughtput
+    [S] using python script to replace awk script
 . model simulation, flow
     1 simulation[sid, dctcp,]
     2 flow[fid, ftype start, end, deadline, src, dst, size, drcount, thrput, finished]
