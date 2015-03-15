@@ -16,19 +16,24 @@ BEGIN {
    packet_id = $12;
 
    if ( flow_id > highest_flow_id )
-	 highest_flow_id = flow_id;
+     highest_flow_id = flow_id;
 
    if ( start_time[flow_id] == 0 )  
-	start_time[flow_id] = time;
+    start_time[flow_id] = time;
 
-   if ( action != "d" ) {
-      if ( action == "r" ) {
-         end_time[flow_id] = time;
-      }
-   } else {
+   #if ( action != "d" ) {
+   #   if ( action == "r" ) {
+   #      end_time[flow_id] = time;
+   #   }
+   #} else {
+   #   end_time[flow_id] = -1;
+   #}
+   if ( action == "r" ) {
+      end_time[flow_id] = time;
+    }else {
       end_time[flow_id] = -1;
-   }
-}							  
+    }
+}                             
 END {
     for ( flow_id = 0; flow_id <= highest_flow_id; flow_id++ ) {
        start = start_time[flow_id];
@@ -36,6 +41,6 @@ END {
        packet_duration = end - start;
 
        #if ( start < end ) printf("%f %f\n", start, packet_duration);
-       if ( start < end ) printf("%f\n", packet_duration);
+       if ( start < end ) printf("%d\t%f\n", flow_id, packet_duration);
    }
 }
