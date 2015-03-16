@@ -13,6 +13,7 @@
             ftype: query traffic(0), background flow{short message(1), large/throughtput-sensitive(2)}
             drcnt: dropped packet count
 . sim/simtool.py: call simulation.tcl to simulate network
+    get full flow info after simulation and save to db
 . classify flows according flow size
 . plot:
         1. plot CDF of time between arrivals of new work for the Aggregator(queries)

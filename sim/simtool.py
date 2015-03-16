@@ -56,6 +56,7 @@ def simulate(s):
     #using python script now
     fid_list, stime_dict, etime_dict, drcnt_dict, thrput_dict = analyse_flow(input_file_name = tcl_output, output_file_name = awk_output)
     from models import Flow
+    flow_list = []
     for fid in fid_list:
         flow = Flow()
         flow.start = stime_dict[fid]
@@ -71,19 +72,14 @@ def simulate(s):
         flow.size = thrput_dict[fid]
         flow.finished = True
         flow.save()
+        flow_list.append(flow)
     print 'has calculated flow: ' + awk_output
-    '''
-    #plot flow delay using python
-    #print plt_input_list
-    #print label_dict
-    plot_flow_delay(plt_input_list, label_dict = label_dict, plt_output = plt_output)
-    print 'plot flow delay: ' + plt_output
-    '''
     #remove tcl output bucause it's to big!!
     (status, output) = commands.getstatusoutput('rm -rf %s/tcl'%(out_dir))
     #print status, output
     (status, output) = commands.getstatusoutput('mkdir -p %s/tcl'%(out_dir))
     #print status, output
+    return flow_list
 
 if __name__ == '__main__':
     from models import Simulation, Flow
