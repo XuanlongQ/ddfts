@@ -6,14 +6,18 @@
 . analyse flow out.tr: flow delay, flow packet-drop, flow throughtput
     [S] using python script to replace awk script
 . model simulation, flow
-    [S]1. simulation[sid, dctcp, done]
+    [S]1. simulation[sid, dctcp, qfcnt, sfcnt, lfcnt, afcnt, done]
             dctcp: enable or disable dctcp
-            done: simulation has done, flows have generated
+            qft: query flow count
+            sft: short flow count
+            lft: large flow count
+            aft: all flow count
+            status: 0-> undone, 1->processing, 2->done
     [S]2. flow[fid, ftype start, end, deadline, src, dst, size, drcnt, thrput, finished]
             ftype: query traffic(0), background flow{short message(1), large/throughtput-sensitive(2)}
             drcnt: dropped packet count
 . sim/simtool.py: call simulation.tcl to simulate network
-    get full flow info after simulation and save to db
+    [S] get full flow info after simulation and save to db
 . classify flows according flow size
 . plot:
         1. plot CDF of time between arrivals of new work for the Aggregator(queries)

@@ -15,7 +15,7 @@ Agent/TCP set windowOption_ 0
 
 
 if { $dctcp } {
-    puts "enable dctcp!!!"
+    #puts "enable dctcp!!!"
     Agent/TCP set dctcp_ $dctcp
     Agent/TCP set dctcp_g_ $DCTCP_g_;
 }

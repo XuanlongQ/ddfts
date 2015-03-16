@@ -25,6 +25,7 @@ proc setup_large_flow {} {
             incr lfc
         }
         puts "large flow count: = $lfc"
+        puts "lfc:$lfc"
 
         #set large flow id
         for {set i 0} {$i < $lfc} {incr i 1} {
@@ -41,8 +42,8 @@ proc setup_large_flow {} {
                 set dst "[expr int([$r1 value])],[expr int([$r2 value])]"
             }
             #puts "large flow $i, src: $src, dst:$dst"
-            set lf_src($i) $server($src)
-            set lf_dst($i) $server($dst)
+            set lf_src($i) $src
+            set lf_dst($i) $dst
 
         }
 
@@ -79,6 +80,7 @@ proc setup_large_flow {} {
 
         for {set i 0} {$i < $lfc} {incr i 1} {
             #puts "large flow $i start at $lf_start($i)"
+            puts "flow:$lf_fid($i)|ftype:l|deadline:-1|src:$lf_src($i)|dst:$lf_dst($i)|size:$lf_size($i)"
             start_flow $i l
         }
 }

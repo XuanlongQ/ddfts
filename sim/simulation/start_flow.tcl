@@ -2,6 +2,7 @@
 proc start_flow {i t} {
 
 	global ns
+    global server
     global ftpPkgSize
     global ${t}f_fid
     global ${t}f_src ${t}f_dst ${t}f_size
@@ -9,8 +10,8 @@ proc start_flow {i t} {
     global ${t}f_tcp ${t}f_sink ${t}f_ftp
 
 	eval "set fid \$${t}f_fid($i)"
-	eval "set src \$${t}f_src($i)"
-	eval "set dst \$${t}f_dst($i)"
+	eval "set src \$server(\$${t}f_src($i))"
+	eval "set dst \$server(\$${t}f_dst($i))"
 	eval "set size \$${t}f_size($i)"
 	eval "set start \$${t}f_start($i)"
 	eval "set tcp \$${t}f_tcp($i)"

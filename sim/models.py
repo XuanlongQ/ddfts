@@ -8,20 +8,25 @@ class Hello(models.Model):
 class Simulation(models.Model):
     sid = models.IntegerField(primary_key=True) 
     dctcp = models.BooleanField(default=False)
+    qfc = models.IntegerField()
+    sfc = models.IntegerField()
+    lfc = models.IntegerField()
+    afc = models.IntegerField()
     done = models.BooleanField(default=False)
 
 class Flow(models.Model):
     fid = models.IntegerField(primary_key=True) 
     ftype = models.CharField(max_length=1, null=True)
-    start = models.DecimalField(max_digits=8, decimal_places=6)
-    end = models.DecimalField(max_digits=8, decimal_places=6)
-    deadline = models.DecimalField(max_digits=8, decimal_places=6)
-    src = models.IntegerField()
-    dst = models.IntegerField()
+    start = models.IntegerField() #us
+    end = models.IntegerField() #us
+    deadline = models.IntegerField() #us
+    src = models.CharField(max_length=5, )
+    dst = models.CharField(max_length=5, )
     size = models.IntegerField()
     drcnt = models.IntegerField(default=0)
     thrput = models.IntegerField(default=0)
     finished = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return '<span>%d|%s|%f->%f|drcnt=%d|thrput=%d</span><hr />' % (self.fid, self.ftype, self.start, self.end, self.drcnt, self.thrput)
+        flow_type = {'q':'query', 's':'short', 'l':'large'}
+        return '<span>%s flow %d from [%s] to [%s], duration time is: %d us, dropped %d packet(s), flow size is %d and transferred %d Bytes</span><hr />' % (flow_type[self.ftype], self.fid, self.src, self.dst, (self.end-self.start), self.drcnt, self.size, self.thrput)

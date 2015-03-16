@@ -25,6 +25,7 @@ proc setup_short_flow {} {
             incr sfc
         }
         puts "short flow count: = $sfc"
+        puts "sfc:$sfc"
 
         #set short (message) flow id
         for {set i 0} {$i < $sfc} {incr i 1} {
@@ -41,8 +42,8 @@ proc setup_short_flow {} {
                 set dst "[expr int([$r1 value])],[expr int([$r2 value])]"
             }
             #puts "short flow $i, src: $src, dst:$dst"
-            set sf_src($i) $server($src)
-            set sf_dst($i) $server($dst)
+            set sf_src($i) $src
+            set sf_dst($i) $dst
 
         }
 
@@ -79,6 +80,7 @@ proc setup_short_flow {} {
 
         for {set i 0} {$i < $sfc} {incr i 1} {
             #puts "short flow $i start at $sf_start($i)"
+            puts "flow:$sf_fid($i)|ftype:s|deadline:-1|src:$sf_src($i)|dst:$sf_dst($i)|size:$sf_size($i)"
             start_flow $i s
         }
 }

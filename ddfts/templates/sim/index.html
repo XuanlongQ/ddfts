@@ -11,9 +11,11 @@
         <!-- <img src="/static/13_250.png"> -->
         <hr/>
         {% for flow in flow_list %}
+        {% autoescape off %}
             <div class="flow">
                 {{flow}}
             </div>
+        {% endautoescape %}
 	    {% endfor %}
         <div class="test_list">
         {% for test_id, image_list in image_dict.iteritems %}

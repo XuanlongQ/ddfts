@@ -25,6 +25,7 @@ proc setup_query_flow {} {
             incr qfc
         }
         puts "query flow count: = $qfc"
+        puts "qfc:$qfc"
         
         #set query flow id
         for {set i 0} {$i < $qfc} {incr i 1} {
@@ -41,8 +42,8 @@ proc setup_query_flow {} {
                 set dst "[expr int([$r1 value])],[expr int([$r2 value])]"
             }
             #puts "short flow $i, src: $src, dst:$dst"
-            set qf_src($i) $server($src)
-            set qf_dst($i) $server($dst)
+            set qf_src($i) $src
+            set qf_dst($i) $dst
 
         }
 
@@ -79,6 +80,7 @@ proc setup_query_flow {} {
 
         for {set i 0} {$i < $qfc} {incr i 1} {
             #puts "query flow $i start at $qf_start($i)"
+            puts "flow:$qf_fid($i)|ftype:q|deadline:-1|src:$qf_src($i)|dst:$qf_dst($i)|size:$qf_size($i)"
             start_flow $i q
         }
 }

@@ -7,13 +7,13 @@ if {$::argc < $my_argc} {
 #simulation id
 set i 0
 set sid [lindex $argv $i]
-	puts "simulation_id=$sid"
+	#puts "simulation_id=$sid"
 incr i
 set dctcp [lindex $argv $i]
-	puts "dctcp=$dctcp"
+	#puts "dctcp=$dctcp"
 incr i
 set tcl_output [lindex $argv $i]
-	puts "tcl_output=$tcl_output"
+	#puts "tcl_output=$tcl_output"
 incr i
 
 set RTT 200
@@ -29,7 +29,7 @@ proc finish {} {
 	global ns f namtrace
 	
 	$ns flush-trace
-	puts "Simulation completed."
+	#puts "Simulation completed."
 	close $f
 	exit 0
 }
@@ -107,6 +107,8 @@ setup_short_flow
 #large flow: copy fresh data to workers 1MB-100MB
 source "$path/large_flow.tcl"
 setup_large_flow
+
+puts "afc:$fc"
 
 $ns at $sim_end_time "finish"
 $ns run
