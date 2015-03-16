@@ -4,10 +4,10 @@ if {$::argc < $my_argc} {
 	puts "argc = $argc, but we need $my_argc arguments"
 	exit
 }
-#test id
+#simulation id
 set i 0
-set tid [lindex $argv $i]
-	puts "test_id=$tid"
+set sid [lindex $argv $i]
+	puts "simulation_id=$sid"
 incr i
 set dctcp [lindex $argv $i]
 	puts "dctcp=$dctcp"
@@ -34,7 +34,9 @@ proc finish {} {
 	exit 0
 }
 ###setup tcp#####################
-source setup_tcp.tcl
+set path [file normalize [info script]]
+set path [file dirname $path]
+source "$path/setup_tcp.tcl"
 ####################################
 $ns color 0 Blue
 $ns color 1 Red
@@ -89,21 +91,21 @@ for {set i 0} {$i < $sg} {incr i 1} {
 }
 
 #######################
-source random.tcl
+source "$path/random.tcl"
 #######################
 #start flow
-source start_flow.tcl
+source "$path/start_flow.tcl"
 
 #query traffic
-source query_flow.tcl
+source "$path/query_flow.tcl"
 setup_query_flow
 
 #short (message) flow: update control state on the workers 100KB-1MB
-source short_flow.tcl
+source "$path/short_flow.tcl"
 setup_short_flow
 
 #large flow: copy fresh data to workers 1MB-100MB
-source large_flow.tcl
+source "$path/large_flow.tcl"
 setup_large_flow
 
 $ns at $sim_end_time "finish"

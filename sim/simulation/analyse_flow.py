@@ -1,4 +1,4 @@
-def analyse_flow(input_file_name):
+def analyse_flow(input_file_name, output_file_name='out.dat'):
     highest_flow_id = 0
     input_file = open(input_file_name, 'r')
     stime_dict = {} #start time for each flow
@@ -30,15 +30,20 @@ def analyse_flow(input_file_name):
     input_file.close()
     #
     id_list = sorted(stime_dict.keys(), lambda x,y: cmp(int(x),int(y)))
+    output_file = open(output_file_name, 'w')
     for flow_id in id_list:
         start = stime_dict[flow_id]
         end = etime_dict[flow_id]
         duration = end - start
         fsize = fsize_dict[flow_id]
         drcnt = drcnt_dict[flow_id]
+        line = '%s %f %d %d\n' % (flow_id, duration, fsize, drcnt)
         if start < end:
             #print 'flow %s: duration = %f, fsize=%d, drcnt = %d' % (flow_id, duration, fsize, drcnt)
-            print '%s\t%f\t%d\t%d' % (flow_id, duration, fsize, drcnt)
+            #print line,
+            pass
+        output_file.write(line)
+    output_file.close()
 if __name__ == '__main__':
     input_file_name = 'out.tr'
     analyse_flow(input_file_name)

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-		#test_id dctcp RTT queue_limit
+		#simulation_id dctcp RTT queue_limit
 #ns simulation.tcl T001 true 17 250
 DEBUG = True
 dctcp_list = ('true', 'false')
@@ -8,8 +8,8 @@ queue_limit_list = (250,)
 
 import time
 now = time.strftime('%y%m%d-%H%M%S', time.localtime(time.time()))
-tid = 'T-%s'%now
-out_dir = 'out/%s'%tid
+sid = 'S-%s'%now
+out_dir = 'out/%s'%sid
 
 import commands
 (status, output) = commands.getstatusoutput('rm -rf out')
@@ -42,7 +42,7 @@ for RTT in RTT_list:
 
             #simulate network using tcl
             #run tcl script
-            (status, output) = commands.getstatusoutput('ns simulation.tcl %s %s %s'%(tid, dctcp, tcl_output))
+            (status, output) = commands.getstatusoutput('ns simulation.tcl %s %s %s'%(sid, dctcp, tcl_output))
             print 'network simulation generate: ' + tcl_output
             #print status, output
             #calculate flow delay using awk

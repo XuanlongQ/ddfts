@@ -5,6 +5,13 @@ from django.shortcuts import render_to_response, render
 
 def home(request):
     print 'sim home'
+    from models import Simulation, Flow
+    s = Simulation()
+    s.sid = 'S001'
+    s.dctcp = False
+    s.done = False
+    from simtool import simulate
+    simulate(s)
     image_dict = get_image_dict()
     #print 'image_dict', image_dict
     return render(request, 'sim/index.html', {'image_dict':image_dict} )

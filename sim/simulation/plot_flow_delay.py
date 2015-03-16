@@ -7,7 +7,7 @@ def get_flow_delay_cdf(input_file_name):
 
     input_file = open(input_file_name, 'r')
     rowList = input_file.readlines()
-    table = [row.strip().split('\t') for row in rowList]
+    table = [row.strip().split(' ') for row in rowList]
     input_file.close()
     flow_delay_list = [ float(x[1]) for x in table ]
     flow_delay_list.sort()
@@ -68,7 +68,7 @@ def plot_flow_delay(input_file_name_list, **kwargs):
         output = kwargs['plt_output']
         plt.savefig(output, dip=72)
 
-    plt.show()
+    #plt.show()
     plt.clf()
 
 if __name__ == '__main__':
