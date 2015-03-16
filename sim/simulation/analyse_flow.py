@@ -1,4 +1,4 @@
-def analyse_flow(input_file_name, output_file_name='out.dat'):
+def analyse_flow(input_file_name, output_file_name=None):
     highest_flow_id = 0
     input_file = open(input_file_name, 'r')
     stime_dict = {} #start time for each flow
@@ -28,22 +28,26 @@ def analyse_flow(input_file_name, output_file_name='out.dat'):
                 drcnt_dict[flow_id] += 1
 
     input_file.close()
-    #
     id_list = sorted(stime_dict.keys(), lambda x,y: cmp(int(x),int(y)))
-    output_file = open(output_file_name, 'w')
-    for flow_id in id_list:
-        start = stime_dict[flow_id]
-        end = etime_dict[flow_id]
-        duration = end - start
-        fsize = fsize_dict[flow_id]
-        drcnt = drcnt_dict[flow_id]
-        line = '%s %f %d %d\n' % (flow_id, duration, fsize, drcnt)
-        if start < end:
-            #print 'flow %s: duration = %f, fsize=%d, drcnt = %d' % (flow_id, duration, fsize, drcnt)
-            #print line,
-            pass
-        output_file.write(line)
-    output_file.close()
+    #if write to file
+    if output_file_name:
+            output_file = open(output_file_name, 'w')
+            for flow_id in id_list:
+                start = stime_dict[flow_id]
+                end = etime_dict[flow_id]
+                duration = end - start
+                fsize = fsize_dict[flow_id]
+                drcnt = drcnt_dict[flow_id]
+                line = '%s %f %d %d\n' % (flow_id, duration, fsize, drcnt)
+                if start < end:
+                    #print 'flow %s: duration = %f, fsize=%d, drcnt = %d' % (flow_id, duration, fsize, drcnt)
+                    #print line,
+                    pass
+                output_file.write(line)
+            output_file.close()
+
+    return (id_list, stime_dict, etime_dict, drcnt_dict, fsize_dict)
+
 if __name__ == '__main__':
     input_file_name = 'out.tr'
     analyse_flow(input_file_name)

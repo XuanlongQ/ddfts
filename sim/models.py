@@ -22,3 +22,6 @@ class Flow(models.Model):
     drcnt = models.IntegerField(default=0)
     thrput = models.IntegerField(default=0)
     finished = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return '<span>%d|%s|%f->%f|drcnt=%d|thrput=%d</span><hr />' % (self.fid, self.ftype, self.start, self.end, self.drcnt, self.thrput)

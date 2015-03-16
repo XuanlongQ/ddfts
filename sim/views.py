@@ -11,11 +11,13 @@ def home(request):
     s.dctcp = False
     s.done = False
     from simtool import simulate
-    simulate(s)
+    #simulate(s)
+    flow_list = Flow.objects.all()
     image_dict = get_image_dict()
     #print 'image_dict', image_dict
-    return render(request, 'sim/index.html', {'image_dict':image_dict} )
+    return render(request, 'sim/index.html', {'image_dict':image_dict, 'flow_list':flow_list} )
     #return render_to_response('sim/index.html',)
+
 def get_image_dict():
     import os.path
     PROJECT_DIR = os.path.abspath(os.path.dirname(__name__))
