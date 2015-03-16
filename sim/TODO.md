@@ -18,7 +18,6 @@
             drcnt: dropped packet count
 . sim/simtool.py: call simulation.tcl to simulate network
     [S] get full flow info after simulation and save to db
-. classify flows according flow size
 . plot:
         1. plot CDF of time between arrivals of new work for the Aggregator(queries)
         2. plot CDF of time between arrivals of new background flows

@@ -1,6 +1,9 @@
 # Creating New Simulator
 set ns [new Simulator]
 
+set packetSize 1460
+Agent/TCP set packetSize_ $packetSize
+
 $ns color 0 Blue
 $ns color 1 Red
 $ns color 2 Green
@@ -19,7 +22,7 @@ proc finish {} {
 	puts "Simulation completed."
 	close $nf
 	close $f
-	exec nam out.nam &
+	#exec nam out.nam &
 	exit 0
 }
 
@@ -123,7 +126,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
 		incr count 1
 	}
 }
-$ns at 0.001 "$mf_ftp(0,0,1) send 1001"
+$ns at 0.001 "$mf_ftp(0,0,1) send 1600"
 
 #large flow
 for {set i 0} {$i < $sg} {incr i 1} {
