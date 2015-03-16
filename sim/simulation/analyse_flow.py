@@ -5,6 +5,8 @@ def analyse_flow(input_file_name, output_file_name=None):
     etime_dict = {} #end time
     fsize_dict = {} #flow size
     drcnt_dict = {} #drop packet count for each flow
+    src_dict = {}
+    dst_dict = {}
     for line in input_file:
         #print len(line.strip().split(' '))
         action, time, frm, to, tp, pktsize, flag, flow_id, src, dst, seq_no, packet_id = line.strip().split(' ')
@@ -13,18 +15,20 @@ def analyse_flow(input_file_name, output_file_name=None):
 
         if not flow_id in stime_dict:
             stime_dict[flow_id] = time
+            etime_dict[flow_id] = time
+            src_dict[flow_id] = src.split('.')[0]
+            dst_dict[flow_id] = dst.split('.')[0]
         if not flow_id in fsize_dict:
             fsize_dict[flow_id] = 0
         if not flow_id in drcnt_dict:
             drcnt_dict[flow_id] = 0
 
         dst_node, dst_port = dst.split('.')
-        if action == 'r' and to == dst_node:
+        #node 'to' receive and 'to' is dst_node and dst_node is flow[flow_id]'s dst
+        if action == 'r' and to == dst_node and dst_dict[flow_id] == dst_node:
             etime_dict[flow_id] = time
             fsize_dict[flow_id] += pktsize
-        else:
-            etime_dict[flow_id] = -1
-            if action == 'd':
+        elif action == 'd':
                 drcnt_dict[flow_id] += 1
 
     input_file.close()

@@ -11,7 +11,7 @@ def home(request):
     s.dctcp = False
     s.done = False
     from simtool import simulate
-    #simulate(s)
+    simulate(s)
     flow_list = Flow.objects.all()
     image_dict = get_image_dict()
     #print 'image_dict', image_dict
@@ -27,7 +27,7 @@ def get_image_dict():
         print 'out_dir does not exist'
         return
     test_list = os.listdir(out_dir)
-    image_dict = {}
+    #image_dict = {}
     for test_id in test_list:
         plt_dir = '%s%s/plt'%(out_dir, test_id)
         if not os.path.exists(plt_dir):
