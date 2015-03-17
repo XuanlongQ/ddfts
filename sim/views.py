@@ -7,16 +7,31 @@ def home(request):
     print 'sim home'
     from models import Simulation, Flow
     s = Simulation()
-    s.sid = 'S001'
     s.dctcp = False
     s.done = False
+    s.save()
     from simtool import simulate
-    simulate(s)
+    s, flow_list = simulate(s)
     flow_list = Flow.objects.all()
+    sim_list = Simulation.objects.all()
     image_dict = get_image_dict()
     #print 'image_dict', image_dict
-    return render(request, 'sim/index.html', {'image_dict':image_dict, 'flow_list':flow_list} )
+    return render(request, 'sim/index.html', {'image_dict':image_dict, 'sim_list':sim_list} )
     #return render_to_response('sim/index.html',)
+
+def flow(request):
+    print 'sim flow'
+    from models import Simulation
+    sim_list = Simulation.objects.all()
+    return render(request, 'sim/flow.html', {'sim_list':sim_list} )
+
+def plot(request):
+    print 'sim plot'
+    from models import Simulation
+    sim_list = Simulation.objects.all()
+    from plttool import plot_flow_delay
+    plot_flow_delay(sim_list)
+    return render(request, 'sim/plot.html', {'sim_list':sim_list} )
 
 def get_image_dict():
     import os.path
@@ -27,7 +42,7 @@ def get_image_dict():
         print 'out_dir does not exist'
         return
     test_list = os.listdir(out_dir)
-    #image_dict = {}
+    image_dict = {}
     for test_id in test_list:
         plt_dir = '%s%s/plt'%(out_dir, test_id)
         if not os.path.exists(plt_dir):

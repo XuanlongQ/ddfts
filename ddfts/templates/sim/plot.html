@@ -1,0 +1,36 @@
+<html>
+	<head>
+		<title>Simulation APP</title>
+		<meta http-equiv=Content-Type content="text/html;charset=utf-8">
+        <style type="text/css">
+        </style>
+	</head>
+	<body>
+		<h1>Simulation APP, this is Plot page!</h1>
+        <hr/>
+        {% for s in sim_list %}
+            <div class="simulation">
+            <div><h3>{{s}}</h3></div>
+                {% for flow in s.flow_set.all %}
+                {% autoescape off %}
+                    <div class="flow">
+                        {{flow}}
+                    </div>
+                {% endautoescape %}
+                {% endfor %}
+	    {% endfor %}
+        <div class="test_list">
+        {% for test_id, image_list in image_dict.iteritems %}
+            <div class="test">
+            <div><h1>{{test_id}}</h1></div>
+			{% for image in image_list %}
+            <div><h1>{{image}}</h1></div>
+            <div class="image">
+                <img src="{{image}}" height="500" width="500">
+            </div>
+			{% endfor %}
+            </div>
+	    {% endfor %}
+        </div>
+	</body>
+</html>

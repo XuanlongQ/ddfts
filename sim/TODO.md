@@ -1,23 +1,24 @@
 [S] Solved
 [C] to be Continue
-. simulation query traffic and background flow in simulation.tcl
-    [S] framework setup
-    [C] unit test, parament reconfiguration
-. analyse flow out.tr: flow delay, flow packet-drop, flow throughtput
+
+.[S] simulation query traffic and background flow in simulation.tcl
+     framework setup
+.[S] analyse flow out.tr: flow delay, flow packet-drop, flow throughtput
     [S] using python script to replace awk script
-. model simulation, flow
-    [S]1. simulation[sid, dctcp, qfcnt, sfcnt, lfcnt, afcnt, done]
+.[S] model simulation, flow
+    1. simulation[sid, dctcp, qfcnt, sfcnt, lfcnt, afcnt, done]
             dctcp: enable or disable dctcp
             qft: query flow count
             sft: short flow count
             lft: large flow count
             aft: all flow count
             status: 0-> undone, 1->processing, 2->done
-    [S]2. flow[fid, ftype start, end, deadline, src, dst, size, drcnt, thrput, finished]
+    2. flow[fid, ftype start, end, deadline, src, dst, size, drcnt, thrput, finished, sim]
             ftype: query traffic(0), background flow{short message(1), large/throughtput-sensitive(2)}
             drcnt: dropped packet count
-. sim/simtool.py: call simulation.tcl to simulate network
-    [S] get full flow info after simulation and save to db
+            sim: simulation which flow belongs to
+.[S] sim/simtool.py: call simulation.tcl to simulate network
+     get full flow info after simulation and save to db
 . plot:
         1. plot CDF of time between arrivals of new work for the Aggregator(queries)
         2. plot CDF of time between arrivals of new background flows
