@@ -19,8 +19,12 @@
             sim: simulation which flow belongs to
 .[S] sim/simtool.py: call simulation.tcl to simulate network
      get full flow info after simulation and save to db
-. plot:
+.[S] plot:
         1. plot CDF of time between arrivals of new work for the Aggregator(queries)
         2. plot CDF of time between arrivals of new background flows
-        3. plot PDF of flow size for background flow: count of flow{f_size between (s1,s2]}/count of all flow
-        4. plot PDF of byte for background flow: sum of bytes of flow{f_size between (s1,s2]}/sum of bytes of all flow
+        3. plot PDF of background flow count : count of flow{f_size between (s1,s2]}/count of all flow
+        4. plot PDF of background flow byte: sum of bytes of flow{f_size between (s1,s2]}/sum of bytes of all flow
+
+. reconfigure query traffic arrival time according to plotted png
+. reconfigure background traffic arrival time according to plotted png
+. adjust PDF of background flow count/byte x axis: 10^3, 10^4, 10^5, 10^6, 10^7, 10^8
