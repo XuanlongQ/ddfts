@@ -54,7 +54,7 @@ $ns color 9 Black
 #server group: sg
 set sg 1
 #server count sc
-set sc 40
+set sc 4
 
 #simulation end time
 set sim_end_time 10.0

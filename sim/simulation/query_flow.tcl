@@ -1,10 +1,11 @@
 #query flow: 1.6-2KB
 proc setup_query_flow {} {
+        global ns
         global ftpPkgSize
         global sg sc server
         global qfc fc
         global qf_fid qf_src qf_dst qf_size qf_start qf_end
-        global qf_tcp qf_sink qf_ftp
+        global qf_tcp qf_sink qf_ftp qf_sftp
         global udr prr
         global sim_end_time
         #1. use $prr to generate query flow arrival time list
@@ -20,9 +21,10 @@ proc setup_query_flow {} {
             incr i
             set qat_list($i) [expr [$r value] + $qat_list($ii)]
         }
-        set qfc [expr $i]
+        #each of HLA queries(i) split into ($sc-1) MLA queries
+        set qfc [expr $i*($sc-1)]
         if { $qat_list($i) < $sim_end_time } {
-            incr qfc
+            incr qfc [expr $sc-1]
         }
         puts "query flow count: = $qfc"
         puts "qfc:$qfc"
@@ -35,20 +37,25 @@ proc setup_query_flow {} {
         #set flow's src & dst
         set r1 [udr 0 $sg]
         set r2 [udr 0 $sc]
-        for {set i 0} {$i < $qfc} {incr i 1} {
-            set src "[expr int([$r1 value])],[expr int([$r2 value])]"
-            set dst "[expr int([$r1 value])],[expr int([$r2 value])]"
-            while {$src == $dst} {
-                set dst "[expr int([$r1 value])],[expr int([$r2 value])]"
+        for {set i 0} {$i < $qfc} { } {
+            set tg [expr int([$r1 value])]
+            set ts [expr int([$r2 value])]
+            set src "$tg,$ts"
+            for {set j 0} {$j < $sc} {incr j 1} {
+                if {$j == $ts} {
+                    continue
+                }
+                set dst "$tg,$j"
+                #puts "short flow $i, src: $src, dst:$dst"
+                set qf_src($i) $src
+                set qf_dst($i) $dst
+                incr i
             }
-            #puts "short flow $i, src: $src, dst:$dst"
-            set qf_src($i) $src
-            set qf_dst($i) $dst
 
         }
 
         #
-        #set short (message) flow's size
+        #set query flow's size
         #
         set r3 [udr 1.6 2]
         for {set i 0} {$i < $qfc} {incr i 1} {
@@ -58,8 +65,8 @@ proc setup_query_flow {} {
         #
         #set flow's start //& end time
         #
-        for {set i 0} {$i < $qfc} {incr i 1} {
-            set qf_start($i) $qat_list($i)
+        for {set i 0} {$i < $qfc} {incr i} {
+            set qf_start($i) $qat_list([expr $i/($sc-1)])
         }
         #
         #set flow's Transmission Layer
@@ -67,6 +74,11 @@ proc setup_query_flow {} {
         for {set i 0} {$i < $qfc} {incr i 1} {
             set qf_tcp($i) [new Agent/TCP/FullTcp/Sack]
             set qf_sink($i) [new Agent/TCP/FullTcp/Sack]
+            $ns attach-agent $server($qf_src($i)) $qf_tcp($i)
+            $ns attach-agent $server($qf_dst($i)) $qf_sink($i)
+            $ns connect $qf_tcp($i) $qf_sink($i)
+            $qf_tcp($i) set fid_ $qf_fid($i)
+            $qf_sink($i) set fid_ $qf_fid($i)
             $qf_sink($i) listen
         }
 
@@ -75,12 +87,28 @@ proc setup_query_flow {} {
         #set flow's Application Layer
         #
         for {set i 0} {$i < $qfc} {incr i 1} {
-            set qf_ftp($i) [new Application/FTP]
+            set qf_ftp($i) [new Application/TcpApp $qf_tcp($i)]
+            set qf_sftp($i) [new Application/TcpApp $qf_sink($i)]
+            $qf_ftp($i) connect $qf_sftp($i)
         }
 
         for {set i 0} {$i < $qfc} {incr i 1} {
-            #puts "query flow $i start at $qf_start($i)"
-            puts "flow:$qf_fid($i)|ftype:q|deadline:-1|src:$qf_src($i)|dst:$qf_dst($i)|size:$qf_size($i)"
-            start_flow $i q
+            if { $qf_start($i) > 0 && $qf_size($i) > 0} {
+                #puts "query flow $i start at $qf_start($i)"
+                puts "flow:$qf_fid($i)|ftype:q|deadline:-1|src:$qf_src($i)|dst:$qf_dst($i)|size:$qf_size($i)"
+                set sftp $qf_sftp($i)
+                $ns at $qf_start($i) "$qf_ftp($i) send $qf_size($i) {$sftp recv {$i}}"
+                #puts "$t flow $i\[[$src id]->[$dst id]\] start at $start and the size is [expr $size*1.0/$ftpPkgSize]"
+            }
         }
+}
+
+
+Application/TcpApp instproc recv {i} {
+	global ns qf_sftp qf_ftp qf_start
+	#$ns trace-annotate "$self received data \"$data\""
+    #$ns at [expr qf_start($i) + 0.56] "$qf_sftp($i) send 2000 {$qf_ftp($i) recv {$i false}}"
+    if { $i>0 } {
+        $ns at [expr $qf_start($i) + 1.56] "$qf_sftp($i) send 2000 {$qf_ftp($i) recv {-1}}"
+    }
 }

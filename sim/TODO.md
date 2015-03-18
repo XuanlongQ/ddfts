@@ -28,4 +28,4 @@
 . reconfigure query traffic arrival time according to plotted png
 . reconfigure background traffic arrival time according to plotted png
 . adjust PDF of background flow count/byte x axis: 10^3, 10^4, 10^5, 10^6, 10^7, 10^8
-. reconfigure query traffic pattern using web traffic
+[C]. reconfigure query traffic pattern using TcpApp
