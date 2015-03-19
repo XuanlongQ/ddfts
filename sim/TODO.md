@@ -25,9 +25,16 @@
         3. plot PDF of background flow count : count of flow{f_size between (s1,s2]}/count of all flow
         4. plot PDF of background flow byte: sum of bytes of flow{f_size between (s1,s2]}/sum of bytes of all flow
 
+[S]. reconfigure query traffic pattern using TcpApp
+. add delay for resonese of query flow
+. remodel simulation, flow
+    1. simulation[sid, dctcp, qfcnt, sfcnt, lfcnt, afcnt, status]
+    2. flow[fid, ftype start, end, deadline, src, dst, size, {pktcnt}, drcnt, thrput, finished, sim]
+        finished = (thrput >= size + 40*pktcnt)
+. filter flow that has finished transportation in analyse_flow.py by comparing flow size and throughput //or by FYN packet
+. plot PDF of dropped packet by flow size
+.trace queue length
+. plot PDF of queue length by time
 . reconfigure query traffic arrival time according to plotted png
 . reconfigure background traffic arrival time according to plotted png
 . adjust PDF of background flow count/byte x axis: 10^3, 10^4, 10^5, 10^6, 10^7, 10^8
-[S]. reconfigure query traffic pattern using TcpApp
-. add delay for resonese of query flow
-. filter flow that has finished transportation in analyse_flow.py by comparing flow size and throughput or by FYN packet

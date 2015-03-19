@@ -11,7 +11,7 @@ def home(request):
     s.done = False
     s.save()
     from simtool import simulate
-    #s, flow_list = simulate(s)
+    s, flow_list = simulate(s)
     flow_list = Flow.objects.all()
     sim_list = Simulation.objects.all()
     image_dict = get_image_dict()
@@ -47,9 +47,9 @@ def plot(request):
         bfs_img_url = '%s/bfs_img_%s.png' % (img_tmp_url, sim.sid)
         plot_bfs_cdf(sim, bfs_img)
 
-        img_dict[sim] = (fd_img_url, qat_img_url, bat_img_url)
         img_dict[sim] = (qat_img_url, bat_img_url)
         img_dict[sim] = (qat_img_url, bat_img_url, bfs_img_url)
+        img_dict[sim] = (fd_img_url, qat_img_url, bat_img_url, bfs_img_url)
 
     return render(request, 'sim/plot.html', {'sim_list':sim_list, 'img_dict':img_dict} )
 

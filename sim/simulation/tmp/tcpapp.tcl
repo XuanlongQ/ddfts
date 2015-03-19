@@ -66,11 +66,13 @@ $app0 connect $app1
 
 # install a procedure to print out the received data
 Application/TcpApp instproc recv {data} {
-	global ns app0 app1
+	global ns n0 n1 app0 app1 tcp0 tcp1
 	#$ns trace-annotate "$self received data \"$data\""
-    if {$data} {
-        $ns at 0.056 "$app1 send 100 {$app0 recv {false}}"
-    }
+    #if {$data} {
+        #$ns at 0.056 "$app1 send 100 {$app0 recv {false}}"
+    #}
+    $tcp0 send FIN
+    #$ns detach-agent $n1 $tcp1
 }
 
 proc finish {} {
