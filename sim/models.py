@@ -33,4 +33,4 @@ class Flow(models.Model):
 
     def __unicode__(self):
         flow_type = {'q':'query', 's':'short', 'l':'large'}
-        return '<span>%s flow %04d belongs to simulation %s, from [%s] to [%s], duration time is: %s us, dropped %d packet(s), flow size is %d and transferred %d Bytes</span><hr />' % (flow_type[self.ftype], self.fid, self.sim.sid, self.src, self.dst, self.end - self.start, self.drcnt, self.size, self.thrput)
+        return '<span>%s flow %04d belongs to simulation %s, from [%s] to [%s], duration time is: (%s->%s):%s us, dropped %d packet(s), flow size is %d and transferred %d Bytes</span><hr />' % (flow_type[self.ftype], self.fid, self.sim.sid, self.src, self.dst, self.start/1000.0 , self.end/1000.0, self.end - self.start, self.drcnt, self.size, self.thrput)

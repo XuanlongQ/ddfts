@@ -11,9 +11,13 @@ proc setup_query_flow {} {
         #1. use $prr to generate query flow arrival time list
         #qat_list[]
         #set avg according CDF of time between background flows(@DCTCP)
+        #avg = 500 ms
         set avg 0.5
-        set shape 5
+        set shape 5.5
         set r [prr $avg $shape]
+        #set avg 0.4
+        #set r [epr $avg]
+        #set r [udr 0 0.6]
         set qat_list(0) 0.03
         set i 0
         while { $qat_list($i) < $sim_end_time } {
@@ -104,12 +108,13 @@ proc setup_query_flow {} {
 }
 
 
+#response delay for query traffic
+set rr_avg 0.05
+set rr_shape 5
+set rr [prr $rr_avg $rr_shape]
 Application/TcpApp instproc recv {i} {
-	global ns qf_sftp qf_ftp qf_start
-	#$ns trace-annotate "$self received data \"$data\""
-    #$ns at [expr qf_start($i) + 0.56] "$qf_sftp($i) send 2000 {$qf_ftp($i) recv {$i false}}"
+	global ns qf_sftp qf_ftp qf_start rr
     if { $i>0 } {
-        $ns at [expr [$ns now] + 0.26] "$qf_sftp($i) send 2000 {$qf_ftp($i) recv {-1}}"
-        #$qf_sftp($i) send 2000 {$qf_ftp($i) recv {-1}}
+        $ns at [expr [$ns now] + [$rr value]] "$qf_sftp($i) send 2000 {$qf_ftp($i) recv {-1}}"
     }
 }

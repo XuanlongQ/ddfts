@@ -19,3 +19,13 @@ proc prr {avg shape} {
 	return $r
 
 }
+
+proc epr {avg} {
+	set rng [new RNG]
+	$rng seed 1
+	set r [new RandomVariable/Exponential]
+	$r use-rng $rng
+	$r set avg_ $avg
+	return $r
+
+}

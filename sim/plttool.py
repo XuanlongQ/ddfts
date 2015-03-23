@@ -64,6 +64,9 @@ def plot_flow_delay(ss, output_file_name=None):
 def plot_qat_cdf(s, output_file_name):
 
     start_list = [ float(f.start)/1000000 for f in s.flow_set.all().filter(ftype='q').order_by('start') ]
+    #when query comes to MLA, MLA split this query into n queries(flow), so we need to converge this n-query into one query
+    start_list = list(set(start_list))
+    start_list.sort()
     #time between arrival list
     at_list = [ (start_list[i] - start_list[i-1]) for i in xrange(1, len(start_list)) ]
     at_list.sort()
@@ -76,11 +79,25 @@ def plot_qat_cdf(s, output_file_name):
         pdf.append(len(np.array(filter(lambda a: a <= bins[i] and a > bins[i-1], at_list)))*1.0/n)
 
     cdf = [ len(np.array(filter(lambda a: a <= bi, at_list)))*1.0/n for bi in at_list ]
+    at_list.insert(0, 0)
+    cdf.insert(0, 0)
 
     plt.plot(at_list, cdf, color='r', linewidth=2.5, linestyle='--', label='cdf')
     plt.plot(bins, pdf, color='b', linewidth=2.5, linestyle=':', label='pdf')
+    '''
+    print 'start_list:'
+    print start_list
+    print 'at_list:'
+    print at_list
+    print 'bins:'
+    print bins
+    print 'pdf:'
+    print pdf
+    print 'cdf:'
+    print cdf
+    '''
 
-    plt.xlim([0,1])
+    #plt.xlim([0,2])
 
     plt.title('CDF of time between query arrivals')
 
@@ -98,7 +115,7 @@ def plot_qat_cdf(s, output_file_name):
 
 #plot cdf of time between background flow(short, large) arrivals
 #input: s(models.Simulation)
-def plot_bat_cdf(s, output_file_name):
+def plot_bat_cdf(s, output_file_name=None):
 
     start_list = [ float(f.start)/1000000 for f in s.flow_set.all().exclude(ftype='q').order_by('start') ]
     #time between arrival list
@@ -117,7 +134,7 @@ def plot_bat_cdf(s, output_file_name):
     plt.plot(at_list, cdf, color='r', linewidth=2.5, linestyle='--', label='cdf')
     plt.plot(bins, pdf, color='b', linewidth=2.5, linestyle=':', label='pdf')
 
-    plt.xlim([0, 20])
+    #plt.xlim([0, 20])
 
     plt.title('CDF of time between background flow arrivals')
 
@@ -167,6 +184,54 @@ def plot_bfs_cdf(s, output_file_name):
     plt.xlabel('flow size(Bytes)')
 
     plt.ylabel('CDF')
+
+    plt.legend(loc = 'upper left')
+
+    if output_file_name:
+        plt.savefig(output_file_name, dip=72)
+
+    #plt.show()
+    plt.clf()
+
+#plot cdf of concurrent connections
+#input: s(models.Simulation)
+def plot_cc_cdf(s, output_file_name):
+
+    sim_start = 0 #simulation start time
+    sim_end = 10000000 #simulation end time
+    tunit = 50000
+
+    tbin = np.arange(sim_start, sim_end, tunit)
+    cnt_list = []
+    print tbin
+    for i in xrange(1, len(tbin)):
+        #tbin[i-1] tbin[i] start end 
+        #start end tbin[i-1] tbin[i]
+        trange = (tbin[i-1],tbin[i])
+        #print trange
+        fc = s.flow_set.all().filter(start__range=trange) | s.flow_set.all().filter(end__range=trange)
+        #print fc
+        cnt_list.append(len(fc))
+    cnt_list.sort()
+    print 'cnt_list:'
+    print cnt_list
+    n = len(cnt_list)
+    cunit = n/20
+    bins = [ i for i in xrange(cnt_list[0], cnt_list[-1], cunit)]
+    cnt_pdf = []
+    for i in xrange(0,len(bins)):
+       cnt_pdf.append(len(filter(lambda a: a>=bins[i] and a<bins[i]+cunit, bins))*1.0/n)
+
+    plt.plot(bins, cnt_pdf, color='black', linewidth=1.0, linestyle='-', label='Cuncurrent Connections')
+
+    #plt.xlim([0, 10])
+    #plt.ylim([0, 0.05])
+
+    plt.title('PDF of Concurrent Connections')
+
+    plt.xlabel('Concurrent Connections')
+
+    plt.ylabel('PDF')
 
     plt.legend(loc = 'upper left')
 

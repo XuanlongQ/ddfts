@@ -11,7 +11,7 @@ proc setup_large_flow {} {
         #lat_list[]
         #set avg according CDF of time between background flows(@DCTCP)
         set avg 0.5
-        set shape 5
+        set shape 55
         set r [prr $avg $shape]
         set lat_list(0) 0.01
         set i 0

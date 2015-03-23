@@ -29,7 +29,7 @@ def plot(request):
     print 'sim plot'
     from models import Simulation
     sim_list = Simulation.objects.filter(done = True).exclude(flow = None)
-    from plttool import plot_flow_delay, plot_qat_cdf, plot_bat_cdf, plot_bfs_cdf
+    from plttool import *
     img_tmp_dir, img_tmp_url = get_img_pos()
     img_dict = {}
     for sim in sim_list:
@@ -46,10 +46,15 @@ def plot(request):
         bfs_img = '%s/bfs_img_%s.png' % (img_tmp_dir, sim.sid)
         bfs_img_url = '%s/bfs_img_%s.png' % (img_tmp_url, sim.sid)
         plot_bfs_cdf(sim, bfs_img)
+        #concurrent connection cdf
+        cc_img = '%s/cc_img_%s.png' % (img_tmp_dir, sim.sid)
+        cc_img_url = '%s/cc_img_%s.png' % (img_tmp_url, sim.sid)
+        plot_cc_cdf(sim, cc_img)
 
         img_dict[sim] = (qat_img_url, bat_img_url)
         img_dict[sim] = (qat_img_url, bat_img_url, bfs_img_url)
         img_dict[sim] = (fd_img_url, qat_img_url, bat_img_url, bfs_img_url)
+        img_dict[sim] = (cc_img_url, fd_img_url, qat_img_url, bat_img_url, bfs_img_url)
 
     return render(request, 'sim/plot.html', {'sim_list':sim_list, 'img_dict':img_dict} )
 
