@@ -3,8 +3,9 @@ def analyse_flow(input_file_name):
     input_file = open(input_file_name, 'r')
     stime_dict = {} #start time for each flow
     etime_dict = {} #end time
-    fsize_dict = {} #flow size
-    drcnt_dict = {} #drop packet count for each flow
+    thrput_dict = {} #flow throughput
+    pktcnt_dict = {} #packet count for each flow
+    drcnt_dict = {} #droped packet count for each flow
     src_dict = {}
     dst_dict = {}
     for line in input_file:
@@ -18,18 +19,25 @@ def analyse_flow(input_file_name):
             etime_dict[flow_id] = time
             src_dict[flow_id] = src.split('.')[0]
             dst_dict[flow_id] = dst.split('.')[0]
-        if not flow_id in fsize_dict:
-            fsize_dict[flow_id] = 0
+        if not flow_id in thrput_dict:
+            thrput_dict[flow_id] = 0
         if not flow_id in drcnt_dict:
             drcnt_dict[flow_id] = 0
+            pktcnt_dict[flow_id] = 0
 
         dst_node, dst_port = dst.split('.')
+        src_node, src_port = src.split('.')
         #node 'to' receive and 'to' is dst_node and dst_node is flow[flow_id]'s dst
         if action == 'r' and to == dst_node and dst_dict[flow_id] == dst_node:
             etime_dict[flow_id] = time
-            fsize_dict[flow_id] += pktsize
+            thrput_dict[flow_id] += pktsize
+            pktcnt_dict[flow_id] += 1
+        #node 'to' receive and 'to' is src_node and src_node is flow[flow_id]'s src
+        elif action == 'r' and to == src_node and src_dict[flow_id] == src_node:
+            thrput_dict[flow_id] += pktsize
+            pktcnt_dict[flow_id] += 1
         elif action == 'd':
-                drcnt_dict[flow_id] += 1
+            drcnt_dict[flow_id] += 1
 
     input_file.close()
 
@@ -39,12 +47,13 @@ def analyse_flow(input_file_name):
                 start = stime_dict[flow_id]
                 end = etime_dict[flow_id]
                 duration = end - start
-                fsize = fsize_dict[flow_id]
+                fsize = thrput_dict[flow_id]
+                pktcnt = pktcnt_dict[flow_id]
                 drcnt = drcnt_dict[flow_id]
-                line = '%s %f %d %d\n' % (flow_id, duration, fsize, drcnt)
+                line = '%s %f %d %d %d\n' % (flow_id, duration, fsize, pktcnt, drcnt)
                 if start < end:
                     #print 'flow %s: duration = %f, fsize=%d, drcnt = %d' % (flow_id, duration, fsize, drcnt)
                     #print line,
                     pass
 
-    return (id_list, stime_dict, etime_dict, drcnt_dict, fsize_dict)
+    return (id_list, stime_dict, etime_dict, drcnt_dict, thrput_dict, pktcnt_dict)

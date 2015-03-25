@@ -12,10 +12,11 @@ class Simulation(models.Model):
     sfc = models.IntegerField(default=0)
     lfc = models.IntegerField(default=0)
     afc = models.IntegerField(default=0)
-    done = models.BooleanField(default=False)
+    status = models.IntegerField(default=False)
 
     def __unicode__(self,):
-        return '[simulation %03d has %s query flow, %d short flow, and %d large flow, which totally has %d flow, and it\' simulation is %s]' % (self.sid, self.qfc, self.sfc, self.lfc, self.afc, self.done)
+        STATUS = ['UDONE', 'SIMING', 'DONE']
+        return '[simulation %03d has %s query flow, %d short flow, and %d large flow, which totally has %d flow, and it\' simulation is %s]' % (self.sid, self.qfc, self.sfc, self.lfc, self.afc, STATUS[self.status])
 
 class Flow(models.Model):
     fid = models.AutoField(primary_key=True) 
@@ -26,6 +27,7 @@ class Flow(models.Model):
     src = models.CharField(max_length=5, )
     dst = models.CharField(max_length=5, )
     size = models.IntegerField()
+    pktcnt = models.IntegerField(default=0)
     drcnt = models.IntegerField(default=0)
     thrput = models.IntegerField(default=0)
     finished = models.BooleanField(default=False)
@@ -33,4 +35,8 @@ class Flow(models.Model):
 
     def __unicode__(self):
         flow_type = {'q':'query', 's':'short', 'l':'large'}
-        return '<span>%s flow %04d belongs to simulation %s, from [%s] to [%s], duration time is: (%s->%s):%s us, dropped %d packet(s), flow size is %d and transferred %d Bytes</span><hr />' % (flow_type[self.ftype], self.fid, self.sim.sid, self.src, self.dst, self.start/1000.0 , self.end/1000.0, self.end - self.start, self.drcnt, self.size, self.thrput)
+        FINISH = ['unfinished', 'finished']
+        return '<span>%s flow %04d belongs to simulation %s, from [%s] to [%s], duration time is: (%s->%s):%s us, dropped %d packet(s), flow size is %d and transferred %d Bytes(%d packets), is %s</span><hr />' \
+% (flow_type[self.ftype], self.fid, self.sim.sid, self.src, self.dst, \
+self.start/1000.0 , self.end/1000.0, self.end - self.start, \
+self.drcnt, self.size, self.thrput, self.pktcnt, FINISH[self.finished])

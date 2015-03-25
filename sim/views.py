@@ -1,35 +1,71 @@
 # Create your views here.
 #encoding=utf-8
-#from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, render
+from models import *
+import functools
+import simtool
+import time
+def check_sim_daemon(f):
+    @functools.wraps(f)
+    def fn(*args, **argskw):
+        print 'check simulation daemon'
+        if simtool.SIM_DAEMON and simtool.SIM_DAEMON.is_alive():
+            print 'simulation daemon is alive'
+            return f(*args, **argskw)
 
+        print 'simulation daemon is not alive, start it!!!'
+        import threading
+        from simtool import simulate_daemon
+        daemon = threading.Thread(target=simulate_daemon, args=('simulate daemon',))
+        daemon.setDaemon(True)
+        daemon.start()
+        simtool.SIM_DAEMON = daemon
+        return f(*args, **argskw)
+    return fn
+def log(f):
+    @functools.wraps(f)
+    def fn(*args, **argskw):
+        print 'call sim.%s' % (f.__name__, )
+        return f(*args, **argskw)
+    return fn
+
+@log
+@check_sim_daemon
 def home(request):
     print 'sim home'
-    from models import Simulation, Flow
-    s = Simulation()
-    s.dctcp = False
-    s.done = False
-    s.save()
-    from simtool import simulate
-    s, flow_list = simulate(s)
+
     flow_list = Flow.objects.all()
     sim_list = Simulation.objects.all()
-    image_dict = get_image_dict()
-    #print 'image_dict', image_dict
-    return render(request, 'sim/index.html', {'image_dict':image_dict, 'sim_list':sim_list} )
+    return render(request, 'sim/index.html', {'sim_list':sim_list} )
     #return render_to_response('sim/index.html',)
 
+@log
+@check_sim_daemon
+def addsim(request):
+    print 'addsim'
+    if 'dctcp' in request.POST:
+        s = Simulation()
+        dctcp = request.POST['dctcp']
+        s.dctcp = True if dctcp == 'true' else False
+        s.save()
+    #return home(request)
+    return HttpResponseRedirect('/sim')
+
+@log
+@check_sim_daemon
 def flow(request):
     print 'sim flow'
-    from models import Simulation
-    sim_list = Simulation.objects.filter(done = True).exclude(flow = None)
+    sim_list = Simulation.objects.filter(status = 2).exclude(flow = None)
     return render(request, 'sim/flow.html', {'sim_list':sim_list} )
 
+
+from plttool import *
+@log
+@check_sim_daemon
 def plot(request):
     print 'sim plot'
-    from models import Simulation
-    sim_list = Simulation.objects.filter(done = True).exclude(flow = None)
-    from plttool import *
+    sim_list = Simulation.objects.filter(status = 2).exclude(flow = None)
     img_tmp_dir, img_tmp_url = get_img_pos()
     img_dict = {}
     for sim in sim_list:
@@ -65,6 +101,7 @@ def get_img_pos():
     img_tmp_url = '/static/image/tmp'
     return img_tmp_dir, img_tmp_url
 
+'''
 def get_image_dict():
     import os.path
     PROJECT_DIR = os.path.abspath(os.path.dirname(__name__))
@@ -93,3 +130,4 @@ def reverse_cmp(x, y):
     if x < y:
         return b
     return 0
+'''

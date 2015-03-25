@@ -12,5 +12,15 @@
             <div class="simulation">
             <div><h3>{{s}}</h3></div>
 	    {% endfor %}
+        <div class="new_simulation">
+            <form action="addsim" method="post">
+                <span class="label">DCTCP</span>
+                <select class="value" name="dctcp">
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                </select>
+                <input type="submit" value="Add" />
+            <form>
+        <div>
 	</body>
 </html>
