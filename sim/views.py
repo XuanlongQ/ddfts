@@ -69,28 +69,27 @@ def plot(request):
     img_tmp_dir, img_tmp_url = get_img_pos()
     img_dict = {}
     for sim in sim_list:
-        fd_img = '%s/fd_img_%s.png' % (img_tmp_dir, sim.sid)
-        fd_img_url = '%s/fd_img_%s.png' % (img_tmp_url, sim.sid)
-        plot_flow_delay([sim], fd_img)
-        qat_img = '%s/qat_img_%s.png' % (img_tmp_dir, sim.sid)
-        qat_img_url = '%s/qat_img_%s.png' % (img_tmp_url, sim.sid)
-        plot_qat_cdf(sim, qat_img)
-        bat_img = '%s/bat_img_%s.png' % (img_tmp_dir, sim.sid)
-        bat_img_url = '%s/bat_img_%s.png' % (img_tmp_url, sim.sid)
-        plot_bat_cdf(sim, bat_img)
-        #background flow size's cdf
-        bfs_img = '%s/bfs_img_%s.png' % (img_tmp_dir, sim.sid)
-        bfs_img_url = '%s/bfs_img_%s.png' % (img_tmp_url, sim.sid)
-        plot_bfs_cdf(sim, bfs_img)
-        #concurrent connection cdf
-        cc_img = '%s/cc_img_%s.png' % (img_tmp_dir, sim.sid)
-        cc_img_url = '%s/cc_img_%s.png' % (img_tmp_url, sim.sid)
-        plot_cc_cdf(sim, cc_img)
-
-        img_dict[sim] = (qat_img_url, bat_img_url)
-        img_dict[sim] = (qat_img_url, bat_img_url, bfs_img_url)
-        img_dict[sim] = (fd_img_url, qat_img_url, bat_img_url, bfs_img_url)
-        img_dict[sim] = (cc_img_url, fd_img_url, qat_img_url, bat_img_url, bfs_img_url)
+        cdf_plot = {}
+        #flow delay cdf/pdf by flow
+        cdf_plot['fd'] = plot_fd_cdf
+        #query arrival time cdf/pdf by query flow
+        cdf_plot['qat'] = plot_qat_cdf
+        #background flow arrival time cdf/pdf by background flow
+        cdf_plot['bat'] = plot_bat_cdf
+        #background flow size's cdf by background flow
+        cdf_plot['bfs'] = plot_bfs_cdf
+        #concurrent connection cdf by time
+        cdf_plot['cc'] = plot_cc_cdf
+        #dropped packet count cdf/pdf by flow size
+        img_list = []
+        for cdf, plot in cdf_plot.iteritems():
+            img = '%s/%s_img_%s.png' % (img_tmp_dir, cdf, sim.sid)
+            img_url = '%s/%s_img_%s.png' % (img_tmp_url, cdf, sim.sid)
+            print img
+            print img_url
+            plot(sim, img)
+            img_list.append(img_url)
+        img_dict[sim] = img_list
 
     return render(request, 'sim/plot.html', {'sim_list':sim_list, 'img_dict':img_dict} )
 

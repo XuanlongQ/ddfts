@@ -3,8 +3,8 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-#s: Simulation
-def get_flow_delay_cdf(s):
+#ss: Simulation List
+def plot_fd_cdf(s, output_file_name=None):
 
     flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.all() ]
 
@@ -12,34 +12,10 @@ def get_flow_delay_cdf(s):
 
     pdf = np.histogram(flow_delay_list, bins=bins, normed=False)[0]
     pdf = pdf*1.0/sum(pdf)
-    bins = bins[1:]
     cdf = [ sum(pdf[:i]) for i in xrange(1, len(pdf)+1)]
 
-    #return (bins, pdf)
-    return bins, cdf, bins, pdf
-
-#ss: Simulation List
-def plot_flow_delay(ss, output_file_name=None):
-
-    l = len(ss)
-
-    color_list = ('blue', 'red', 'black', 'yellow', 'green', 'grey', 'pink', 'orange',)
-    while len(color_list) < l:
-        color_list += color_list
-
-    linestyle_list = (':', '--', '-', )
-    while len(linestyle_list) < l:
-        linestyle_list += linestyle_list
-
-    i = 0
-    for s in ss:
-        bins, cdf, bins, pdf  = get_flow_delay_cdf(s)
-        label = s.sid
-        color = color_list[i]
-        linestyle = linestyle_list[i]
-        #print 'linestyle = ' + linestyle
-        plt.plot(bins, cdf, color=color, linewidth=2.5, linestyle=linestyle, label=label)
-        i += 1
+    plt.plot(bins[1:], cdf, color='r', linewidth=2.5, linestyle=':', label='flow delay cdf')
+    i += 1
 
     #plt.xlim([0, 20])
 
@@ -133,7 +109,7 @@ def plot_bat_cdf(s, output_file_name=None):
 #input: s(models.Simulation)
 def plot_bfs_cdf(s, output_file_name):
 
-    fsize = [ f.size for f in s.flow_set.all()]
+    fsize = [ f.size for f in s.flow_set.exclude(ftype='q')]
     #print fsize
     sunit = 1000000
     bins = np.arange(min(fsize) - sunit/2, max(fsize), sunit)
@@ -147,11 +123,11 @@ def plot_bfs_cdf(s, output_file_name):
     #print cdf
 
     plt.plot(bins, pdf, color='black', linewidth=1.0, linestyle='-', label='Flow Count PDF')
-    plt.plot(bins, cdf, color='blue', linewidth=1.0, linestyle=':', label='Flow Count CDF')
+    #plt.plot(bins, cdf, color='blue', linewidth=1.0, linestyle=':', label='Flow Count CDF')
     #plt.plot(bins, bty_pdf, color='blue', linewidth=1.0, linestyle='--', label='Flow Bytes')
 
     #plt.xlim([0, 10])
-    plt.ylim([0, 0.1])
+    #plt.ylim([0, 0.1])
 
     plt.title('PDF of background flow size')
 
@@ -212,3 +188,8 @@ def plot_cc_cdf(s, output_file_name):
 
     #plt.show()
     plt.clf()
+
+#plot cdf of dropped packet count by time
+#input: s(models.Simulation)
+def plot_cc_cdf(s, output_file_name):
+    pass

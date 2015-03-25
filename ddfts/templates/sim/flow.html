@@ -4,14 +4,25 @@
 		<meta http-equiv=Content-Type content="text/html;charset=utf-8">
         <style type="text/css">
         </style>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $('.content:not(:first)').hide();
+                $('.title').click(function(){
+                    //console.log($(this).siblings().length);
+                    $(this).siblings('.content').toggle();
+                });
+            });
+        </script>
 	</head>
 	<body>
+        {%include 'sim/nav.html' %}
 		<h1>Simulation APP, this is Flow page!</h1>
         <hr/>
         {% for s in sim_list %}
-            <div class="simulation">
-            <div class="title"><h3>{{s}}</h3></div>
-            <div class="content">
+        <div class="simulation">
+                <div class="title"><h3>{{s}}</h3></div>
+            <div class="content flows">
                 {% for flow in s.flow_set.all %}
                 {% autoescape off %}
                     <div class="flow">
@@ -20,6 +31,7 @@
                 {% endautoescape %}
                 {% endfor %}
            </div>
+        </div>
 	    {% endfor %}
 	</body>
 </html>
