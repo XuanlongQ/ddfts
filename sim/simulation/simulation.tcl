@@ -18,7 +18,7 @@ incr i
 
 set RTT 200
 set queue_limit 250
-set trace_sampling_interval 0.0001
+set trace_sampling_interval 0.01
 
 #######################
 # Creating New Simulator
@@ -27,13 +27,14 @@ set ns [new Simulator]
 set flow_file [open $output_dir/flow.tr w]
 set packet_file [open $output_dir/packet.tr w]
 set queue_file [open $output_dir/queue.tr w]
-$ns trace-all $flow_file
+$ns trace-all $packet_file
 proc finish {} { 
-	global ns f namtrace
+	global ns flow_file packet_file queue_file
 	
 	$ns flush-trace
 	#puts "Simulation completed."
 	close $flow_file
+	close $packet_file
 	close $queue_file
 	exit 0
 }
@@ -46,7 +47,7 @@ source "$path/setup_tcp.tcl"
 #server group: sg
 set sg 1
 #server count sc
-set sc 10
+set sc 14
 
 #simulation end time
 set sim_end_time 10.0
@@ -75,7 +76,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
 		set server($i,$j) [$ns node]
       			#puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
 		$ns simplex-link $rack($i) $server($i,$j) 1000Mb .020ms RED
-        set queue_monitor($i,$j) [$ns monitor-queue $rack($i) $server($i,$j) /tmp/queue_$i_$j.tr $trace_sampling_interval]
+        set queue_monitor($i,$j) [$ns monitor-queue $rack($i) $server($i,$j) /tmp/queue_${i}_$j.tr $trace_sampling_interval]
 		$ns simplex-link $server($i,$j) $rack($i) 1000Mb .020ms DropTail
 		$ns queue-limit $rack($i) $server($i,$j) $queue_limit
 		$ns queue-limit $server($i,$j) $rack($i) $queue_limit

@@ -4,12 +4,11 @@ proc my_trace { } {
     set now [$ns now]
     for {set i 0} {$i < $sg} {incr i 1} {
 	    for {set j 0} {$j < $sc} {incr j 1} {
-            $queue_monitor($i,$j) instvar parrivals_ pdepartures_ pdrops_ bdepartures_ size_
+            $queue_monitor($i,$j) instvar parrivals_ pdepartures_ pdrops_ bdepartures_ pkts_ size_
             #now $rack $server $queue_size_
-            puts $queue_file "$now $i $j $size_"    
-            $ns at [expr $now + $trace_sampling_interval] "my_trace"
-
+            puts $queue_file "$now $i $j $pkts_ $size_"    
         }
     }
+    $ns at [expr $now + $trace_sampling_interval] "my_trace"
     
 }

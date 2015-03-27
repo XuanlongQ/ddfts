@@ -28,14 +28,15 @@
 [S]. reconfigure query traffic pattern using TcpApp
 [S]. add delay for resonese of query flow
 [S]. remodel simulation, flow
-    1. simulation[sid, dctcp, qfcnt, sfcnt, lfcnt, afcnt, status]
+    1. simulation[sid, dctcp, qfcnt, sfcnt, lfcnt, afcnt, status, time]
     2. flow[fid, ftype start, end, deadline, src, dst, size, {pktcnt}, drcnt, thrput, finished, sim]
         finished = (thrput >= size + 40*pktcnt)
 [S]. in sim home page, add function to create a simulation
 [S]. add simthread which regularly gets undone simulation from db and make it
 [S]. filter flow that has finished transportation in analyse_flow.py by comparing flow size and throughput //or by FYN packet
 [S]. create head navigate template for sim app
-.trace queue length
+[S].trace queue length
+. model qrecord[qid, rack, server, pktcnt, size]
 . plot PDF of queue length by time
 . reconfigure query traffic arrival time according to plotted png
 . reconfigure background traffic arrival time according to plotted png

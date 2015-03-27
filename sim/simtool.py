@@ -37,17 +37,24 @@ def simulate(s):
     tcl_output_dir = '%s/tcl/'%(out_dir,) 
     #print tcl_output_dir
 
+    import time
+    t1 = time.time()
     #simulate network using tcl script
     (status, output) = commands.getstatusoutput('/home/lqx/bin/ns-allinone-2.35/bin/ns sim/simulation/simulation.tcl %s %s %s'%(sid, dctcp, tcl_output_dir))
     print 'network simulation has generated: ' + tcl_output_dir
     print status, output
+    t2 = time.time()
+    sim_time = int(t2 - t1)
+    print 'simulation take time %s second' % ( sim_time,)
+    s.time = sim_time
+    s.save()
 
     s, flow_list = get_sim_result(s, tcl_output_dir)
 
     #remove tcl output bucause it's to big!!
-    (status, output) = commands.getstatusoutput('rm -rf %s/tcl'%(out_dir))
+    #(status, output) = commands.getstatusoutput('rm -rf %s/tcl'%(out_dir))
     #print status, output
-    (status, output) = commands.getstatusoutput('mkdir -p %s/tcl'%(out_dir))
+    #(status, output) = commands.getstatusoutput('mkdir -p %s/tcl'%(out_dir))
     #print status, output
     return s, flow_list
 
@@ -65,15 +72,15 @@ def simulate_daemon(args):
             #print 'len(siming):', len(siming)
             undone = Simulation.objects.filter(status=UNDONE) 
             if len(undone) == 0:
-                print '[At %s: %s]there is no undone simulation now' % (current_thread, time.time())
+                print '[At %s: %03d] There is no undone simulation now' % (current_thread, int(time.time())%100,)
             for sim in undone:
-                print '[At %s: %s]simulate simulation ' % (current_thread, time.time()), sim.sid
+                print '[At %s: %03d] Simulate simulation %s' % (current_thread, int(time.time())%100, sim.sid,)
                 sim.status = SIMING
                 sim.save()
                 sim, flow_list = simulate(sim)
                 sim.status = DONE
                 sim.save()
-                print '[At %s: %s]simulation %s is finished' % (current_thread, time.time(), sim.sid,)
+                print '[At %s: %03d] Simulation %s is finished' % (current_thread, int(time.time())%100, sim.sid,)
             import time
-            time.sleep(5)
+            time.sleep(30)
     

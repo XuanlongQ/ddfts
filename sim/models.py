@@ -13,6 +13,7 @@ class Simulation(models.Model):
     lfc = models.IntegerField(default=0)
     afc = models.IntegerField(default=0)
     status = models.IntegerField(default=False)
+    time = models.IntegerField(default=0)
 
     def __unicode__(self,):
         STATUS = ['UDONE', 'SIMING', 'DONE']

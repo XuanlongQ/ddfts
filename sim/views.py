@@ -56,7 +56,7 @@ def addsim(request):
 @check_sim_daemon
 def flow(request):
     print 'sim flow'
-    sim_list = Simulation.objects.filter(status = 2).exclude(flow = None)
+    sim_list = Simulation.objects.filter(status = 2)#.exclude(flow = None)
     return render(request, 'sim/flow.html', {'sim_list':sim_list} )
 
 
