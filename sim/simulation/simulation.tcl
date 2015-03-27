@@ -1,5 +1,5 @@
 set my_argc 3
-#argv: test_id, dctcp, tcl_output
+#argv: test_id, dctcp, output_dir
 if {$::argc < $my_argc} {
 	puts "argc = $argc, but we need $my_argc arguments"
 	exit
@@ -12,25 +12,29 @@ incr i
 set dctcp [lindex $argv $i]
 	#puts "dctcp=$dctcp"
 incr i
-set tcl_output [lindex $argv $i]
-	#puts "tcl_output=$tcl_output"
+set output_dir [lindex $argv $i]
+	#puts "output_dir=$output_dir"
 incr i
 
 set RTT 200
 set queue_limit 250
+set trace_sampling_interval 0.0001
 
 #######################
 # Creating New Simulator
 set ns [new Simulator]
 # Setting up the traces
-set f [open $tcl_output w]
-$ns trace-all $f
+set flow_file [open $output_dir/flow.tr w]
+set packet_file [open $output_dir/packet.tr w]
+set queue_file [open $output_dir/queue.tr w]
+$ns trace-all $flow_file
 proc finish {} { 
 	global ns f namtrace
 	
 	$ns flush-trace
 	#puts "Simulation completed."
-	close $f
+	close $flow_file
+	close $queue_file
 	exit 0
 }
 ###setup tcp#####################
@@ -38,18 +42,6 @@ set path [file normalize [info script]]
 set path [file dirname $path]
 source "$path/setup_tcp.tcl"
 ####################################
-$ns color 0 Blue
-$ns color 1 Red
-$ns color 2 Green
-$ns color 3 Yellow
-$ns color 4 Purple
-$ns color 5 White
-$ns color 6 Orange
-$ns color 7 Violet
-$ns color 8 Brown
-$ns color 9 Black
-
-
 
 #server group: sg
 set sg 1
@@ -83,12 +75,15 @@ for {set i 0} {$i < $sg} {incr i 1} {
 		set server($i,$j) [$ns node]
       			#puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
 		$ns simplex-link $rack($i) $server($i,$j) 1000Mb .020ms RED
+        set queue_monitor($i,$j) [$ns monitor-queue $rack($i) $server($i,$j) /tmp/queue_$i_$j.tr $trace_sampling_interval]
 		$ns simplex-link $server($i,$j) $rack($i) 1000Mb .020ms DropTail
 		$ns queue-limit $rack($i) $server($i,$j) $queue_limit
 		$ns queue-limit $server($i,$j) $rack($i) $queue_limit
 		$ns duplex-link-op $server($i,$j) $rack($i) queuePos 0.5
 	}
 }
+
+source "$path/trace.tcl"
 
 #######################
 source "$path/random.tcl"
@@ -110,5 +105,6 @@ setup_large_flow
 
 puts "afc:$fc"
 
+$ns at $trace_sampling_interval "my_trace"
 $ns at $sim_end_time "finish"
 $ns run
