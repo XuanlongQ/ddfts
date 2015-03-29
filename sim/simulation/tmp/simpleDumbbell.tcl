@@ -76,7 +76,7 @@ proc finish {} {
         close $throughputfile
         if {$enableNAM != 0} {
 	    close $namfile
-	    exec nam out.nam &
+	    #exec nam out.nam &
 	}
 	exit 0
 }
