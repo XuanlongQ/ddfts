@@ -41,7 +41,7 @@ if {[string compare $sourceAlg "DC-TCP-Sack"] == 0} {
     Agent/TCP set dctcp_g_ $DCTCP_g_;
 }
 Agent/TCP set d2tcp_ true;
-Agent/TCP set d2tcp_d_ 1.0;
+Agent/TCP set d2tcp_d_ 0.75;
 Agent/TCP/FullTcp set segsperack_ $ackRatio; 
 Agent/TCP/FullTcp set spa_thresh_ 3000;
 Agent/TCP/FullTcp set interval_ 0.04 ; #delayed ACK interval = 40ms
