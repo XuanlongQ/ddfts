@@ -18,7 +18,7 @@ incr i
 
 set RTT 200
 set queue_limit 250
-set trace_sampling_interval 0.01
+set trace_sampling_interval 0.0001
 set dctcp false
 set d2tcp false
 if { $tcptype == "dctcp" } {
@@ -84,9 +84,9 @@ for {set i 0} {$i < $sg} {incr i 1} {
 	for {set j 0} {$j < $sc} {incr j 1} {
 		set server($i,$j) [$ns node]
       			#puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
-		$ns simplex-link $rack($i) $server($i,$j) 1000Mb .020ms RED
+		$ns simplex-link $rack($i) $server($i,$j) 100Mb .020ms RED
         set queue_monitor($i,$j) [$ns monitor-queue $rack($i) $server($i,$j) /tmp/queue_${i}_$j.tr $trace_sampling_interval]
-		$ns simplex-link $server($i,$j) $rack($i) 1000Mb .020ms DropTail
+		$ns simplex-link $server($i,$j) $rack($i) 100Mb .020ms DropTail
 		$ns queue-limit $rack($i) $server($i,$j) $queue_limit
 		$ns queue-limit $server($i,$j) $rack($i) $queue_limit
 		$ns duplex-link-op $server($i,$j) $rack($i) queuePos 0.5

@@ -88,7 +88,7 @@ def plot(request):
             #print img
             #print img_url
             plot(sim, img)
-            if img_url.find('fd') >= 0:
+            if img_url.find('fd') >= 0 and True:
                 img_list.append(img_url)
         img_dict[sim] = img_list
 

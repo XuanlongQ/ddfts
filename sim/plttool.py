@@ -8,24 +8,20 @@ def plot_fd_cdf(s, output_file_name=None):
 
     flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.all() ]
 
-    bins = np.linspace(flow_delay_list[0], flow_delay_list[-1], 100)
+    bins = np.linspace(min(flow_delay_list), max(flow_delay_list), 100)
 
     pdf = np.histogram(flow_delay_list, bins=bins, normed=False)[0]
     pdf = pdf*1.0/sum(pdf)
     cdf = [ sum(pdf[:i]) for i in xrange(1, len(pdf)+1)]
 
-    plt.plot(bins[1:], cdf, color='r', linewidth=2.5, linestyle=':', label='flow delay cdf')
-    i += 1
+    plt.plot(bins[1:], pdf, color='r', linewidth=2.5, linestyle=':', label='flow delay cdf')
 
-    #plt.xlim([0, 20])
-
+    plt.xlim([0, 5000])
+    plt.ylim([0, .5])
     plt.title('flow delay CDF')
-
     plt.xlabel('flow delay(ms)')
-
     plt.ylabel('CDF')
-
-    plt.legend(loc = 'lower right')
+    plt.legend(loc = 'upper right')
 
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
@@ -55,13 +51,9 @@ def plot_qat_cdf(s, output_file_name):
     plt.plot(bins, pdf, color='b', linewidth=2.5, linestyle=':', label='pdf')
 
     #plt.xlim([0,2])
-
     plt.title('CDF of time between query arrivals')
-
     plt.xlabel('query flow start time(s)')
-
     plt.ylabel('CDF')
-
     plt.legend(loc = 'right')
 
     if output_file_name:
@@ -78,7 +70,7 @@ def plot_bat_cdf(s, output_file_name=None):
     #time between arrival list
     at_list = [ (start_list[i] - start_list[i-1]) for i in xrange(1, len(start_list)) ]
 
-    bins = np.linspace(at_list[0], at_list[-1], 100)
+    bins = np.linspace(min(at_list), max(at_list), 100)
 
     pdf = np.histogram(at_list, bins=bins, normed=False)[0]
     pdf = pdf*1.0/sum(pdf)
@@ -90,13 +82,9 @@ def plot_bat_cdf(s, output_file_name=None):
     plt.plot(bins, pdf, color='b', linewidth=2.5, linestyle=':', label='pdf')
 
     #plt.xlim([0, 20])
-
     plt.title('CDF of time between background flow arrivals')
-
     plt.xlabel('background flow start time(s)')
-
     plt.ylabel('CDF')
-
     plt.legend(loc = 'lower right')
 
     if output_file_name:
@@ -130,11 +118,8 @@ def plot_bfs_cdf(s, output_file_name):
     #plt.ylim([0, 0.1])
 
     plt.title('PDF of background flow size')
-
     plt.xlabel('flow size(Bytes)')
-
     plt.ylabel('CDF')
-
     plt.legend(loc = 'right')
 
     if output_file_name:
@@ -176,11 +161,8 @@ def plot_cc_cdf(s, output_file_name):
     #plt.ylim([0, 0.05])
 
     plt.title('PDF of Concurrent Connections')
-
     plt.xlabel('Concurrent Connections')
-
     plt.ylabel('PDF')
-
     plt.legend(loc = 'upper left')
 
     if output_file_name:
@@ -191,5 +173,5 @@ def plot_cc_cdf(s, output_file_name):
 
 #plot cdf of dropped packet count by time
 #input: s(models.Simulation)
-def plot_cc_cdf(s, output_file_name):
+def plot_dpc_cdf(s, output_file_name):
     pass

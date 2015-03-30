@@ -11,7 +11,7 @@ proc setup_short_flow {} {
         #1. use $prr to generate short flow arrival time list
         #sat_list[]
         #set avg according CDF of time between background flows(@DCTCP)
-        set avg 0.1
+        set avg 0.05
         set shape 25
         set r [prr $avg $shape]
         set sat_list(0) 0.02

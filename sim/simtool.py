@@ -26,7 +26,7 @@ def simulate(s):
     #return
 
     import commands
-    (status, output) = commands.getstatusoutput('rm -rf %s/sim/out' % (path,) )
+    #(status, output) = commands.getstatusoutput('rm -rf %s/sim/out' % (path,) )
     #print status, output
     (status, output) = commands.getstatusoutput('mkdir -p %s/tcl'%(out_dir))
     #print status, output
