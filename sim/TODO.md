@@ -36,6 +36,9 @@
 [S]. filter flow that has finished transportation in analyse_flow.py by comparing flow size and throughput //or by FYN packet
 [S]. create head navigate template for sim app
 [S].trace queue length
+[S]. remodel simulation
+    simulation[sid, {tcptype}, qfcnt, sfcnt, lfcnt, afcnt, status, time]
+        tcptype: tcp, dctcp, d2tcp
 . model qrecord[qid, rack, server, pktcnt, size]
 . plot PDF of queue length by time
 . reconfigure query traffic arrival time according to plotted png

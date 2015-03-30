@@ -1322,9 +1322,13 @@ TcpAgent::slowdown(int how)
 		}
 	else if (how & CLOSE_SSTHRESH_DCTCP) {
 		ssthresh_ = (int) ((1 - dctcp_alpha_/2.0) * windowd());
-        printf("dctcp_=%d, d2tcp_g_=%lf, SSTHRESH\n", dctcp_, dctcp_g_);
-        printf("d2tcp_=%d, d2tcp_d_=%lf, SSTHRESH\n", d2tcp_, d2tcp_d_);
+        //printf("dctcp_=%d, d2tcp_g_=%lf, SSTHRESH\n", dctcp_, dctcp_g_);
+        //printf("d2tcp_=%d, d2tcp_d_=%lf, SSTHRESH\n", d2tcp_, d2tcp_d_);
         //if d2tcp enabled
+        if(d2tcp_){
+            double p = pow(dctcp_alpha_, d2tcp_d_);
+		    cwnd_ = (1 - p/2.0) * windowd();
+        }
     }
         else if (how & THREE_QUARTER_SSTHRESH)
 		if (ssthresh_ < 3*cwnd_/4)
@@ -1338,8 +1342,12 @@ TcpAgent::slowdown(int how)
 	else if (how & CLOSE_CWND_DCTCP) {
 		cwnd_ = (1 - dctcp_alpha_/2.0) * windowd();
         //if d2tcp enabled
-        printf("dctcp_=%d, d2tcp_g_=%lf, SSTHRESH\n", dctcp_, dctcp_g_);
-        printf("d2tcp_=%d, d2tcp_d_=%lf, CWND\n", d2tcp_, d2tcp_d_);
+        //printf("dctcp_=%d, d2tcp_g_=%lf, SSTHRESH\n", dctcp_, dctcp_g_);
+        //printf("d2tcp_=%d, d2tcp_d_=%lf, CWND\n", d2tcp_, d2tcp_d_);
+        if(d2tcp_){
+            double p = pow(dctcp_alpha_, d2tcp_d_);
+		    cwnd_ = (1 - p/2.0) * windowd();
+        }
     }
         else if (how & CWND_HALF_WITH_MIN) {
 		// We have not thought about how non-standard TCPs, with

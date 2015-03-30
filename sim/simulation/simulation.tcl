@@ -1,5 +1,5 @@
 set my_argc 3
-#argv: test_id, dctcp, output_dir
+#argv: test_id, tcp_type, output_dir
 if {$::argc < $my_argc} {
 	puts "argc = $argc, but we need $my_argc arguments"
 	exit
@@ -9,8 +9,8 @@ set i 0
 set sid [lindex $argv $i]
 	#puts "simulation_id=$sid"
 incr i
-set dctcp [lindex $argv $i]
-	#puts "dctcp=$dctcp"
+set tcptype [lindex $argv $i]
+	#puts "tcp_type=$tcp_type"
 incr i
 set output_dir [lindex $argv $i]
 	#puts "output_dir=$output_dir"
@@ -19,6 +19,15 @@ incr i
 set RTT 200
 set queue_limit 250
 set trace_sampling_interval 0.01
+set dctcp false
+set d2tcp false
+if { $tcptype == "dctcp" } {
+    set dctcp true
+}
+
+if { $tcptype == "d2tcp" } {
+    set d2tcp true
+}
 
 #######################
 # Creating New Simulator
@@ -47,7 +56,7 @@ source "$path/setup_tcp.tcl"
 #server group: sg
 set sg 1
 #server count sc
-set sc 14
+set sc 40
 
 #simulation end time
 set sim_end_time 10.0

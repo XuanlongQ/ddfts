@@ -15,12 +15,20 @@ Agent/TCP set windowOption_ 0
 
 
 if { $dctcp } {
-    #puts "enable dctcp!!!"
-    Agent/TCP set dctcp_ $dctcp
+    puts "enable dctcp!!!"
+    Agent/TCP set dctcp_ true
     Agent/TCP set dctcp_g_ $DCTCP_g_; #g is the weight given to new samples against the past in the estimation of alpha
     Agent/TCP set dctcp_alpha_ 0; # alpha = (1-g)*alpha + g*F, alpha is an estimate of the fraction of packets that are marked
                                   #where F is the fraction of 
                                   #packets that were marked in the last window of data
+}
+if { $d2tcp } {
+    puts "enable d2tcp!!!"
+    Agent/TCP set dctcp_ true
+    Agent/TCP set dctcp_g_ $DCTCP_g_; 
+    Agent/TCP set dctcp_alpha_ 0; 
+    Agent/TCP set dctcp_ true
+    Agent/TCP set dctcp_d_ 1; 
 }
 Agent/TCP/FullTcp set segsperack_ $ackRatio; 
 Agent/TCP/FullTcp set spa_thresh_ 3000;

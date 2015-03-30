@@ -7,7 +7,7 @@ class Hello(models.Model):
 '''
 class Simulation(models.Model):
     sid = models.AutoField(primary_key=True) 
-    dctcp = models.BooleanField(default=False)
+    tcptype = models.CharField(max_length=10, null=True)
     qfc = models.IntegerField(default=0)
     sfc = models.IntegerField(default=0)
     lfc = models.IntegerField(default=0)

@@ -18,7 +18,7 @@ def cur_file_dir():
 #output s, flow_list: model.Flow
 def simulate(s):
     sid = s.sid
-    dctcp = 'true' if s.dctcp else 'false'
+    tcptype = s.tcptype
     
     path = cur_file_dir()
     out_dir = '%s/sim/out/%s' % (path, sid)
@@ -40,7 +40,7 @@ def simulate(s):
     import time
     t1 = time.time()
     #simulate network using tcl script
-    (status, output) = commands.getstatusoutput('/home/lqx/bin/ns-allinone-2.35/bin/ns sim/simulation/simulation.tcl %s %s %s'%(sid, dctcp, tcl_output_dir))
+    (status, output) = commands.getstatusoutput('/home/lqx/bin/ns-allinone-2.35/bin/ns sim/simulation/simulation.tcl %s %s %s'%(sid, tcptype, tcl_output_dir))
     print 'network simulation has generated: ' + tcl_output_dir
     print status, output
     t2 = time.time()

@@ -44,10 +44,10 @@ def home(request):
 @check_sim_daemon
 def addsim(request):
     print 'addsim'
-    if 'dctcp' in request.POST:
+    if 'tcptype' in request.POST:
         s = Simulation()
-        dctcp = request.POST['dctcp']
-        s.dctcp = True if dctcp == 'true' else False
+        tcptype = request.POST['tcptype']
+        s.tcptype = tcptype.lower()
         s.save()
     #return home(request)
     return HttpResponseRedirect('/sim')
@@ -85,10 +85,11 @@ def plot(request):
         for cdf, plot in cdf_plot.iteritems():
             img = '%s/%s_img_%s.png' % (img_tmp_dir, cdf, sim.sid)
             img_url = '%s/%s_img_%s.png' % (img_tmp_url, cdf, sim.sid)
-            print img
-            print img_url
+            #print img
+            #print img_url
             plot(sim, img)
-            img_list.append(img_url)
+            if img_url.find('fd') >= 0:
+                img_list.append(img_url)
         img_dict[sim] = img_list
 
     return render(request, 'sim/plot.html', {'sim_list':sim_list, 'img_dict':img_dict} )

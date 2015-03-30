@@ -13,10 +13,11 @@
 	    {% endfor %}
         <div class="new_simulation">
             <form action="addsim" method="post">
-                <span class="label">DCTCP</span>
-                <select class="value" name="dctcp">
-                    <option value="true">True</option>
-                    <option value="false">False</option>
+                <span class="label">TCP Type</span>
+                <select class="value" name="tcptype">
+                    <option value="tcp">TCP</option>
+                    <option value="dctcp">DCTCP</option>
+                    <option value="d2tcp">D2TCP</option>
                 </select>
                 <input type="submit" value="Add" />
             <form>

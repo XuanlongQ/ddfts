@@ -91,17 +91,18 @@ proc myTrace {file} {
     for {set i 0} {$i < $N} {incr i} {
 	set cwnd($i) [$tcp($i) set cwnd_]
 	set dctcp_alpha($i) [$tcp($i) set dctcp_alpha_]
+	set d2tcp_dline($i) [$tcp($i) set d2tcp_d_]
     }
     
     $qfile instvar parrivals_ pdepartures_ pdrops_ bdepartures_
   
 #now cwnd0 cwnd1 ... cwnd$N alpha0 alpha1 ... alpha$N (parr-pdep-pdro) pdro
-    puts -nonewline $file "$now $cwnd(0)"
+    puts -nonewline $file [format "%.4lf %.2lf" $now $cwnd(0)]
     for {set i 1} {$i < $N} {incr i} {
-	puts -nonewline $file " $cwnd($i)"
+	puts -nonewline $file [format " %.2lf" $cwnd($i)]
     }
     for {set i 0} {$i < $N} {incr i} {
-	puts -nonewline $file " $dctcp_alpha($i)"
+	puts -nonewline $file [format " %.3lf^%.3lf" $dctcp_alpha($i) $d2tcp_dline($i)]
     }
  
     puts -nonewline $file " [expr $parrivals_-$pdepartures_-$pdrops_]"    
@@ -198,6 +199,7 @@ for {set i 0} {$i < $N} {incr i} {
     $ns attach-agent $nclient $sink($i)
     
     $tcp($i) set fid_ [expr $i]
+    $tcp($i) set d2tcp_d_ [expr $i+0.2]
     $sink($i) set fid_ [expr $i]
 
     $ns connect $tcp($i) $sink($i)       
