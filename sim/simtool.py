@@ -49,7 +49,7 @@ def simulate(s):
     s.time = sim_time
     s.save()
 
-    s, flow_list = get_sim_result(s, tcl_output_dir)
+    s, flow_list, qrecord_list = get_sim_result(s, tcl_output_dir)
 
     #remove tcl output bucause it's to big!!
     #(status, output) = commands.getstatusoutput('rm -rf %s/tcl'%(out_dir))

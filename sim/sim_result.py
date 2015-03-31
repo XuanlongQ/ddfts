@@ -93,6 +93,20 @@ def flow_tracer(input_file_name):
             
     return qfc, sfc, lfc, afc, ftype_dict, deadline_dict, src_dict, dst_dict, size_dict 
 
+def queue_tracer(input_file_name):
+    input_file = open(input_file_name, 'r')
+    qrecord_list = []
+    for line in input_file:
+        time, rack, server, pktcnt, size = line.strip().split(' ')
+        q = Qrecord()
+        q.time = int(time)
+        q.rack = int(rack)
+        q.server = int(server)
+        q.pktcnt = int(pktcnt)
+        q.size = int(size)
+        qrecord_list.append(q)
+    return qrecord_list
+
 #input: models.Simulation s, output_dir
 #output: s, flow_list
 def get_sim_result(s, output_dir):
@@ -127,4 +141,7 @@ def get_sim_result(s, output_dir):
         flow.save()
         #print flow
         flow_list.append(flow)
-    return s, flow_list
+    qrecord_list = queue_tracer(input_file_name = '%s/queue.tr' % output_dir)
+    map(lambda q: q.sim = s, qrecord_list)
+    map(lambda q: q.save(), qrecord_list)
+    return s, flow_list, qrecord_list

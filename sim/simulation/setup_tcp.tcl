@@ -27,7 +27,7 @@ if { $d2tcp } {
     Agent/TCP set dctcp_ true
     Agent/TCP set dctcp_g_ $DCTCP_g_; 
     Agent/TCP set dctcp_alpha_ 0; 
-    Agent/TCP set dctcp_ true
+    Agent/TCP set d2tcp_ true
     Agent/TCP set dctcp_d_ 1; 
 }
 Agent/TCP/FullTcp set segsperack_ $ackRatio; 

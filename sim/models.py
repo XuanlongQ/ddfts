@@ -17,7 +17,7 @@ class Simulation(models.Model):
 
     def __unicode__(self,):
         STATUS = ['UDONE', 'SIMING', 'DONE']
-        return '[simulation %03d has %s query flow, %d short flow, and %d large flow, which totally has %d flow, and it\' simulation is %s]' % (self.sid, self.qfc, self.sfc, self.lfc, self.afc, STATUS[self.status])
+        return '[simulation %03d[%s] has %s query flow, %d short flow, and %d large flow, which totally has %d flow, and it\' simulation is %s]' % (self.sid, self.tcptype, self.qfc, self.sfc, self.lfc, self.afc, STATUS[self.status])
 
 class Flow(models.Model):
     fid = models.AutoField(primary_key=True) 
@@ -41,3 +41,14 @@ class Flow(models.Model):
 % (flow_type[self.ftype], self.fid, self.sim.sid, self.src, self.dst, \
 self.start/1000.0 , self.end/1000.0, self.end - self.start, \
 self.drcnt, self.size, self.thrput, self.pktcnt, FINISH[self.finished])
+
+class Qrecord(models.Model):
+    qid = models.AutoField(primary_key=True) 
+    time = models.IntegerField(default=0)
+    rack = models.IntegerField(default=0)
+    server = models.IntegerField(default=0)
+    pktcnt = models.IntegerField(default=0)
+    size = models.IntegerField(default=0)
+    sim = models.ForeignKey(Simulation)
+
+    #def __unicode__(self,):

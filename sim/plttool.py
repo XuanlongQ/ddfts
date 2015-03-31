@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 #ss: Simulation List
 def plot_fd_cdf(s, output_file_name=None):
 
-    flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.all() ]
+    flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.all().filter(ftype='q') ]
 
     bins = np.linspace(min(flow_delay_list), max(flow_delay_list), 100)
 

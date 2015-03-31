@@ -79,8 +79,8 @@ proc setup_query_flow {} {
         for {set i 0} {$i < $qfc} {incr i 1} {
             set qf_tcp($i) [new Agent/TCP/FullTcp/Sack]
             set qf_sink($i) [new Agent/TCP/FullTcp/Sack]
-            $qf_tcp($i) set d2tcp_d_ [expr ($i+1)*10]
-            $qf_sink($i) set d2tcp_d_ [expr ($i+1)*10]
+            $qf_tcp($i) set d2tcp_d_ [expr ($i+1)]
+            $qf_sink($i) set d2tcp_d_ [expr ($i+1)]
             $ns attach-agent $server($qf_src($i)) $qf_tcp($i)
             $ns attach-agent $server($qf_dst($i)) $qf_sink($i)
             $ns connect $qf_tcp($i) $qf_sink($i)
