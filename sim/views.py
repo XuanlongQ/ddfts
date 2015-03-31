@@ -15,6 +15,9 @@ def check_sim_daemon(f):
             print 'simulation daemon is alive'
             return f(*args, **argskw)
 
+        print 'simtool.SIM_DAEMON:', simtool.SIM_DAEMON
+        if simtool.SIM_DAEMON:
+            print 'simtool.SIM_DAEMON.is_alive():', simtool.SIM_DAEMON.is_alive()
         print 'simulation daemon is not alive, start it!!!'
         import threading
         from simtool import simulate_daemon

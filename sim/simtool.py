@@ -70,10 +70,10 @@ def simulate_daemon(args):
             DONE = 2
             #check if simulate thread is already started 
             #print 'len(siming):', len(siming)
-            print 'len(sim): ', len(Simulation.objects.all())
-            print 'len(sim undone): ', len(Simulation.objects.filter(status=UNDONE))
-            print 'len(sim siming): ', len(Simulation.objects.filter(status=SIMING))
-            print 'len(sim done): ', len(Simulation.objects.filter(status=DONE))
+            #print 'len(sim): ', len(Simulation.objects.all())
+            #print 'len(sim undone): ', len(Simulation.objects.filter(status=UNDONE))
+            #print 'len(sim siming): ', len(Simulation.objects.filter(status=SIMING))
+            #print 'len(sim done): ', len(Simulation.objects.filter(status=DONE))
             undone = Simulation.objects.filter(status=UNDONE) 
             if len(undone) == 0:
                 print '[At %s: %03d] There is no undone simulation now' % (current_thread, int(time.time())%100,)
@@ -86,4 +86,12 @@ def simulate_daemon(args):
                 sim.save()
                 print '[At %s: %03d] Simulation %s is finished' % (current_thread, int(time.time())%100, sim.sid,)
             time.sleep(30)
+
+            daemon = threading.Thread(target=simulate_daemon, args=('simulate daemon',))
+            daemon.setDaemon(True)
+            daemon.start()
+            print '[At %s: %03d] start daemon %s' % (current_thread, int(time.time())%100, daemon,)
+            global SIM_DAEMON
+            SIM_DAEMON = daemon
+            return
     

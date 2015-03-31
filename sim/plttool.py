@@ -191,6 +191,8 @@ def plot_ql_cdf(s, output_file_name):
         qlen_list = qlen_dict[qid]
         plt.plot(time_list, qlen_list)
 
+    #plt.xlim([0, 4])
+    plt.ylim([0, 300])
     plt.title('PDF of queue length')
     plt.xlabel('time')
     plt.ylabel('PDF fo queue length')

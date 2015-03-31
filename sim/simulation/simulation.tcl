@@ -19,7 +19,7 @@ incr i
 set queue_limit 250
 set link_bw 100Mb
 set link_lt .020ms
-set trace_sampling_interval .001
+set trace_sampling_interval .01
 set dctcp false
 set d2tcp false
 if { $tcptype == "dctcp" } {

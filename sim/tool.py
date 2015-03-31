@@ -1,5 +1,5 @@
 import functools
-import time
+import time, threading
 
 def performance(prefix):
     def performance_decorator(f):
@@ -11,7 +11,8 @@ def performance(prefix):
             r = f(*args, **argskw)
             t2 = time.time()
             duraction = t2 - t1
-            print 'function %s takes %ds' % (f.__name__, duraction)
+            current_thread = threading.currentThread()
+            print '[At %s: %03d] func %s takes %ds' % (current_thread, int(time.time())%100, f.__name__, duraction, )
             return r
         return wrapper
     return performance_decorator
