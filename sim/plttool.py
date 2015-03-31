@@ -171,7 +171,30 @@ def plot_cc_cdf(s, output_file_name):
     #plt.show()
     plt.clf()
 
-#plot cdf of dropped packet count by time
+#plot cdf of queue length by time
 #input: s(models.Simulation)
-def plot_dpc_cdf(s, output_file_name):
-    pass
+def plot_ql_cdf(s, output_file_name):
+    qrecord = s.qrecord_set.all()
+    #print 'qrcord.len = ' , len(qrecord)
+    time_dict = {}
+    qlen_dict = {}
+    for q in qrecord:
+        qid = '%d,%d' % (q.rack, q.server)
+        if not (qid in qlen_dict):
+            time_dict[qid] = []
+            qlen_dict[qid] = []
+        time_dict[qid].append(q.time) 
+        qlen_dict[qid].append(q.pktcnt) 
+    for qid in time_dict:
+        #print 'qid = ', qid
+        time_list = time_dict[qid]
+        qlen_list = qlen_dict[qid]
+        plt.plot(time_list, qlen_list)
+
+    plt.title('PDF of queue length')
+    plt.xlabel('time')
+    plt.ylabel('PDF fo queue length')
+    if output_file_name:
+        plt.savefig(output_file_name, dip=72)
+
+    plt.clf()

@@ -6,6 +6,7 @@ from models import *
 import functools
 import simtool
 import time
+
 def check_sim_daemon(f):
     @functools.wraps(f)
     def fn(*args, **argskw):
@@ -80,7 +81,8 @@ def plot(request):
         cdf_plot['bfs'] = plot_bfs_cdf
         #concurrent connection cdf by time
         cdf_plot['cc'] = plot_cc_cdf
-        #dropped packet count cdf/pdf by flow size
+        #queue length cdf/pdf by time
+        cdf_plot['ql'] = plot_ql_cdf
         img_list = []
         for cdf, plot in cdf_plot.iteritems():
             img = '%s/%s_img_%s.png' % (img_tmp_dir, cdf, sim.sid)
@@ -90,6 +92,10 @@ def plot(request):
             plot(sim, img)
             if img_url.find('fd') >= 0 and True:
                 img_list.append(img_url)
+            elif img_url.find('ql') >= 0 and True:
+                img_list.append(img_url)
+            else:
+                pass
         img_dict[sim] = img_list
 
     return render(request, 'sim/plot.html', {'sim_list':sim_list, 'img_dict':img_dict} )

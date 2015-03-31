@@ -1,3 +1,8 @@
+from models import *
+from tool import performance
+LEVEL = 'DEBUG'
+
+@performance(LEVEL)
 def packet_tracer(input_file_name):
 
     input_file = open(input_file_name, 'r')
@@ -58,6 +63,7 @@ def packet_tracer(input_file_name):
 
     return (id_list, stime_dict, etime_dict, drcnt_dict, thrput_dict, pktcnt_dict)
 
+@performance(LEVEL)
 def flow_tracer(input_file_name):
     qfc, sfc, lfc, afc = (0, 0, 0, 0)
     ftype_dict = {}
@@ -93,6 +99,7 @@ def flow_tracer(input_file_name):
             
     return qfc, sfc, lfc, afc, ftype_dict, deadline_dict, src_dict, dst_dict, size_dict 
 
+@performance(LEVEL)
 def queue_tracer(input_file_name):
     input_file = open(input_file_name, 'r')
     qrecord_list = []
@@ -109,6 +116,7 @@ def queue_tracer(input_file_name):
 
 #input: models.Simulation s, output_dir
 #output: s, flow_list
+@performance(LEVEL)
 def get_sim_result(s, output_dir):
 
     qfc, sfc, lfc, afc, ftype_dict, deadline_dict, src_dict, dst_dict, size_dict = flow_tracer(input_file_name = '%s/flow.tr' % output_dir)
@@ -120,7 +128,6 @@ def get_sim_result(s, output_dir):
     #print 's = %s' % s
     #using python script now
     fid_list, stime_dict, etime_dict, drcnt_dict, thrput_dict, pktcnt_dict = packet_tracer(input_file_name = '%s/packet.tr' % output_dir)
-    from models import Flow
     flow_list = []
     for fid in fid_list:
         flow = Flow()
@@ -142,6 +149,7 @@ def get_sim_result(s, output_dir):
         #print flow
         flow_list.append(flow)
     qrecord_list = queue_tracer(input_file_name = '%s/queue.tr' % output_dir)
-    map(lambda q: q.sim = s, qrecord_list)
-    map(lambda q: q.save(), qrecord_list)
+    for q in qrecord_list:
+        q.sim = s
+        q.save()
     return s, flow_list, qrecord_list

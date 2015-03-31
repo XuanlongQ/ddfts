@@ -1,12 +1,13 @@
 proc my_trace { } {
 
     global ns sc sg trace_sampling_interval queue_monitor queue_file
-    set now [expr int([expr [$ns now]*1000000])]
+    set now [$ns now]
+    set now_ [expr int([expr $now*1000000])]
     for {set i 0} {$i < $sg} {incr i 1} {
 	    for {set j 0} {$j < $sc} {incr j 1} {
             $queue_monitor($i,$j) instvar parrivals_ pdepartures_ pdrops_ bdepartures_ pkts_ size_
             #now $rack $server $queue_size_
-            puts $queue_file "$now $i $j $pkts_ $size_"    
+            puts $queue_file "$now_ $i $j $pkts_ $size_"    
         }
     }
     $ns at [expr $now + $trace_sampling_interval] "my_trace"

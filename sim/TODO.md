@@ -40,14 +40,8 @@
     simulation[sid, {tcptype}, qfcnt, sfcnt, lfcnt, afcnt, status, time]
         tcptype: tcp, dctcp, d2tcp
 [S]. proving the difference of tcp, dctcp, d2tcp using cwnd & alpha tracer
-. model qrecord[qid, time, rack, server, pktcnt, size, sim]
-. plot PDF of queue length by time
+[S]. model qrecord[qid, time, rack, server, pktcnt, size, sim]
+[S]. plot PDF of queue length by time
 . reconfigure query traffic arrival time according to plotted png
 . reconfigure background traffic arrival time according to plotted png
 . adjust PDF of background flow count/byte x axis: 10^3, 10^4, 10^5, 10^6, 10^7, 10^8
-. model drop[did, start, end, cnt, sim]
-        did: drop id
-        start end: time duraction
-        cnt: count of dropped packets
-        sim: belong simulation
-. plot PDF of dropped packet by time
