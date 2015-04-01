@@ -2,11 +2,12 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+import simtool
 
 #ss: Simulation List
 def plot_fd_cdf(s, output_file_name=None):
 
-    flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.all().filter(ftype='q') ]
+    flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True).filter(ftype='q') ]
 
     bins = np.linspace(min(flow_delay_list), max(flow_delay_list), 100)
 
@@ -14,10 +15,11 @@ def plot_fd_cdf(s, output_file_name=None):
     pdf = pdf*1.0/sum(pdf)
     cdf = [ sum(pdf[:i]) for i in xrange(1, len(pdf)+1)]
 
-    plt.plot(bins[1:], pdf, color='r', linewidth=2.5, linestyle=':', label='flow delay cdf')
+    plt.plot(bins[1:], pdf, label='flow delay pdf')
+    plt.plot(bins[1:], cdf, label='flow delay cdf')
 
-    plt.xlim([0, 5000])
-    plt.ylim([0, .5])
+    plt.xlim([4000, 6500])
+    plt.ylim([0, .0010])
     plt.title('flow delay CDF')
     plt.xlabel('flow delay(ms)')
     plt.ylabel('CDF')
@@ -100,7 +102,7 @@ def plot_bfs_cdf(s, output_file_name):
     fsize = [ f.size for f in s.flow_set.exclude(ftype='q')]
     #print fsize
     sunit = 1000000
-    bins = np.arange(min(fsize) - sunit/2, max(fsize), sunit)
+    bins = np.linspace(min(fsize) - sunit/2, max(fsize), 100)
     #print bins
     #bins = np.array([0, 2001, 1000100, 10000000, 100000000,])
     pdf = np.histogram(fsize, bins=bins, density=False)[0]
@@ -112,7 +114,6 @@ def plot_bfs_cdf(s, output_file_name):
 
     plt.plot(bins, pdf, color='black', linewidth=1.0, linestyle='-', label='Flow Count PDF')
     #plt.plot(bins, cdf, color='blue', linewidth=1.0, linestyle=':', label='Flow Count CDF')
-    #plt.plot(bins, bty_pdf, color='blue', linewidth=1.0, linestyle='--', label='Flow Bytes')
 
     #plt.xlim([0, 10])
     #plt.ylim([0, 0.1])
@@ -134,7 +135,7 @@ def plot_cc_cdf(s, output_file_name):
 
     sim_start = 0 #simulation start time
     sim_end = 10000000 #simulation end time
-    tunit = 50000
+    tunit = 50000 #50ms
 
     tbin = np.arange(sim_start, sim_end, tunit)
     tbin = tbin + tunit/2
@@ -143,19 +144,20 @@ def plot_cc_cdf(s, output_file_name):
     for i in xrange(0, len(tbin)):
         trange = (tbin[i]-tunit/2,tbin[i]+tunit/2)
         #print trange
-        fc = s.flow_set.all().filter(start__range=trange) | s.flow_set.all().filter(end__range=trange)
+        flow_list = s.flow_set.all().filter(start__range=trange) | s.flow_set.all().filter(end__range=trange)
+        #we want the average count of active flow in every server
+        fc = (len(flow_list) * 1.0) / (simtool.SG * simtool.SC)
         #print fc
-        fcnt.append(len(fc))
+        fcnt.append(fc)
     #print 'fcnt:'
     #print fcnt 
 
-    bins = np.arange(min(fcnt)-1, max(fcnt)+1)
+    bins = np.linspace(min(fcnt), max(fcnt), 100)
     pdf = np.histogram(fcnt, bins=bins, density=False)[0]
     pdf = pdf*1.0/sum(pdf)
     cdf = [ sum(pdf[:i]) for i in xrange(1, len(pdf)+1)]
-    bins = bins[1:]
-    plt.plot(bins, pdf, color='black', linewidth=1.0, linestyle='-', label='Cuncurrent Connections PDF')
-    plt.plot(bins, cdf, color='blue', linewidth=1.0, linestyle=':', label='Cuncurrent Connections CDF')
+    plt.plot(bins[1:], pdf, color='black', linewidth=1.0, linestyle='-', label='Cuncurrent Connections PDF')
+    plt.plot(bins[1:], cdf, color='blue', linewidth=1.0, linestyle=':', label='Cuncurrent Connections CDF')
 
     #plt.xlim([0, 4])
     #plt.ylim([0, 0.05])

@@ -42,6 +42,8 @@
 [S]. proving the difference of tcp, dctcp, d2tcp using cwnd & alpha tracer
 [S]. model qrecord[qid, time, rack, server, pktcnt, size, sim]
 [S]. plot PDF of queue length by time
+[S]. incast avoidance: reduce cwnds of flows which share the same link with the query flow so the bandwidth is unoccupied
+. plot PDF of flow delay(all, query, short, large)
 . reconfigure query traffic arrival time according to plotted png
 . reconfigure background traffic arrival time according to plotted png
 . adjust PDF of background flow count/byte x axis: 10^3, 10^4, 10^5, 10^6, 10^7, 10^8

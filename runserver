@@ -1,5 +1,5 @@
-#sudo rm /tmp/ddfts.db
-#mysql -uroot -p123 -e"drop database if exists ddfts;"
-#mysql -uroot -p123 -e"create database ddfts;"
-#python manage.py syncdb
+sudo rm /tmp/ddfts.db
+mysql -uroot -p123 -e"drop database if exists ddfts;"
+mysql -uroot -p123 -e"create database ddfts;"
+python manage.py syncdb
 sudo python manage.py runserver 0.0.0.0:80

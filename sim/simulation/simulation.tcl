@@ -22,12 +22,17 @@ set link_lt .020ms
 set trace_sampling_interval .01
 set dctcp false
 set d2tcp false
+set sdnd2tcp false
 if { $tcptype == "dctcp" } {
     set dctcp true
 }
 
 if { $tcptype == "d2tcp" } {
     set d2tcp true
+}
+
+if { $tcptype == "sdnd2tcp" } {
+    set sdnd2tcp true
 }
 
 #######################
@@ -59,7 +64,7 @@ source "$path/setup_tcp.tcl"
 #server group: sg
 set sg 1
 #server count sc
-set sc 40
+set sc 44
 
 #simulation end time
 set sim_end_time 10.0

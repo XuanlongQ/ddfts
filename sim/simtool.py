@@ -6,6 +6,8 @@ import threading, time
 from models import *
 from tool import performance
 LEVEL = 'DEBUG'
+SG = 1 #count of server group
+SC = 44 #count of server in every group
 
 def cur_file_dir():
     path = sys.path[0]

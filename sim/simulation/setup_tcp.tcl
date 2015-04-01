@@ -22,8 +22,18 @@ if { $dctcp } {
                                   #where F is the fraction of 
                                   #packets that were marked in the last window of data
 }
+
 if { $d2tcp } {
     puts "enable d2tcp!!!"
+    Agent/TCP set dctcp_ true
+    Agent/TCP set dctcp_g_ $DCTCP_g_; 
+    Agent/TCP set dctcp_alpha_ 0; 
+    Agent/TCP set d2tcp_ true
+    Agent/TCP set dctcp_d_ 1; 
+}
+
+if { $sdnd2tcp } {
+    puts "enable sdnd2tcp!!!"
     Agent/TCP set dctcp_ true
     Agent/TCP set dctcp_g_ $DCTCP_g_; 
     Agent/TCP set dctcp_alpha_ 0; 

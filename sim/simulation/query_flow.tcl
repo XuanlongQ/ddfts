@@ -12,8 +12,8 @@ proc setup_query_flow {} {
         #1. use $prr to generate query flow arrival time list
         #qat_list[]
         #set avg according CDF of time between background flows(@DCTCP)
-        #avg = 500 ms
-        set avg 0.3
+        #avg = 100 ms
+        set avg 0.1
         set shape 5.5
         set r [prr $avg $shape]
         #set avg 0.4
@@ -117,7 +117,20 @@ set rr_shape 5
 set rr [prr $rr_avg $rr_shape]
 Application/TcpApp instproc recv {i} {
 	global ns qf_sftp qf_ftp qf_start rr
+    global sdnd2tcp
+    global lfc sfc
+    global lf_tcp sf_tcp
+    global lf_src sf_src qf_src
+    global lf_dst sf_dst qf_src
     if { $i>0 } {
         $ns at [expr [$ns now] + [$rr value]] "$qf_sftp($i) send 2000 {$qf_ftp($i) recv {-1}}"
+        #TODO accroding link bandwidth and port queue length, reduce cwnd
+        if { $sdnd2tcp } {
+            for {set i 0} {$i < $lfc} {incr i 1} {
+                if { $lf_src($i) == $qf_src($i) || $lf_dst($i) == $qf_src($i) } {
+                    $ns at [expr [$ns now] + [$rr value]] "$lf_tcp($i) set cwnd_ 1"
+                }
+            }
+        }
     }
 }

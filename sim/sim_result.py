@@ -151,5 +151,5 @@ def get_sim_result(s, output_dir):
     qrecord_list = queue_tracer(input_file_name = '%s/queue.tr' % output_dir)
     for q in qrecord_list:
         q.sim = s
-        q.save()
+        #q.save()
     return s, flow_list, qrecord_list
