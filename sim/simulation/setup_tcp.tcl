@@ -1,4 +1,4 @@
-set DCTCP_g_ 0.0625
+set DCTCP_g_  [expr 1.0/16]; #@DCTCP
 set ackRatio 1 
 set packetSize 1460
 set ftpPkgSize 1000
