@@ -51,7 +51,7 @@ proc setup_short_flow {} {
         #
         #set short (message) flow's size
         #
-        set r3 [udr 20 1001]
+        set r3 [udr 2000 1000001]
         for {set i 0} {$i < $sfc} {incr i 1} {
             set sf_size($i) [expr int([$r3 value])*$ftpPkgSize]
             #puts "flow $i, flow size: [expr $sf_size($i)]"

@@ -51,7 +51,7 @@ proc setup_large_flow {} {
         #
         #set large flow's size
         #
-        set r3 [udr 50000 1000001]
+        set r3 [udr 1000000 50000001]
         for {set i 0} {$i < $lfc} {incr i 1} {
             set lf_size($i) [expr int([$r3 value])*$ftpPkgSize]
             #puts "flow $i, flow size: [expr $lf_size($i)]"
