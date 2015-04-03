@@ -17,7 +17,7 @@ set output_dir [lindex $argv $i]
 incr i
 
 set queue_limit 250
-set link_bw 100Mb
+set link_bw 1000Mb
 set link_lt .020ms
 set trace_sampling_interval .01
 set dctcp false
@@ -121,7 +121,7 @@ setup_short_flow
 source "$path/large_flow.tcl"
 setup_large_flow
 
-puts "afc:$fc"
+puts $flow_file "afc:$fc"
 
 #set tmp_tcp $lf_tcp(0)
 #$ns at $lf_start(0) "tcp_trace $lf_tcp(0)"

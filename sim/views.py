@@ -100,7 +100,7 @@ def plot(request):
                 #img_list.append(img_url)
                 pass
             else:
-                #img_list.append(img_url)
+                img_list.append(img_url)
                 pass
         img_dict[sim] = img_list
 

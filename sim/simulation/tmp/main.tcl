@@ -43,7 +43,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
 	for {set j 0} {$j < $sn} {incr j 1} {
 		set server($i,$j) [$ns node]
       			puts "server([expr $i],[expr $j]): [$server($i,$j) id]"
-		$ns duplex-link $rack($i) $server($i,$j) 10Mb .9ms DropTail
+		$ns duplex-link $rack($i) $server($i,$j) 1000Mb .020ms DropTail
 		$ns queue-limit $rack($i) $server($i,$j) 10
 		$ns duplex-link-op $server($i,$j) $rack($i) queuePos 0.5
 	}
@@ -126,7 +126,7 @@ for {set i 0} {$i < $sg} {incr i 1} {
 		incr count 1
 	}
 }
-$ns at 0.001 "$mf_ftp(0,0,1) send 160000"
+$ns at 0.001 "$mf_ftp(0,0,1) send 1600"
 
 #large flow
 for {set i 0} {$i < $sg} {incr i 1} {

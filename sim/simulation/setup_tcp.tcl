@@ -53,7 +53,7 @@ Queue/RED set setbit_ true ; #mark instead of drop
 Queue/RED set gentle_ false
 Queue/RED set q_weight_ 1.0 ; #1.0 means that use current queue length but not average queue length
 Queue/RED set mark_p_ 1.0
-set K 65
+set K 20
 Queue/RED set thresh_ [expr $K] ; #minthresh
 Queue/RED set maxthresh_ [expr $K] ; #maxthresh
 			 
