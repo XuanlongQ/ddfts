@@ -18,16 +18,16 @@ def plot_fd_cdf(s, output_file_name=None):
     ftype_list = ['a', 'q', 's', 'l'] # all, query, short, large
     for i, ftype in zip(range(1,5), ftype_list):
         if ftype == 'a':
-            flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True) ]
+            flow_delay_list = [ float(f.end - f.start)/1000000 for f in s.flow_set.filter(finished=True) ]
         else:
-            flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True).filter(ftype=ftype) ]
+            flow_delay_list = [ float(f.end - f.start)/1000000 for f in s.flow_set.filter(finished=True).filter(ftype=ftype) ]
         bins, pdf, cdf = getbinspdfcdf(flow_delay_list)
         plt.subplot(2, 2, i)
         plt.plot(bins, pdf, label='%s flow delay pdf' % (ftype,))
         plt.plot(bins, cdf, label='%s flow delay cdf' % (ftype,))
 
-        #plt.xlim([4000, 6500])
-        #plt.ylim([0, 1])
+        #plt.xlim([0, 300])
+        #plt.ylim([0, 0.01])
         #plt.title('%s flow delay CDF' % (ftype,))
         #plt.xlabel('flow delay(ms)')
         #plt.ylabel('CDF')

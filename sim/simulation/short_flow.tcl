@@ -1,5 +1,6 @@
 #short (message) flow: update control state on the workers 100KB-1MB
 proc setup_short_flow {} {
+        global ns
         global flow_file
         global ftpPkgSize
         global sfc fc
@@ -11,7 +12,7 @@ proc setup_short_flow {} {
         #1. use $prr to generate short flow arrival time list
         #sat_list[]
         #set avg according CDF of time between background flows(@DCTCP)
-        set avg 0.05
+        set avg 0.09
         set shape 25
         set r [prr $avg $shape]
         set sat_list(0) 0.02
@@ -51,7 +52,7 @@ proc setup_short_flow {} {
         #
         #set short (message) flow's size
         #
-        set r3 [udr 2000 1000001]
+        set r3 [udr 2 1001]
         for {set i 0} {$i < $sfc} {incr i 1} {
             set sf_size($i) [expr int([$r3 value])*$ftpPkgSize]
             #puts "flow $i, flow size: [expr $sf_size($i)]"
@@ -68,6 +69,10 @@ proc setup_short_flow {} {
         for {set i 0} {$i < $sfc} {incr i 1} {
             set sf_tcp($i) [new Agent/TCP/FullTcp/Sack]
             set sf_sink($i) [new Agent/TCP/FullTcp/Sack]
+	        $ns attach-agent $server($sf_src($i)) $sf_tcp($i)
+	        $ns attach-agent $server($sf_dst($i)) $sf_sink($i)
+	        $ns connect $sf_tcp($i) $sf_sink($i)
+	        $sf_tcp($i) set fid_ $sf_fid($i)
             $sf_sink($i) listen
         }
 
@@ -77,11 +82,13 @@ proc setup_short_flow {} {
         #
         for {set i 0} {$i < $sfc} {incr i 1} {
             set sf_ftp($i) [new Application/FTP]
+	        $sf_ftp($i) attach-agent $sf_tcp($i)
+	        $sf_ftp($i) set type_ FTP
         }
 
         for {set i 0} {$i < $sfc} {incr i 1} {
             #puts "short flow $i start at $sf_start($i)"
             puts $flow_file "flow:$sf_fid($i)|ftype:s|deadline:-1|src:$sf_src($i)|dst:$sf_dst($i)|size:$sf_size($i)"
-            start_flow $i s
+		    $ns at $sf_start($i) "$sf_ftp($i) send $sf_size($i)"
         }
 }

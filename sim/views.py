@@ -60,7 +60,8 @@ def addsim(request):
 @check_sim_daemon
 def flow(request):
     print 'sim flow'
-    sim_list = Simulation.objects.filter(status = 2)#.exclude(flow = None)
+    DONE = 2
+    sim_list = Simulation.objects.filter(status = DONE)
     return render(request, 'sim/flow.html', {'sim_list':sim_list} )
 
 
@@ -100,7 +101,7 @@ def plot(request):
                 #img_list.append(img_url)
                 pass
             else:
-                img_list.append(img_url)
+                #img_list.append(img_url)
                 pass
         img_dict[sim] = img_list
 

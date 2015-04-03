@@ -23,7 +23,8 @@
         <div class="simulation">
                 <div class="title"><h3>{{s}}</h3></div>
             <div class="content flows">
-                {% for flow in s.flow_set.all %}
+                <!-- s.flow_set.all -->
+                {% for flow in s.query_flow_set %}
                 {% autoescape off %}
                     <div class="flow">
                         {{flow}}
