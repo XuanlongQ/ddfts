@@ -3,7 +3,10 @@ proc setup_short_flow {} {
         global ns
         global flow_file
         global ftpPkgSize
-        global sfc fc
+        #flow count fc
+        global fc
+        #short (message) flow count
+        global sfc
         global sf_fid sf_src sf_dst sf_size sf_start sf_end
         global sg sc server
         global udr prr
@@ -12,7 +15,7 @@ proc setup_short_flow {} {
         #1. use $prr to generate short flow arrival time list
         #sat_list[]
         #set avg according CDF of time between background flows(@DCTCP)
-        set avg 0.09
+        set avg 0.9
         set shape 25
         set r [prr $avg $shape]
         set sat_list(0) 0.02

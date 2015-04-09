@@ -4,7 +4,10 @@ proc setup_query_flow {} {
         global flow_file
         global ftpPkgSize
         global sg sc server
-        global qfc fc
+        #flow count fc
+        global fc
+        #query flow count qfc
+        global qfc
         global qf_fid qf_src qf_dst qf_size qf_start qf_end
         global qf_tcp qf_sink qf_ftp qf_sftp
         global udr prr
@@ -13,7 +16,7 @@ proc setup_query_flow {} {
         #qat_list[]
         #set avg according CDF of time between background flows(@DCTCP)
         #avg = 100 ms
-        set avg 0.1
+        set avg 0.5
         set shape 5.5
         set r [prr $avg $shape]
         #set avg 0.4

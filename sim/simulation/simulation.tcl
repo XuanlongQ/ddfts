@@ -12,10 +12,7 @@ set output_dir [lindex $argv $i]
 	#puts "output_dir=$output_dir"
 incr i
 
-set queue_limit 250
-set link_bw 1000Mb
-set link_lt .020ms
-set trace_sampling_interval .01
+#tcp type
 set dctcp false
 set d2tcp false
 set sdnd2tcp false
@@ -30,6 +27,18 @@ if { $tcptype == "d2tcp" } {
 if { $tcptype == "sdnd2tcp" } {
     set sdnd2tcp true
 }
+
+#topology parameters
+set queue_limit 250
+set link_bw 1Gb
+set link_lt 20us
+
+#trace parameters
+set trace_sampling_interval .01
+
+#simulation end time
+set sim_end_time 10.0
+
 
 #######################
 # Creating New Simulator
@@ -51,34 +60,20 @@ proc finish {} {
 	#close $tcp_file
 	exit 0
 }
-###setup tcp#####################
 set path [file normalize [info script]]
 set path [file dirname $path]
-source "$path/init_param.tcl"
-####################################
 
+source "$path/random.tcl"
+
+#########initial parameters#############
+source "$path/init_param.tcl"
+
+#set topology
 #server group: sg
 set sg 1
 #server count sc
-set sc 44
+set sc 4
 
-#simulation end time
-set sim_end_time 10.0
-
-#fid, start, end, size, src, dst, 
-#query flow: 1.6-2KB, qf_
-#short (message) flow: 50KB-1MB, sf_
-#large flow: 1MB-100MB, lf_
-#flow count fc
-set fc 0
-#query flow count qfc
-set qfc [expr 2000*$sg*$sc]
-#short (message) flow count
-set sfc [expr 200*$sg*$sc]
-#large flow count
-set lfc 100
-
-#set topology
 for {set i 0} {$i < $sg} {incr i 1} {
 	#
 	#Create Nodes
@@ -97,14 +92,15 @@ for {set i 0} {$i < $sg} {incr i 1} {
 	}
 }
 
-source "$path/trace.tcl"
 
-#######################
-source "$path/random.tcl"
-#######################
-#start flow
-#source "$path/start_flow.tcl"
-
+#fid, start, end, size, src, dst, 
+#query flow: 1.6-2KB, qf_
+#short (message) flow: 50KB-1MB, sf_
+#large flow: 1MB-100MB, lf_
+set fc 0
+set qfc 0
+set sfc 0
+set lfc 0
 #query traffic
 source "$path/query_flow.tcl"
 setup_query_flow
@@ -119,8 +115,8 @@ setup_large_flow
 
 puts $flow_file "afc:$fc"
 
-#set tmp_tcp $lf_tcp(0)
-#$ns at $lf_start(0) "tcp_trace $lf_tcp(0)"
+source "$path/trace.tcl"
 $ns at $trace_sampling_interval "my_trace"
+
 $ns at $sim_end_time "finish"
 $ns run
