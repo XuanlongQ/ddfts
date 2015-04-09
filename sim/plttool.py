@@ -1,8 +1,12 @@
 #!/usr/bin/python
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 import simtool
+
+import matplotlib
+matplotlib.use('Agg')
+print 'matplotlib.use("Agg")'
+import matplotlib.pyplot as plt
 
 def getbinspdfcdf(sample_list):
     bins = np.linspace(min(sample_list), max(sample_list), 100)
@@ -31,7 +35,7 @@ def plot_fd_cdf(s, output_file_name=None):
         #plt.title('%s flow delay CDF' % (ftype,))
         #plt.xlabel('flow delay(ms)')
         #plt.ylabel('CDF')
-        plt.legend(loc = 'right', fontsize=8)
+        plt.legend(loc = 'right', ) #fontsize=8)
 
     if output_file_name:
         plt.savefig(output_file_name, dip=72)

@@ -1,14 +1,10 @@
-set my_argc 3
-#argv: test_id, tcp_type, output_dir
+set my_argc 2
+#argv: tcp_type, output_dir
 if {$::argc < $my_argc} {
 	puts "argc = $argc, but we need $my_argc arguments"
 	exit
 }
-#simulation id
 set i 0
-set sid [lindex $argv $i]
-	#puts "simulation_id=$sid"
-incr i
 set tcptype [lindex $argv $i]
 	#puts "tcp_type=$tcp_type"
 incr i
@@ -58,7 +54,7 @@ proc finish {} {
 ###setup tcp#####################
 set path [file normalize [info script]]
 set path [file dirname $path]
-source "$path/setup_tcp.tcl"
+source "$path/init_param.tcl"
 ####################################
 
 #server group: sg
@@ -107,7 +103,7 @@ source "$path/trace.tcl"
 source "$path/random.tcl"
 #######################
 #start flow
-source "$path/start_flow.tcl"
+#source "$path/start_flow.tcl"
 
 #query traffic
 source "$path/query_flow.tcl"

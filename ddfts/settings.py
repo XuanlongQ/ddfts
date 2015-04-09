@@ -4,7 +4,7 @@ DEBUG = False
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 MYSQL = True
-#MYSQL = False
+MYSQL = False
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),

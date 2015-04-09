@@ -43,7 +43,8 @@
 [S]. model qrecord[qid, time, rack, server, pktcnt, size, sim]
 [S]. plot PDF of queue length by time
 [S]. incast avoidance: reduce cwnds of flows which share the same link with the query flow so the bandwidth is unoccupied
-. plot PDF of flow delay(all, query, short, large)
+[S]. plot PDF of flow delay(all, query, short, large)
+. setup simulation INCAST[one receiver, n senders, query traffic with background flows]
 . calculate available bandwidth of link
 . add deadline for query & short flow
 . reconfigure query traffic arrival time according to plotted png

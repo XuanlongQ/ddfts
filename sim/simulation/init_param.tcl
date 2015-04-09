@@ -9,7 +9,7 @@ Agent/TCP set packetSize_ $packetSize
 Agent/TCP/FullTcp set segsize_ $packetSize
 Agent/TCP set window_ 1256
 Agent/TCP set slow_start_restart_ false
-Agent/TCP set tcpTick_ 0.01
+Agent/TCP set tcpTick_ 0.01; #clock granularity
 Agent/TCP set minrto_ 0.2 ; # minRTO = 200ms
 Agent/TCP set windowOption_ 0
 
@@ -40,8 +40,8 @@ if { $sdnd2tcp } {
     Agent/TCP set d2tcp_ true
     Agent/TCP set dctcp_d_ 1; 
 }
-Agent/TCP/FullTcp set segsperack_ $ackRatio; 
-Agent/TCP/FullTcp set spa_thresh_ 3000;
+Agent/TCP/FullTcp set segsperack_ $ackRatio; #for window updates
+Agent/TCP/FullTcp set spa_thresh_ 3000; # rcv_nxt < spa_thresh_? -> 1 seg per ack
 Agent/TCP/FullTcp set interval_ 0.04 ; #delayed ACK interval = 40ms
 
 Queue set limit_ 1000

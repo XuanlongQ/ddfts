@@ -24,7 +24,7 @@ def cur_file_dir():
 @performance(LEVEL)
 def ns_simulation(sid, tcptype, tcl_output_dir):
     #simulate network using tcl script
-    (status, output) = commands.getstatusoutput('/home/lqx/bin/ns-allinone-2.35/bin/ns sim/simulation/simulation.tcl %s %s %s'%(sid, tcptype, tcl_output_dir))
+    (status, output) = commands.getstatusoutput('/home/lqx/bin/ns-allinone-2.35/bin/ns sim/simulation/simulation.tcl %s %s'%(tcptype, tcl_output_dir))
     print 'network simulation has generated: ' + tcl_output_dir
     print status, output
 
