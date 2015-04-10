@@ -1,44 +1,9 @@
-set my_argc 2
-#argv: tcp_type, output_dir
-if {$::argc < $my_argc} {
-	puts "argc = $argc, but we need $my_argc arguments"
-	exit
-}
-set i 0
-set tcptype [lindex $argv $i]
-	#puts "tcp_type=$tcp_type"
-incr i
-set output_dir [lindex $argv $i]
-	#puts "output_dir=$output_dir"
-incr i
-
-#tcp type
-set dctcp false
-set d2tcp false
-set sdnd2tcp false
-if { $tcptype == "dctcp" } {
-    set dctcp true
-}
-
-if { $tcptype == "d2tcp" } {
-    set d2tcp true
-}
-
-if { $tcptype == "sdnd2tcp" } {
-    set sdnd2tcp true
-}
-
-#topology parameters
-set queue_limit 250
-set link_bw 1Gb
-set link_lt 20us
-
-#trace parameters
-set trace_sampling_interval .01
-
-#simulation end time
-set sim_end_time 10.0
-
+set path [file normalize [info script]]
+set path [file dirname $path]
+source "$path/random.tcl"
+#########initial parameters#############
+source "$path/init_param.tcl"
+init_param
 
 #######################
 # Creating New Simulator
@@ -49,24 +14,6 @@ set packet_file [open $output_dir/packet.tr w]
 set queue_file [open $output_dir/queue.tr w]
 #set tcp_file [open $output_dir/tcp.tr w]
 $ns trace-all $packet_file
-proc finish {} { 
-	global ns flow_file packet_file queue_file
-	
-	$ns flush-trace
-	#puts "Simulation completed."
-	close $flow_file
-	close $packet_file
-	close $queue_file
-	#close $tcp_file
-	exit 0
-}
-set path [file normalize [info script]]
-set path [file dirname $path]
-
-source "$path/random.tcl"
-
-#########initial parameters#############
-source "$path/init_param.tcl"
 
 #set topology
 #server group: sg
@@ -120,3 +67,15 @@ $ns at $trace_sampling_interval "my_trace"
 
 $ns at $sim_end_time "finish"
 $ns run
+
+proc finish {} { 
+	global ns flow_file packet_file queue_file
+	
+	$ns flush-trace
+	#puts "Simulation completed."
+	close $flow_file
+	close $packet_file
+	close $queue_file
+	#close $tcp_file
+	exit 0
+}

@@ -2,7 +2,6 @@
 proc setup_query_flow {} {
         global ns
         global flow_file
-        global ftpPkgSize
         global sg sc server
         #flow count fc
         global fc
@@ -67,7 +66,7 @@ proc setup_query_flow {} {
         #
         set r3 [udr 1.6 2]
         for {set i 0} {$i < $qfc} {incr i 1} {
-            set qf_size($i) [expr int([expr [$r3 value]*$ftpPkgSize])]
+            set qf_size($i) [expr int([expr [$r3 value]*1000])]
             #puts "flow $i, flow size: [expr $qf_size($i)]"
         }
         #
@@ -110,7 +109,7 @@ proc setup_query_flow {} {
                 puts $flow_file "flow:$qf_fid($i)|ftype:q|deadline:-1|src:$qf_src($i)|dst:$qf_dst($i)|size:$qf_size($i)"
                 set sftp $qf_sftp($i)
                 $ns at $qf_start($i) "$qf_ftp($i) send $qf_size($i) {$sftp recv {$i}}"
-                #puts "$t flow $i\[[$src id]->[$dst id]\] start at $start and the size is [expr $size*1.0/$ftpPkgSize]"
+                #puts "$t flow $i\[[$src id]->[$dst id]\] start at $start and the size is [expr $size*1.0/1000]"
             }
         }
 }
