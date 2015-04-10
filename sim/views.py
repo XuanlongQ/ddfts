@@ -77,6 +77,7 @@ def plot(request):
         cdf_plot = {}
         #flow delay cdf/pdf by flow
         cdf_plot['fd'] = plot_fd_cdf
+        '''
         #query arrival time cdf/pdf by query flow
         cdf_plot['qat'] = plot_qat_cdf
         #background flow arrival time cdf/pdf by background flow
@@ -87,6 +88,7 @@ def plot(request):
         cdf_plot['cc'] = plot_cc_cdf
         #queue length cdf/pdf by time
         #cdf_plot['ql'] = plot_ql_cdf
+        '''
         img_list = []
         for cdf, plot in cdf_plot.iteritems():
             img = '%s/%s_img_%s.png' % (img_tmp_dir, cdf, sim.sid)

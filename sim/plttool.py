@@ -20,11 +20,13 @@ def getbinspdfcdf(sample_list):
 def plot_fd_cdf(s, output_file_name=None):
 
     ftype_list = ['a', 'q', 's', 'l'] # all, query, short, large
+    ftype_list = ['a', 'q', ] # all, query, 
     for i, ftype in zip(range(1,5), ftype_list):
         if ftype == 'a':
-            flow_delay_list = [ float(f.end - f.start)/1000000 for f in s.flow_set.filter(finished=True) ]
+            flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True) ]
         else:
-            flow_delay_list = [ float(f.end - f.start)/1000000 for f in s.flow_set.filter(finished=True).filter(ftype=ftype) ]
+            flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True).filter(ftype=ftype) ]
+
         bins, pdf, cdf = getbinspdfcdf(flow_delay_list)
         plt.subplot(2, 2, i)
         plt.plot(bins, pdf, label='%s flow delay pdf' % (ftype,))

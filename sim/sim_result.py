@@ -20,8 +20,8 @@ def packet_tracer(input_file_name):
         pktsize = int(pktsize)
 
         if not flow_id in stime_dict:
-            stime_dict[flow_id] = time
-            etime_dict[flow_id] = time
+            stime_dict[flow_id] = float(time)
+            etime_dict[flow_id] = float(time)
             src_dict[flow_id] = src.split('.')[0]
             dst_dict[flow_id] = dst.split('.')[0]
         if not flow_id in thrput_dict:
@@ -37,12 +37,15 @@ def packet_tracer(input_file_name):
             etime_dict[flow_id] = time
             thrput_dict[flow_id] += pktsize
             pktcnt_dict[flow_id] += 1
-        #node 'to' receive and 'to' is src_node and src_node is flow[flow_id]'s src
-        elif action == 'r' and to == src_node and src_dict[flow_id] == src_node:
+        #node 'to' receive and 'to' is dst_node and dst_node is flow[flow_id]'s src
+        elif action == 'r' and to == dst_node and src_dict[flow_id] == dst_node:
             thrput_dict[flow_id] += pktsize
             pktcnt_dict[flow_id] += 1
         elif action == 'd':
             drcnt_dict[flow_id] += 1
+        elif action == 'r':
+          #print 'to =%s, src_node=%s, src_dict[flow_id]=%s' % (to, src_node, src_dict[flow_id])
+          pass
 
     input_file.close()
 
