@@ -20,7 +20,7 @@ def getbinspdfcdf(sample_list):
 def plot_fd_cdf(s, output_file_name=None):
 
     ftype_list = ['a', 'q', 's', 'l'] # all, query, short, large
-    ftype_list = ['a', 'q', ] # all, query, 
+    ftype_list = ['q', ] #query, 
     for i, ftype in zip(range(1,5), ftype_list):
         if ftype == 'a':
             flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True) ]
@@ -28,16 +28,16 @@ def plot_fd_cdf(s, output_file_name=None):
             flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True).filter(ftype=ftype) ]
 
         bins, pdf, cdf = getbinspdfcdf(flow_delay_list)
-        plt.subplot(2, 2, i)
+        #plt.subplot(2, 2, i)
         plt.plot(bins, pdf, label='%s flow delay pdf' % (ftype,))
-        plt.plot(bins, cdf, label='%s flow delay cdf' % (ftype,))
+        #plt.plot(bins, cdf, label='%s flow delay cdf' % (ftype,))
 
-        #plt.xlim([0, 300])
-        #plt.ylim([0, 0.01])
+        #plt.xlim([100, 500])
+        plt.ylim([0, 1])
         #plt.title('%s flow delay CDF' % (ftype,))
         #plt.xlabel('flow delay(ms)')
         #plt.ylabel('CDF')
-        plt.legend(loc = 'right', ) #fontsize=8)
+        plt.legend(loc = 'upper right', ) #fontsize=8)
 
     if output_file_name:
         plt.savefig(output_file_name, dip=72)

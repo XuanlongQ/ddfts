@@ -15,7 +15,7 @@ proc setup_query_flow {} {
         #qat_list[]
         #set avg according CDF of time between background flows(@DCTCP)
         #avg = 100 ms
-        set avg 0.5
+        set avg 0.01
         set shape 5.5
         set r [prr $avg $shape]
         #set avg 0.4

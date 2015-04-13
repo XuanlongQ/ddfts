@@ -14,7 +14,7 @@ proc setup_large_flow {} {
         #1. use $prr to generate large flow arrival time list
         #lat_list[]
         #set avg according CDF of time between background flows(@DCTCP)
-        set avg 1
+        set avg 0.81
         set shape 55
         set r [prr $avg $shape]
         set lat_list(0) 0.01

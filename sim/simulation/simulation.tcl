@@ -19,7 +19,7 @@ $ns trace-all $packet_file
 #server group: sg
 set sg 1
 #server count sc
-set sc 4
+set sc 35
 
 for {set i 0} {$i < $sg} {incr i 1} {
 	#
@@ -65,9 +65,6 @@ puts $flow_file "afc:$fc"
 source "$path/trace.tcl"
 $ns at $trace_sampling_interval "my_trace"
 
-$ns at $sim_end_time "finish"
-$ns run
-
 proc finish {} { 
 	global ns flow_file packet_file queue_file
 	
@@ -79,3 +76,6 @@ proc finish {} {
 	#close $tcp_file
 	exit 0
 }
+
+$ns at $sim_end_time "finish"
+$ns run

@@ -16,7 +16,7 @@ set queue_file [open $output_dir/queue.tr w]
 $ns trace-all $packet_file
 
 ##topology
-set sc 44
+set sc 35
 set tor [$ns node]
 for {set i 0} {$i < $sc} {incr i 1} {
     set server($i) [$ns node]
@@ -56,6 +56,10 @@ proc query { } {
         #Transmission Layer
         set qf_req_tcp($qfid) [new Agent/TCP/FullTcp/Sack]
         set qf_res_tcp($qfid) [new Agent/TCP/FullTcp/Sack]
+        $qf_req_tcp($qfid) set d2tcp_d_ [expr 1000]
+        $qf_res_tcp($qfid) set d2tcp_d_ [expr 1000]
+        $qf_req_tcp($qfid) set cwnd_ [expr 2000000]
+        $qf_res_tcp($qfid) set cwnd_ [expr 2000000]
         $ns attach-agent $server(0)  $qf_req_tcp($qfid)
         $ns attach-agent $server($i) $qf_res_tcp($qfid)
         $ns connect $qf_req_tcp($qfid) $qf_res_tcp($qfid)
@@ -86,7 +90,7 @@ Application/TcpApp instproc recv {i} {
     if { $i>0 } {
         $ns at $now "$qf_res_app($i) send $size {$qf_req_app($i) recv {-1}}"
     }
-    if { $i<0 } {
+    if { $i==-1 } {
       incr res_count
       if { $res_count >= $req_count } {
         $ns at [expr $now + 0.0] "query"
@@ -94,11 +98,33 @@ Application/TcpApp instproc recv {i} {
     }
 }
 
-query
+$ns at .1 "query"
 
 #short (message) flow: update control state on the workers 100KB-1MB
 
 #large flow: copy fresh data to workers 1MB-100MB
+for {set i 1} {$i < 3} {incr i 1} {
+      incr lfc
+      incr fc
+      set lfid $lfc
+      set fid $fc
+      #Transmission Layer
+      set lf_req_tcp($lfid) [new Agent/TCP/FullTcp/Sack]
+      set lf_res_tcp($lfid) [new Agent/TCP/FullTcp/Sack]
+      $ns attach-agent $server(0)  $lf_req_tcp($lfid)
+      $ns attach-agent $server($i) $lf_res_tcp($lfid)
+      $ns connect $lf_req_tcp($lfid) $lf_res_tcp($lfid)
+      $lf_req_tcp($lfid) set fid_ $fid
+      $lf_res_tcp($lfid) set fid_ $fid
+      $lf_res_tcp($lfid) listen
+      #Application Layer
+      set lf_req_app($lfid) [new Application/TcpApp $lf_req_tcp($lfid)]
+      set lf_res_app($lfid) [new Application/TcpApp $lf_res_tcp($lfid)]
+      $lf_req_app($lfid) connect $lf_res_app($lfid)
+      set size [expr 100000 * $packetSize]
+      puts $flow_file "flow:$fid|ftype:l|deadline:-1|src:0|dst:$i|size:$size"
+      $ns at 0.0 "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {-3}}"
+}
 
 
 ##tracer
@@ -117,10 +143,11 @@ proc my_trace { } {
 $ns at $trace_sampling_interval "my_trace"
 
 proc finish {} { 
-    global qfc fc
+    global qfc lfc fc
 	global ns flow_file packet_file queue_file
 	
     puts $flow_file "qfc:$qfc"
+    puts $flow_file "lfc:$lfc"
     puts $flow_file "afc:$fc"
 	$ns flush-trace
 	#puts "Simulation completed."
