@@ -98,12 +98,12 @@ Application/TcpApp instproc recv {i} {
     }
 }
 
-$ns at .1 "query"
+$ns at .0 "query"
 
 #short (message) flow: update control state on the workers 100KB-1MB
 
 #large flow: copy fresh data to workers 1MB-100MB
-for {set i 1} {$i < 3} {incr i 1} {
+for {set i 1} {$i < $sc} {incr i 1} {
       incr lfc
       incr fc
       set lfid $lfc
@@ -121,7 +121,7 @@ for {set i 1} {$i < 3} {incr i 1} {
       set lf_req_app($lfid) [new Application/TcpApp $lf_req_tcp($lfid)]
       set lf_res_app($lfid) [new Application/TcpApp $lf_res_tcp($lfid)]
       $lf_req_app($lfid) connect $lf_res_app($lfid)
-      set size [expr 100000 * $packetSize]
+      set size [expr 2000000000]
       puts $flow_file "flow:$fid|ftype:l|deadline:-1|src:0|dst:$i|size:$size"
       $ns at 0.0 "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {-3}}"
 }
