@@ -1,3 +1,6 @@
+set FTYPE_L 0
+set FTYPE_S 1
+set FTYPE_Q 2
 set path [file normalize [info script]]
 set path [file dirname $path]
 source "$path/random.tcl"
@@ -43,6 +46,10 @@ proc query { } {
     global qf_req_app qf_res_app
     global flow_file
     global req_count res_count
+    global FTYPE_Q
+    global incast_avoid
+
+    set incast_avoid false
 
     set req_count 0
     set res_count 0
@@ -58,6 +65,8 @@ proc query { } {
         set qf_res_tcp($qfid) [new Agent/TCP/FullTcp/Sack]
         $qf_req_tcp($qfid) set d2tcp_d_ [expr 1000]
         $qf_res_tcp($qfid) set d2tcp_d_ [expr 1000]
+        $qf_req_tcp($qfid) set ftype_ FTYPE_Q
+        $qf_res_tcp($qfid) set ftype_ FTYPE_Q
         $ns attach-agent $server(0)  $qf_req_tcp($qfid)
         $ns attach-agent $server($i) $qf_res_tcp($qfid)
         $ns connect $qf_req_tcp($qfid) $qf_res_tcp($qfid)
@@ -76,6 +85,25 @@ proc query { } {
     }
 }
 
+proc avoid_incast { } {
+    global incast_avoid
+    global lfc
+    global lf_req_tcp lf_res_tcp
+    set incast_avoid true
+    global K
+
+    for {set i 1} {$i < $lfc} {incr i 1} {
+        set lfid $i
+        #$lf_req_tcp($lfid) set cwnd_ 1
+        #$lf_res_tcp($lfid) set cwnd_ 1
+        #$lf_req_tcp($lfid) set ssthresh_ 2
+        #$lf_res_tcp($lfid) set ssthresh_ 2
+    }
+
+    Queue/RED set thresh_ [expr $K/4] ; #minthresh
+    Queue/RED set maxthresh_ [expr $K/4] ; #maxthresh
+
+}
 set delay [expr 0.000004*($sc-1)*2]
 set jitter [udr 0 $delay]
 Application/TcpApp instproc recv {i} {
@@ -85,7 +113,12 @@ Application/TcpApp instproc recv {i} {
     global req_count
     global res_count
     global jitter
+    global incast_avoid
+    global K
 
+    if { $incast_avoid == false } {
+        avoid_incast
+    }
     set now [expr [$ns now] + 0.00000]
     set res_time [expr $now + [$jitter value]]
     set size [expr 2 * $packetSize]
@@ -95,6 +128,9 @@ Application/TcpApp instproc recv {i} {
     if { $i==-1 } {
       incr res_count
       if { $res_count >= $req_count } {
+        set incast_avoid true
+        Queue/RED set thresh_ [expr $K] ; #minthresh
+        Queue/RED set maxthresh_ [expr $K] ; #maxthresh
         $ns at [expr $now + 0.0] "query"
       }
     }
@@ -118,6 +154,8 @@ for {set i 1} {$i < $sc} {incr i 1} {
       $ns connect $lf_req_tcp($lfid) $lf_res_tcp($lfid)
       $lf_req_tcp($lfid) set fid_ $fid
       $lf_res_tcp($lfid) set fid_ $fid
+      $lf_req_tcp($lfid) set ftype_ FTYPE_L
+      $lf_res_tcp($lfid) set ftype_ FTYPE_L
       $lf_res_tcp($lfid) listen
       #Application Layer
       set lf_req_app($lfid) [new Application/TcpApp $lf_req_tcp($lfid)]

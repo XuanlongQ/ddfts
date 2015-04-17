@@ -41,14 +41,16 @@ set sim_end_time 4
 
 set packetSize 1460
 
+set K 20
+
 proc init_param { } {
 
     global dctcp d2tcp sdnd2tcp
     global packetSize
+    global K
 
     set DCTCP_g_  [expr 1.0/16]; #@DCTCP
     set ackRatio 1 
-    set K 20
 
     Agent/TCP set ecn_ 1
     Agent/TCP set old_ecn_ 1
@@ -86,6 +88,7 @@ proc init_param { } {
         Agent/TCP set dctcp_alpha_ 0; 
         Agent/TCP set d2tcp_ true
         Agent/TCP set dctcp_d_ 1; 
+        Agent/TCP set sdn_ true
     }
     Agent/TCP/FullTcp set segsperack_ $ackRatio; #for window updates
     Agent/TCP/FullTcp set spa_thresh_ 3000; # rcv_nxt < spa_thresh_? -> 1 seg per ack

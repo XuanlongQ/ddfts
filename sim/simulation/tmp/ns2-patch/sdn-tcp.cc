@@ -1337,7 +1337,7 @@ TcpAgent::slowdown(int how)
         //if d2tcp enabled
         if(d2tcp_){
             double p = pow(dctcp_alpha_, d2tcp_d_);
-		    cwnd_ = (1 - p/2.0) * windowd();
+		    ssthresh_ = (int) ((1 - p/2.0) * windowd());
         }
     }
         else if (how & THREE_QUARTER_SSTHRESH)
