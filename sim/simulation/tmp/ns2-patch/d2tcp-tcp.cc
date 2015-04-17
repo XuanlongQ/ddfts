@@ -1569,6 +1569,12 @@ void TcpAgent::recv_newack_helper(Packet *pkt) {
 double
 TcpAgent::initial_window()
 {
+    //TODO for sdnd2tcp
+    //if (sdnd2tcp_ && (ftype_ == FTYPE.Q)) {
+    //if (sdnd2tcp_) {
+    if (d2tcp_) {
+        return (4.0);
+    }
         // If Quick-Start Request was approved, use that as a basis for
         // initial window
         if (qs_cwnd_) {

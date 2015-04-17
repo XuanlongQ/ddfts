@@ -58,8 +58,6 @@ proc query { } {
         set qf_res_tcp($qfid) [new Agent/TCP/FullTcp/Sack]
         $qf_req_tcp($qfid) set d2tcp_d_ [expr 1000]
         $qf_res_tcp($qfid) set d2tcp_d_ [expr 1000]
-        $qf_req_tcp($qfid) set cwnd_ [expr 2000000]
-        $qf_res_tcp($qfid) set cwnd_ [expr 2000000]
         $ns attach-agent $server(0)  $qf_req_tcp($qfid)
         $ns attach-agent $server($i) $qf_res_tcp($qfid)
         $ns connect $qf_req_tcp($qfid) $qf_res_tcp($qfid)
@@ -78,17 +76,21 @@ proc query { } {
     }
 }
 
+set delay [expr 0.000004*($sc-1)*2]
+set jitter [udr 0 $delay]
 Application/TcpApp instproc recv {i} {
 	global ns
     global packetSize
     global qf_req_app qf_res_app
     global req_count
     global res_count
+    global jitter
 
     set now [expr [$ns now] + 0.00000]
+    set res_time [expr $now + [$jitter value]]
     set size [expr 2 * $packetSize]
     if { $i>0 } {
-        $ns at $now "$qf_res_app($i) send $size {$qf_req_app($i) recv {-1}}"
+        $ns at $res_time "$qf_res_app($i) send $size {$qf_req_app($i) recv {-1}}"
     }
     if { $i==-1 } {
       incr res_count

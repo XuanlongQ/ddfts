@@ -27,7 +27,7 @@ def plot_fd_cdf(s, output_file_name=None):
         else:
             flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True).filter(ftype=ftype) ]
 
-        flow_delay_list = filter(lambda d: d < 100, flow_delay_list)
+        #flow_delay_list = filter(lambda d: d < 100, flow_delay_list)
 
         bins, pdf, cdf = getbinspdfcdf(flow_delay_list)
         #plt.subplot(2, 2, i)
