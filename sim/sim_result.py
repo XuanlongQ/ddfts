@@ -117,6 +117,20 @@ def queue_tracer(input_file_name):
         qrecord_list.append(q)
     return qrecord_list
 
+@performance(LEVEL)
+def cwnd_tracer(input_file_name):
+    input_file = open(input_file_name, 'r')
+    cwnd_list = []
+    for line in input_file:
+        time, qf, sf, lf = line.strip().split(' ')
+        c = Cwnd()
+        c.time = int(time)
+        c.qf = float(qf)
+        c.sf = float(sf)
+        c.lf = float(lf)
+        cwnd_list.append(c)
+    return cwnd_list
+
 #input: models.Simulation s, output_dir
 #output: s, flow_list
 @performance(LEVEL)
@@ -151,8 +165,16 @@ def get_sim_result(s, output_dir):
         flow.save()
         #print flow
         flow_list.append(flow)
+    #queue record
     qrecord_list = queue_tracer(input_file_name = '%s/queue.tr' % output_dir)
     for q in qrecord_list:
         q.sim = s
-        #q.save()
-    return s, flow_list, qrecord_list
+        q.save()
+
+    #cwnd record
+    cwnd_list = cwnd_tracer(input_file_name = '%s/tcp.tr' % output_dir)
+    for c in cwnd_list:
+        c.sim = s
+        c.save()
+
+    return s, flow_list, qrecord_list, cwnd_list

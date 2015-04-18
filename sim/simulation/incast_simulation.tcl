@@ -126,6 +126,7 @@ Application/TcpApp instproc recv {i} {
     }
     set now [expr [$ns now] + 0.00000]
     set res_time [expr $now + [$jitter value]]
+    set res_time [expr $now + 0.0]
     set size [expr 2 * $packetSize]
     if { $i>0 } {
         set ii [expr -$i]

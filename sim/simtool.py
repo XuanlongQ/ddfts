@@ -52,7 +52,7 @@ def simulate(s):
     t1 = time.time()
     ns_simulation(sid, tcptype, tcl_output_dir)
     from sim_result import get_sim_result
-    s, flow_list, qrecord_list = get_sim_result(s, tcl_output_dir)
+    s, flow_list, qrecord_list, cwnd_list = get_sim_result(s, tcl_output_dir)
     t2 = time.time()
     s.time = t2 - t1
     s.save()
@@ -62,7 +62,7 @@ def simulate(s):
     #print status, output
     #(status, output) = commands.getstatusoutput('mkdir -p %s/tcl'%(out_dir))
     #print status, output
-    return s, flow_list, qrecord_list
+    return s, flow_list, qrecord_list, cwnd_list
 
 SIM_DAEMON =  None
 
@@ -85,7 +85,7 @@ def simulate_daemon(args):
                 print '[At %s: %03d] Simulate simulation %s' % (current_thread, int(time.time())%100, sim.sid,)
                 sim.status = SIMING
                 sim.save()
-                sim, flow_list, qrecord_list = simulate(sim)
+                sim, flow_list, qrecord_list, cwnd_list = simulate(sim)
                 sim.status = DONE
                 sim.save()
                 print '[At %s: %03d] Simulation %s is finished' % (current_thread, int(time.time())%100, sim.sid,)

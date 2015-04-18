@@ -77,6 +77,8 @@ def plot(request):
         cdf_plot = {}
         #flow delay cdf/pdf by flow
         cdf_plot['fd'] = plot_fd_cdf
+        cdf_plot['ql'] = plot_ql_cdf
+        cdf_plot['cw'] = plot_cw_cdf
         '''
         #query arrival time cdf/pdf by query flow
         cdf_plot['qat'] = plot_qat_cdf
@@ -100,7 +102,10 @@ def plot(request):
                 img_list.append(img_url)
                 pass
             elif img_url.find('ql') >= 0 and True:
-                #img_list.append(img_url)
+                img_list.append(img_url)
+                pass
+            elif img_url.find('cw') >= 0 and True:
+                img_list.append(img_url)
                 pass
             else:
                 #img_list.append(img_url)

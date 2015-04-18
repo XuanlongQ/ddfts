@@ -185,10 +185,42 @@ def plot_ql_cdf(s, output_file_name):
         plt.plot(time_list, qlen_list)
 
     #plt.xlim([0, 4])
-    plt.ylim([0, 300])
+    #plt.ylim([0, 300])
     plt.title('PDF of queue length')
     plt.xlabel('time')
     plt.ylabel('PDF fo queue length')
+    if output_file_name:
+        plt.savefig(output_file_name, dip=72)
+
+    plt.clf()
+
+#plot cwnd by time
+#input: s(models.Simulation)
+def plot_cw_cdf(s, output_file_name):
+    cwnd_list = s.cwnd_set.all()
+    #print 'qrcord.len = ' , len(qrecord)
+    time_list = []
+    qf_list = []
+    sf_list = []
+    lf_list = []
+    af_list = []
+    for c in cwnd_list:
+        time_list.append(c.time)
+        qf_list.append(c.qf)
+        sf_list.append(c.sf)
+        lf_list.append(c.lf)
+        af_list.append(c.qf+c.lf)
+
+    plt.plot(time_list, qf_list, label="query flow cwnd", )
+    plt.plot(time_list, lf_list, label="large flow cwnd", )
+    plt.plot(time_list, af_list, label="all flow cwnd", )
+
+    #plt.xlim([0, 4])
+    #plt.ylim([0, 300])
+    plt.title('congestion window')
+    plt.xlabel('time')
+    plt.ylabel('cwnd')
+    plt.legend(loc = 'upper left')
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
 

@@ -1583,7 +1583,7 @@ TcpAgent::initial_window()
     //if (sdnd2tcp_ && (ftype_ == FTYPE.Q)) {
     //if (sdnd2tcp_) {
     if (d2tcp_) {
-        return (4.0);
+        //return (4.0);
     }
         // If Quick-Start Request was approved, use that as a basis for
         // initial window

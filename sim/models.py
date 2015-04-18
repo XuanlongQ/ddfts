@@ -72,3 +72,13 @@ class Qrecord(models.Model):
     sim = models.ForeignKey(Simulation)
 
     #def __unicode__(self,):
+
+class Cwnd(models.Model):
+    cid = models.AutoField(primary_key=True) 
+    time = models.IntegerField(default=0)
+    qf = models.FloatField(default=0)
+    sf = models.FloatField(default=0)
+    lf = models.FloatField(default=0)
+    sim = models.ForeignKey(Simulation)
+
+    #def __unicode__(self,):

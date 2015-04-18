@@ -27,9 +27,10 @@ proc tcp_trace { } {
 
     set now [$ns now]
     set now_ [expr int([expr $now*1000000000])]
+    puts -nonewline $tcp_file [format "%9d" $now_]
 
     #query flow
-    set cwnd_sum 0
+    set qf_cwnd_sum 0
     #query flow only has ($sc - 1) "live" at most
     #qfid start with 1
     set offset [expr $qfc - ($sc - 1) + 1]
@@ -41,21 +42,27 @@ proc tcp_trace { } {
         set req_cwnd  [$qf_req_tcp($i) set cwnd_]
         set res_cwnd  [$qf_res_tcp($i) set cwnd_]
         set cwnd [expr $req_cwnd + $res_cwnd]
-        set cwnd_sum [expr $cwnd_sum + $cwnd]
+        set qf_cwnd_sum [expr $qf_cwnd_sum + $cwnd]
     }
-    puts -nonewline $tcp_file [format "q %9d %.2lf" $now_ $cwnd_sum]
+    puts -nonewline $tcp_file [format " %.2lf" $qf_cwnd_sum]
+
+    #short flow
+    set sf_cwnd_sum 0
+    puts -nonewline $tcp_file [format " %.2lf" $sf_cwnd_sum]
 
     #large flow
-    set cwnd_sum 0
+    set lf_cwnd_sum 0
     #lfid start with 0
     for {set i 0} {$i < $lfc} {incr i 1} {
         set req_cwnd  [$lf_req_tcp($i) set cwnd_]
         set req_alpha [$lf_req_tcp($i) set dctcp_alpha_]
         set res_cwnd  [$lf_res_tcp($i) set cwnd_]
         set cwnd [expr $req_cwnd + $res_cwnd]
-        set cwnd_sum [expr $cwnd_sum + $cwnd]
+        set lf_cwnd_sum [expr $lf_cwnd_sum + $cwnd]
     }
-    puts -nonewline $tcp_file [format "l %9d %.2lf" $now_ $cwnd_sum]
+    puts -nonewline $tcp_file [format " %.2lf" $lf_cwnd_sum]
+
+    puts $tcp_file ""
 
     $ns at [expr $now + $trace_sampling_interval] "tcp_trace"
 }
