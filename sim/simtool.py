@@ -57,7 +57,7 @@ def simulate(s):
     s.time = t2 - t1
     s.save()
 
-    #remove tcl output bucause it's to big!!
+    #remove tcl output bucause it's too big!!
     #(status, output) = commands.getstatusoutput('rm -rf %s/tcl'%(out_dir))
     #print status, output
     #(status, output) = commands.getstatusoutput('mkdir -p %s/tcl'%(out_dir))

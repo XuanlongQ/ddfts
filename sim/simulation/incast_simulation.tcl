@@ -15,7 +15,7 @@ set ns [new Simulator]
 set flow_file [open $output_dir/flow.tr w]
 set packet_file [open $output_dir/packet.tr w]
 set queue_file [open $output_dir/queue.tr w]
-#set tcp_file [open $output_dir/tcp.tr w]
+set tcp_file [open $output_dir/tcp.tr w]
 $ns trace-all $packet_file
 
 ##topology
@@ -43,6 +43,7 @@ proc query { } {
     global server
     global fc
     global qfc
+    global qf_req_tcp qf_res_tcp
     global qf_req_app qf_res_app
     global flow_file
     global req_count res_count
@@ -58,6 +59,7 @@ proc query { } {
     for {set i 1} {$i < $sc} {incr i 1} {
         incr qfc
         incr fc
+        #for recv function, qfid start with 1, not 0
         set qfid $qfc
         set fid $fc
         #Transmission Layer
@@ -100,21 +102,24 @@ proc avoid_incast { } {
         #$lf_res_tcp($lfid) set ssthresh_ 2
     }
 
-    Queue/RED set thresh_ [expr $K/4] ; #minthresh
-    Queue/RED set maxthresh_ [expr $K/4] ; #maxthresh
+    #Queue/RED set thresh_ [expr $K/4] ; #minthresh
+    #Queue/RED set maxthresh_ [expr $K/4] ; #maxthresh
 
 }
 set delay [expr 0.000004*($sc-1)*2]
 set jitter [udr 0 $delay]
+set INT_MIN -1000000000
 Application/TcpApp instproc recv {i} {
 	global ns
     global packetSize
+    global qf_req_tcp qf_res_tcp
     global qf_req_app qf_res_app
     global req_count
     global res_count
     global jitter
     global incast_avoid
     global K
+    global INT_MIN
 
     if { $incast_avoid == false } {
         avoid_incast
@@ -123,12 +128,17 @@ Application/TcpApp instproc recv {i} {
     set res_time [expr $now + [$jitter value]]
     set size [expr 2 * $packetSize]
     if { $i>0 } {
-        $ns at $res_time "$qf_res_app($i) send $size {$qf_req_app($i) recv {-1}}"
+        set ii [expr -$i]
+        $ns at $res_time "$qf_res_app($i) send $size {$qf_req_app($i) recv {$ii}}"
     }
-    if { $i==-1 } {
+    if { $i<0 && $i>$INT_MIN } {
       incr res_count
       if { $res_count >= $req_count } {
         set incast_avoid true
+        #set cwnd_ 0 for tcp_trace
+        set ii [expr -$i]
+        $qf_req_tcp($ii) set cwnd_ 0
+        $qf_res_tcp($ii) set cwnd_ 0
         Queue/RED set thresh_ [expr $K] ; #minthresh
         Queue/RED set maxthresh_ [expr $K] ; #maxthresh
         $ns at [expr $now + 0.0] "query"
@@ -141,11 +151,12 @@ $ns at .0 "query"
 #short (message) flow: update control state on the workers 100KB-1MB
 
 #large flow: copy fresh data to workers 1MB-100MB
-for {set i 1} {$i < $sc} {incr i 1} {
-      incr lfc
-      incr fc
+for {set i 1} {$i < $sc} {incr i 35} {
+      #lfid start with 0
       set lfid $lfc
       set fid $fc
+      incr lfc
+      incr fc
       #Transmission Layer
       set lf_req_tcp($lfid) [new Agent/TCP/FullTcp/Sack]
       set lf_res_tcp($lfid) [new Agent/TCP/FullTcp/Sack]
@@ -163,28 +174,18 @@ for {set i 1} {$i < $sc} {incr i 1} {
       $lf_req_app($lfid) connect $lf_res_app($lfid)
       set size [expr 2000000000]
       puts $flow_file "flow:$fid|ftype:l|deadline:-1|src:0|dst:$i|size:$size"
-      $ns at 0.0 "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {-3}}"
+      $ns at 0.0 "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {$INT_MIN}}"
 }
 
 
 ##tracer
-proc my_trace { } {
-
-    global ns sc trace_sampling_interval queue_monitor queue_file
-    set now [$ns now]
-    set now_ [expr int([expr $now*1000000])]
-    for {set i 0} {$i < $sc} {incr i 1} {
-        $queue_monitor($i) instvar parrivals_ pdepartures_ pdrops_ bdepartures_ pkts_ size_
-        #now $rack $server $queue_size_
-        puts $queue_file "$now_ 0 $i $pkts_ $size_"    
-    }
-    $ns at [expr $now + $trace_sampling_interval] "my_trace"
-}
-$ns at $trace_sampling_interval "my_trace"
+source "$path/trace.tcl"
+$ns at $trace_sampling_interval "tcp_trace"
+$ns at $trace_sampling_interval "queue_trace"
 
 proc finish {} { 
     global qfc lfc fc
-	global ns flow_file packet_file queue_file
+	global ns flow_file packet_file queue_file tcp_file
 	
     puts $flow_file "qfc:$qfc"
     puts $flow_file "lfc:$lfc"
@@ -194,7 +195,7 @@ proc finish {} {
 	close $flow_file
 	close $packet_file
 	close $queue_file
-	#close $tcp_file
+	close $tcp_file
 	exit 0
 }
 

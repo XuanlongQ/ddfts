@@ -92,7 +92,7 @@
 
     traffic: query traffic + background flow
 
-    observation: (switch) queue length, flow delay
+    observation: {(switch) queue length, cwnd} flow delay
 
 . speed up decresing cwnd of background flow, so we can see all query flow delay is under 100ms
 

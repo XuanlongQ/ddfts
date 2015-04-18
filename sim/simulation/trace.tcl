@@ -1,29 +1,61 @@
-proc my_trace { } {
+proc queue_trace { } {
 
-    global ns sc sg trace_sampling_interval queue_monitor queue_file
+    global ns
+    global sc
+    global trace_sampling_interval
+    global queue_monitor queue_file
     set now [$ns now]
-    set now_ [expr int([expr $now*1000000])]
-    for {set i 0} {$i < $sg} {incr i 1} {
-	    for {set j 0} {$j < $sc} {incr j 1} {
-            $queue_monitor($i,$j) instvar parrivals_ pdepartures_ pdrops_ bdepartures_ pkts_ size_
-            #now $rack $server $queue_size_
-            puts $queue_file "$now_ $i $j $pkts_ $size_"    
-        }
+    set now_ [expr int([expr $now*1000000000])]
+    for {set i 0} {$i < $sc} {incr i 1} {
+          $queue_monitor($i) instvar parrivals_ pdepartures_ pdrops_ bdepartures_ pkts_ size_
+          #now $queue($server) $queue_size_
+          puts $queue_file "$now_ $i $pkts_ $size_"    
     }
-    $ns at [expr $now + $trace_sampling_interval] "my_trace"
+    $ns at [expr $now + $trace_sampling_interval] "queue_trace"
 }
 
-proc tcp_trace {tcp} {
+proc tcp_trace { } {
 
-    global ns trace_sampling_interval tcp_file
+    global ns
+    global sc
+    global trace_sampling_interval
+    global tcp_file
+    global qfc sfc lfc fc
+    global qf_req_tcp qf_res_tcp
+    global sf_req_tcp sf_res_tcp
+    global lf_req_tcp lf_res_tcp
+
     set now [$ns now]
-	set cwnd [$tcp set cwnd_]
-	set dctcp_alpha [$tcp set dctcp_alpha_]
-	set d2tcp_dline [$tcp set d2tcp_d_]
-    #now cwnd0 cwnd1 ... cwnd$N
-    #now alpha0 alpha1 ... alpha$N
-    puts -nonewline $tcp_file [format "%.4lf %.2lf" $now $cwnd]
-    puts $tcp_file [format " %.3lf^%.3lf" $dctcp_alpha $d2tcp_dline]
+    set now_ [expr int([expr $now*1000000000])]
 
-    $ns at [expr $now + $trace_sampling_interval] "tcp_trace $tcp"
+    #query flow
+    set cwnd_sum 0
+    #query flow only has ($sc - 1) "live" at most
+    #qfid start with 1
+    set offset [expr $qfc - ($sc - 1) + 1]
+    if { $offset < 1 } {
+        puts "warming: offset = $offset!!!! It should be greater than 0!!!"
+        set offset 1
+    }
+    for {set i $offset} {$i <= $qfc} {incr i 1} {
+        set req_cwnd  [$qf_req_tcp($i) set cwnd_]
+        set res_cwnd  [$qf_res_tcp($i) set cwnd_]
+        set cwnd [expr $req_cwnd + $res_cwnd]
+        set cwnd_sum [expr $cwnd_sum + $cwnd]
+    }
+    puts -nonewline $tcp_file [format "q %9d %.2lf" $now_ $cwnd_sum]
+
+    #large flow
+    set cwnd_sum 0
+    #lfid start with 0
+    for {set i 0} {$i < $lfc} {incr i 1} {
+        set req_cwnd  [$lf_req_tcp($i) set cwnd_]
+        set req_alpha [$lf_req_tcp($i) set dctcp_alpha_]
+        set res_cwnd  [$lf_res_tcp($i) set cwnd_]
+        set cwnd [expr $req_cwnd + $res_cwnd]
+        set cwnd_sum [expr $cwnd_sum + $cwnd]
+    }
+    puts -nonewline $tcp_file [format "l %9d %.2lf" $now_ $cwnd_sum]
+
+    $ns at [expr $now + $trace_sampling_interval] "tcp_trace"
 }

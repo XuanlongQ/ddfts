@@ -107,10 +107,10 @@ def queue_tracer(input_file_name):
     input_file = open(input_file_name, 'r')
     qrecord_list = []
     for line in input_file:
-        time, rack, server, pktcnt, size = line.strip().split(' ')
+        time, server, pktcnt, size = line.strip().split(' ')
         q = Qrecord()
         q.time = int(time)
-        q.rack = int(rack)
+        q.rack = 0
         q.server = int(server)
         q.pktcnt = int(pktcnt)
         q.size = int(size)
