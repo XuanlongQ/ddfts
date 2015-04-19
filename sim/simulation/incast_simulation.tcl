@@ -36,6 +36,8 @@ set fc 0
 set qfc 0
 set sfc 0
 set lfc 0
+set req_pkts 1
+set res_pkts 2
 #query traffic: 1 pkt for request, 2 pkts for response
 proc query { } {
     global ns
@@ -50,6 +52,7 @@ proc query { } {
     global req_count res_count
     global FTYPE_Q
     global incast_avoid
+    global req_pkts res_pkts
 
     set incast_avoid false
 
@@ -80,9 +83,9 @@ proc query { } {
         set qf_req_app($qfid) [new Application/TcpApp $qf_req_tcp($qfid)]
         set qf_res_app($qfid) [new Application/TcpApp $qf_res_tcp($qfid)]
         $qf_req_app($qfid) connect $qf_res_app($qfid)
-        set size [expr 3 * $packetSize]
+        set size [expr ($req_pkts + $res_pkts) * $packetSize]
         puts $flow_file "flow:$fid|ftype:q|deadline:-1|src:0|dst:$i|size:$size"
-        set size [expr 1 * $packetSize]
+        set size [expr $req_pkts * $packetSize]
         $ns at $now "$qf_req_app($qfid) send $size {$qf_res_app($qfid) recv {$qfid}}"
         incr req_count
     }
@@ -93,6 +96,7 @@ proc avoid_incast { } {
     global lfc
     global lf_req_tcp lf_res_tcp
     set incast_avoid true
+    global sdnd2tcp
     global K
 
     for {set i 1} {$i < $lfc} {incr i 1} {
@@ -105,6 +109,10 @@ proc avoid_incast { } {
 
     #Queue/RED set thresh_ [expr $K/4] ; #minthresh
     #Queue/RED set maxthresh_ [expr $K/4] ; #maxthresh
+    if { $sdnd2tcp } {
+        Queue/RED set thresh_ [expr 0] ; #minthresh
+        Queue/RED set maxthresh_ [expr 0] ; #maxthresh
+    }
 
 }
 set delay [expr 0.000004*($sc-1)*2]
@@ -121,6 +129,7 @@ Application/TcpApp instproc recv {i} {
     global incast_avoid
     global K
     global INT_MIN
+    global req_pkts res_pkts
 
     if { $incast_avoid == false } {
         avoid_incast
@@ -128,7 +137,7 @@ Application/TcpApp instproc recv {i} {
     set now [expr [$ns now] + 0.00000]
     set res_time [expr $now + [$jitter value]]
     set res_time [expr $now + 0.0]
-    set size [expr 2 * $packetSize]
+    set size [expr $res_pkts * $packetSize]
     if { $i>0 } {
         set ii [expr -$i]
         $ns at $res_time "$qf_res_app($i) send $size {$qf_req_app($i) recv {$ii}}"

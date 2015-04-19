@@ -32,12 +32,12 @@ if { $tcptype == "sdnd2tcp" } {
 set queue_alg DropTail
 #set queue_alg RED
 set K 20
-set queue_limit 250 ; #incast: a static allocation of 100 packets to each port(@DCTCP)
+set queue_limit 204 ; #incast: a static allocation of 100 packets to each port(@DCTCP)
 set link_bw 1Gb
 set link_lt 20us
 
 #trace parameters
-set trace_sampling_interval .0001
+set trace_sampling_interval 0.001
 
 #simulation end time
 set sim_end_time .051
@@ -62,7 +62,7 @@ proc init_param { } {
     Agent/TCP set window_ 1256
     Agent/TCP set slow_start_restart_ false
     Agent/TCP set tcpTick_ 0.01; #clock granularity
-    Agent/TCP set minrto_ 0.2 ; # minRTO = 200ms
+    Agent/TCP set minrto_ 0.3 ; # minRTO = 300ms
     Agent/TCP set windowOption_ 0
 
 
