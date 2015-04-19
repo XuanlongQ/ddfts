@@ -99,10 +99,10 @@ def plot(request):
             #print img_url
             plot(sim, img)
             if img_url.find('fd') >= 0 and True:
-                img_list.append(img_url)
+                #img_list.append(img_url)
                 pass
             elif img_url.find('ql') >= 0 and True:
-                img_list.append(img_url)
+                #img_list.append(img_url)
                 pass
             elif img_url.find('cw') >= 0 and True:
                 img_list.append(img_url)

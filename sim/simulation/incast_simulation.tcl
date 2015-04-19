@@ -7,6 +7,7 @@ source "$path/random.tcl"
 #########initial parameters#############
 source "$path/init_param.tcl"
 init_param
+puts "queue algorithm: $queue_alg"
 
 #######################
 # Creating New Simulator
@@ -23,7 +24,7 @@ set sc 35
 set tor [$ns node]
 for {set i 0} {$i < $sc} {incr i 1} {
     set server($i) [$ns node]
-    $ns simplex-link $tor $server($i) $link_bw $link_lt RED
+    $ns simplex-link $tor $server($i) $link_bw $link_lt $queue_alg
     set queue_monitor($i) [$ns monitor-queue $tor $server($i) /tmp/queue_${i}.tr $trace_sampling_interval]
     $ns simplex-link $server($i) $tor $link_bw $link_lt DropTail
     $ns queue-limit $tor $server($i) $queue_limit

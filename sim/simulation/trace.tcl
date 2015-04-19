@@ -8,7 +8,6 @@ proc queue_trace { } {
     set now_ [expr int([expr $now*1000000000])]
     for {set i 0} {$i < $sc} {incr i 1} {
           $queue_monitor($i) instvar parrivals_ pdepartures_ pdrops_ bdepartures_ pkts_ size_
-          #now $queue($server) $queue_size_
           puts $queue_file "$now_ $i $pkts_ $size_"    
     }
     $ns at [expr $now + $trace_sampling_interval] "queue_trace"

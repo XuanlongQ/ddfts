@@ -220,7 +220,7 @@ def plot_cw_cdf(s, output_file_name):
     plt.title('congestion window')
     plt.xlabel('time')
     plt.ylabel('cwnd')
-    plt.legend(loc = 'upper left')
+    plt.legend(loc = 'upper right')
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
 

@@ -29,25 +29,28 @@ if { $tcptype == "sdnd2tcp" } {
 }
 
 #topology parameters
-set queue_limit 250
+set queue_alg DropTail
+#set queue_alg RED
+set K 20
+set queue_limit 250 ; #incast: a static allocation of 100 packets to each port(@DCTCP)
 set link_bw 1Gb
 set link_lt 20us
 
 #trace parameters
-set trace_sampling_interval .01
+set trace_sampling_interval .0001
 
 #simulation end time
 set sim_end_time .051
 
 set packetSize 1460
 
-set K 20
 
 proc init_param { } {
 
     global dctcp d2tcp sdnd2tcp
     global packetSize
     global K
+    global queue_alg
 
     set DCTCP_g_  [expr 1.0/16]; #@DCTCP
     set ackRatio 1 
@@ -65,6 +68,7 @@ proc init_param { } {
 
     if { $dctcp } {
         puts "enable dctcp!!!"
+        set queue_alg RED
         Agent/TCP set dctcp_ true
         Agent/TCP set dctcp_g_ $DCTCP_g_; #g is the weight given to new samples against the past in the estimation of alpha
         Agent/TCP set dctcp_alpha_ 0; # alpha = (1-g)*alpha + g*F, alpha is an estimate of the fraction of packets that are marked
@@ -74,6 +78,7 @@ proc init_param { } {
 
     if { $d2tcp } {
         puts "enable d2tcp!!!"
+        set queue_alg RED
         Agent/TCP set dctcp_ true
         Agent/TCP set dctcp_g_ $DCTCP_g_; 
         Agent/TCP set dctcp_alpha_ 0; 
@@ -83,6 +88,7 @@ proc init_param { } {
 
     if { $sdnd2tcp } {
         puts "enable sdnd2tcp!!!"
+        set queue_alg RED
         Agent/TCP set dctcp_ true
         Agent/TCP set dctcp_g_ $DCTCP_g_; 
         Agent/TCP set dctcp_alpha_ 0; 
