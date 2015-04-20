@@ -110,8 +110,9 @@ proc avoid_incast { } {
     #Queue/RED set thresh_ [expr $K/4] ; #minthresh
     #Queue/RED set maxthresh_ [expr $K/4] ; #maxthresh
     if { $sdnd2tcp } {
-        Queue/RED set thresh_ [expr 0] ; #minthresh
-        Queue/RED set maxthresh_ [expr 0] ; #maxthresh
+        #puts "set thresh 3"
+        Queue/RED set thresh_ [expr 3] ; #minthresh
+        Queue/RED set maxthresh_ [expr 3] ; #maxthresh
     }
 
 }
@@ -136,7 +137,7 @@ Application/TcpApp instproc recv {i} {
     }
     set now [expr [$ns now] + 0.00000]
     set res_time [expr $now + [$jitter value]]
-    set res_time [expr $now + 0.0]
+    set res_time [expr $now + 0.05]
     set size [expr $res_pkts * $packetSize]
     if { $i>0 } {
         set ii [expr -$i]
@@ -152,7 +153,7 @@ Application/TcpApp instproc recv {i} {
         $qf_res_tcp($ii) set cwnd_ 0
         Queue/RED set thresh_ [expr $K] ; #minthresh
         Queue/RED set maxthresh_ [expr $K] ; #maxthresh
-        $ns at [expr $now + 0.0] "query"
+        $ns at [expr $now + 0.01] "query"
       }
     }
 }
@@ -162,7 +163,7 @@ $ns at .0 "query"
 #short (message) flow: update control state on the workers 100KB-1MB
 
 #large flow: copy fresh data to workers 1MB-100MB
-for {set i 1} {$i < $sc} {incr i 35} {
+for {set i 1} {$i < $sc} {incr i 4} {
       #lfid start with 0
       set lfid $lfc
       set fid $fc
