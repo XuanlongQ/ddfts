@@ -9,6 +9,8 @@ print 'matplotlib.use("Agg")'
 import matplotlib.pyplot as plt
 
 def getbinspdfcdf(sample_list):
+    if len(sample_list) <= 0: 
+      return (0,), (0,), (0,),
     bins = np.linspace(min(sample_list), max(sample_list), 100)
     pdf = np.histogram(sample_list, bins=bins, normed=False)[0]
     pdf = pdf*1.0/sum(pdf)

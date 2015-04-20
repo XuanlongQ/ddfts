@@ -1037,6 +1037,7 @@ Agent/TCP set d2tcp_d_ 1.0;
 
 # SDN
 Agent/TCP set sdn_ false;
+Agent/TCP set incast_ 0;
 Agent/TCP set ftype_ 0; #0->elephant flow, 1->time sensitive flow, 2->query flow
 
 # XXX Generate nam trace or plain old text trace for variables. 

@@ -445,7 +445,11 @@ protected:
 
 	/* Use for SDN */
 	int sdn_;
+	int incast_;
 	double ftype_; //
+    int FTYPE_L=0;
+    int FTYPE_S=1;
+    int FTYPE_Q=2;
 
 
 	int cong_action_;	/* Congestion Action.  True to indicate

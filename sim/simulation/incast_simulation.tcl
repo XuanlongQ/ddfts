@@ -92,29 +92,32 @@ proc query { } {
 }
 
 proc avoid_incast { } {
+    global ns
     global incast_avoid
     global lfc
     global lf_req_tcp lf_res_tcp
     set incast_avoid true
     global sdnd2tcp
     global K
+    global req_count res_count
 
+    if { !$sdnd2tcp } {
+        return
+    }
+    if { $res_count >= $req_count } {
+        return
+    }
+    puts "set large flow to avoid incasnt"
     for {set i 1} {$i < $lfc} {incr i 1} {
         set lfid $i
         #$lf_req_tcp($lfid) set cwnd_ 1
         #$lf_res_tcp($lfid) set cwnd_ 1
         #$lf_req_tcp($lfid) set ssthresh_ 2
         #$lf_res_tcp($lfid) set ssthresh_ 2
+        $lf_req_tcp($lfid) set incast_ 2
+        $lf_res_tcp($lfid) set incast_ 2
     }
-
-    #Queue/RED set thresh_ [expr $K/4] ; #minthresh
-    #Queue/RED set maxthresh_ [expr $K/4] ; #maxthresh
-    if { $sdnd2tcp } {
-        puts "set thresh 10"
-        Queue/RED set thresh_ [expr 10] ; #minthresh
-        Queue/RED set maxthresh_ [expr 10] ; #maxthresh
-        Queue/RED set sdn_ [expr 1] ; #sdn_
-    }
+    #set now [expr [$ns now] + 0.001]
 
 }
 set delay [expr 0.000004*($sc-1)*2]
@@ -133,12 +136,12 @@ Application/TcpApp instproc recv {i} {
     global INT_MIN
     global req_pkts res_pkts
 
-    if { $incast_avoid == false } {
-        avoid_incast
-    }
     set now [expr [$ns now] + 0.00000]
     set res_time [expr $now + [$jitter value]]
     set res_time [expr $now + 0.05]
+    if { $incast_avoid == false } {
+        $ns at $now "avoid_incast"
+    }
     set size [expr $res_pkts * $packetSize]
     if { $i>0 } {
         set ii [expr -$i]
@@ -152,14 +155,12 @@ Application/TcpApp instproc recv {i} {
         set ii [expr -$i]
         $qf_req_tcp($ii) set cwnd_ 0
         $qf_res_tcp($ii) set cwnd_ 0
-        Queue/RED set thresh_ [expr $K] ; #minthresh
-        Queue/RED set maxthresh_ [expr $K] ; #maxthresh
         $ns at [expr $now + 0.01] "query"
       }
     }
 }
 
-$ns at .0 "query"
+$ns at .1 "query"
 
 #short (message) flow: update control state on the workers 100KB-1MB
 

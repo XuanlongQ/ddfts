@@ -1531,6 +1531,15 @@ FullTcpAgent::recv(Packet *pkt, Handler*)
 	int datalen = th->size() - tcph->hlen(); // # payload bytes
 	int ackno = tcph->ackno();		 // ack # from packet
 	int tiflags = tcph->flags() ; 		 // tcp flags from packet
+    //TODO if incast happen, we set ce = 1
+    if(sdn_ && incast_ > 0){
+        printf("sdn_ && incast_\n");
+        if(ftype_ == FTYPE_L){
+            fh->ce() = 1;
+        }else if(ftype_ == FTYPE_Q){
+            fh->ce() = 0;
+        }
+    }
 
 //if (state_ != TCPS_ESTABLISHED || (tiflags&(TH_SYN|TH_FIN))) {
 //fprintf(stdout, "%f(%s)in state %s recv'd this packet: ", now(), name(), statestr(state_));

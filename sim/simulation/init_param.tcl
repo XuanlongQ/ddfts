@@ -32,7 +32,7 @@ if { $tcptype == "sdnd2tcp" } {
 set queue_alg DropTail
 #set queue_alg RED
 set K 20
-set queue_limit 204 ; #incast: a static allocation of 100 packets to each port(@DCTCP)
+set queue_limit 124 ; #incast: a static allocation of 100 packets to each port(@DCTCP)
 set link_bw 1Gb
 set link_lt 20us
 
@@ -40,7 +40,7 @@ set link_lt 20us
 set trace_sampling_interval 0.001
 
 #simulation end time
-set sim_end_time .51
+set sim_end_time .31
 
 set packetSize 1460
 

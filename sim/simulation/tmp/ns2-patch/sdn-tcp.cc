@@ -109,6 +109,7 @@ TcpAgent::TcpAgent()
 	bind("d2tcp_d_", &d2tcp_d_);
     //sdn
 	bind("sdn_", &sdn_);
+	bind("incast_", &incast_);
 	bind("ftype_", &ftype_);
 #endif /* TCP_DELAY_BIND_ALL */
 
@@ -143,6 +144,7 @@ TcpAgent::delay_bind_init_all()
 
 	// SDN
 	delay_bind_init_one("sdn_"); 
+	delay_bind_init_one("incast_"); 
 	delay_bind_init_one("ftype_");
 
         delay_bind_init_one("SetCWRonRetransmit_");
@@ -265,6 +267,7 @@ TcpAgent::delay_bind_dispatch(const char *varName, const char *localName, TclObj
 	if (delay_bind(varName, localName, "d2tcp_d_", &d2tcp_d_ , tracer)) return TCL_OK;
 
         if (delay_bind_bool(varName, localName, "sdn_", &sdn_, tracer)) return TCL_OK; 
+        if (delay_bind_bool(varName, localName, "incast_", &incast_, tracer)) return TCL_OK; 
 	if (delay_bind(varName, localName, "ftype_", &ftype_ , tracer)) return TCL_OK;
 
         if (delay_bind_bool(varName, localName, "SetCWRonRetransmit_", &SetCWRonRetransmit_, tracer)) return TCL_OK;

@@ -89,7 +89,7 @@ def simulate_daemon(args):
                 sim.status = DONE
                 sim.save()
                 print '[At %s: %03d] Simulation %s is finished' % (current_thread, int(time.time())%100, sim.sid,)
-            time.sleep(30)
+            time.sleep(10)
 
             daemon = threading.Thread(target=simulate_daemon, args=('simulate daemon',))
             daemon.setDaemon(True)
