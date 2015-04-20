@@ -44,7 +44,6 @@ set sim_end_time .51
 
 set packetSize 1460
 
-
 proc init_param { } {
 
     global dctcp d2tcp sdnd2tcp
@@ -109,6 +108,7 @@ proc init_param { } {
     Queue/RED set gentle_ false
     Queue/RED set q_weight_ 1.0 ; #1.0 means that use current queue length but not average queue length
     Queue/RED set mark_p_ 1.0
+    #puts "set thresh_"
     Queue/RED set thresh_ [expr $K] ; #minthresh
     Queue/RED set maxthresh_ [expr $K] ; #maxthresh
                  

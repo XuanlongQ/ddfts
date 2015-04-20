@@ -110,9 +110,10 @@ proc avoid_incast { } {
     #Queue/RED set thresh_ [expr $K/4] ; #minthresh
     #Queue/RED set maxthresh_ [expr $K/4] ; #maxthresh
     if { $sdnd2tcp } {
-        #puts "set thresh 3"
-        Queue/RED set thresh_ [expr 3] ; #minthresh
-        Queue/RED set maxthresh_ [expr 3] ; #maxthresh
+        puts "set thresh 10"
+        Queue/RED set thresh_ [expr 10] ; #minthresh
+        Queue/RED set maxthresh_ [expr 10] ; #maxthresh
+        Queue/RED set sdn_ [expr 1] ; #sdn_
     }
 
 }
