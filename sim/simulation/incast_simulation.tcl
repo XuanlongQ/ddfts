@@ -37,7 +37,7 @@ set qfc 0
 set sfc 0
 set lfc 0
 set req_pkts 1
-set res_pkts 20
+set res_pkts 2
 #query traffic: 1 pkt for request, 2 pkts for response
 proc query { } {
     global ns

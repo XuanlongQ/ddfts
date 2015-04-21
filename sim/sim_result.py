@@ -2,6 +2,55 @@ from models import *
 from tool import performance
 LEVEL = 'DEBUG'
 
+NEW_FLOW_ID = 0
+NEW_QRECORD_ID = 0
+NEW_CWND_ID = 0 
+
+def get_new_flow_id():
+  global NEW_FLOW_ID
+  from django.core.exceptions import ObjectDoesNotExist
+  if NEW_FLOW_ID > 0:
+      NEW_FLOW_ID = NEW_FLOW_ID + 1
+      return NEW_FLOW_ID
+
+  try:
+      flow = Flow.objects.order_by('-fid')[0:1].get()
+      NEW_FLOW_ID = flow.fid + 1
+  except ObjectDoesNotExist:
+      #print 'flow does not exist'
+      NEW_FLOW_ID = 1
+  return NEW_FLOW_ID
+
+def get_new_qrecord_id():
+  global NEW_QRECORD_ID
+  if NEW_QRECORD_ID > 0:
+      NEW_QRECORD_ID = NEW_QRECORD_ID + 1
+      return NEW_QRECORD_ID
+
+  from django.core.exceptions import ObjectDoesNotExist
+  try:
+    q = Qrecord.objects.order_by('-qid')[0:1].get()
+    NEW_QRECORD_ID = q.qid + 1
+  except ObjectDoesNotExist:
+      #print 'qrecord does not exist'
+      NEW_QRECORD_ID = 1
+      return NEW_QRECORD_ID
+
+def get_new_cwnd_id():
+  global NEW_CWND_ID
+  if NEW_CWND_ID > 0:
+      NEW_CWND_ID = NEW_CWND_ID + 1
+      return NEW_CWND_ID
+
+  from django.core.exceptions import ObjectDoesNotExist
+  try:
+    cwnd = Cwnd.objects.order_by('-cid')[0:1].get()
+    NEW_CWND_ID = cwnd.cid + 1
+  except ObjectDoesNotExist:
+      #print 'cwnd does not exist'
+      NEW_CWND_ID = 1
+  return NEW_CWND_ID
+
 @performance(LEVEL)
 def packet_tracer(input_file_name):
 
@@ -109,6 +158,7 @@ def queue_tracer(input_file_name):
     for line in input_file:
         time, server, pktcnt, size = line.strip().split(' ')
         q = Qrecord()
+        q.qid = get_new_qrecord_id()
         q.time = int(time)
         q.rack = 0
         q.server = int(server)
@@ -124,6 +174,7 @@ def cwnd_tracer(input_file_name):
     for line in input_file:
         time, qf, sf, lf = line.strip().split(' ')
         c = Cwnd()
+        c.cid = get_new_cwnd_id()
         c.time = int(time)
         c.qf = float(qf)
         c.sf = float(sf)
@@ -148,6 +199,7 @@ def get_sim_result(s, output_dir):
     flow_list = []
     for fid in fid_list:
         flow = Flow()
+        flow.fid = get_new_flow_id()
         flow.start = int(stime_dict[fid]*1000000)
         flow.end = int(etime_dict[fid]*1000000)
         duration = flow.end - flow.start
@@ -162,19 +214,22 @@ def get_sim_result(s, output_dir):
         flow.size = size_dict[fid]
         flow.finished = size_dict[fid] + pktcnt_dict[fid]*40 <= thrput_dict[fid]
         flow.sim = s
-        flow.save()
+        #flow.save()
         #print flow
         flow_list.append(flow)
     #queue record
     qrecord_list = queue_tracer(input_file_name = '%s/queue.tr' % output_dir)
     for q in qrecord_list:
         q.sim = s
-        q.save()
+        #q.save()
 
     #cwnd record
     cwnd_list = cwnd_tracer(input_file_name = '%s/tcp.tr' % output_dir)
     for c in cwnd_list:
         c.sim = s
-        c.save()
+        #c.save()
+    print flow_list[0]
+    print qrecord_list[0]
+    print cwnd_list[0]
 
     return s, flow_list, qrecord_list, cwnd_list

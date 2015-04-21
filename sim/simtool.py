@@ -86,6 +86,14 @@ def simulate_daemon(args):
                 sim.status = SIMING
                 sim.save()
                 sim, flow_list, qrecord_list, cwnd_list = simulate(sim)
+                '''
+                for flow in flow_list:
+                  flow.save()
+                for q in qrecord_list:
+                  q.save()
+                for c in cwnd_list:
+                  c.save()
+                '''
                 sim.status = DONE
                 sim.save()
                 print '[At %s: %03d] Simulation %s is finished' % (current_thread, int(time.time())%100, sim.sid,)

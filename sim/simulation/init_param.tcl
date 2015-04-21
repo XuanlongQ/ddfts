@@ -40,7 +40,7 @@ set link_lt 20us
 set trace_sampling_interval 0.001
 
 #simulation end time
-set sim_end_time .61
+set sim_end_time .31
 
 set packetSize 1460
 

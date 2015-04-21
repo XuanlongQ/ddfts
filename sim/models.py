@@ -71,7 +71,8 @@ class Qrecord(models.Model):
     size = models.IntegerField(default=0)
     sim = models.ForeignKey(Simulation)
 
-    #def __unicode__(self,):
+    def __unicode__(self,):
+        return 'Qrecord %s' % (self.qid)
 
 class Cwnd(models.Model):
     cid = models.AutoField(primary_key=True) 
@@ -80,5 +81,8 @@ class Cwnd(models.Model):
     sf = models.FloatField(default=0)
     lf = models.FloatField(default=0)
     sim = models.ForeignKey(Simulation)
+
+    def __unicode__(self,):
+        return 'Cwnd %s' % (self.cid)
 
     #def __unicode__(self,):
