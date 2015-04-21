@@ -37,7 +37,7 @@ set qfc 0
 set sfc 0
 set lfc 0
 set req_pkts 1
-set res_pkts 2
+set res_pkts 20
 #query traffic: 1 pkt for request, 2 pkts for response
 proc query { } {
     global ns
@@ -91,33 +91,16 @@ proc query { } {
     }
 }
 
-proc avoid_incast { } {
-    global ns
-    global incast_avoid
+proc avoid_incast { incast } {
     global lfc
     global lf_req_tcp lf_res_tcp
-    set incast_avoid true
-    global sdnd2tcp
-    global K
-    global req_count res_count
-
-    if { !$sdnd2tcp } {
-        return
-    }
-    if { $res_count >= $req_count } {
-        return
-    }
-    puts "set large flow to avoid incasnt"
+    global ns
+    puts "[$ns now]:set large flow $incast to avoid incasnt"
     for {set i 1} {$i < $lfc} {incr i 1} {
         set lfid $i
-        #$lf_req_tcp($lfid) set cwnd_ 1
-        #$lf_res_tcp($lfid) set cwnd_ 1
-        #$lf_req_tcp($lfid) set ssthresh_ 2
-        #$lf_res_tcp($lfid) set ssthresh_ 2
-        $lf_req_tcp($lfid) set incast_ 2
-        $lf_res_tcp($lfid) set incast_ 2
+        $lf_req_tcp($lfid) set incast_ $incast
+        $lf_res_tcp($lfid) set incast_ $incast
     }
-    #set now [expr [$ns now] + 0.001]
 
 }
 set delay [expr 0.000004*($sc-1)*2]
@@ -135,12 +118,16 @@ Application/TcpApp instproc recv {i} {
     global K
     global INT_MIN
     global req_pkts res_pkts
+    global sdnd2tcp
 
     set now [expr [$ns now] + 0.00000]
     set res_time [expr $now + [$jitter value]]
-    set res_time [expr $now + 0.05]
-    if { $incast_avoid == false } {
-        $ns at $now "avoid_incast"
+    set res_time [expr $now + 0.08]
+    if { $sdnd2tcp && $incast_avoid == false } {
+        $ns at [expr $now + 0.01] "avoid_incast 0"
+        $ns at [expr $now + 0.03] "avoid_incast 2"
+        #avoid_incast 2
+        set incast_avoid true
     }
     set size [expr $res_pkts * $packetSize]
     if { $i>0 } {
@@ -150,17 +137,16 @@ Application/TcpApp instproc recv {i} {
     if { $i<0 && $i>$INT_MIN } {
       incr res_count
       if { $res_count >= $req_count } {
-        set incast_avoid true
-        #set cwnd_ 0 for tcp_trace
-        set ii [expr -$i]
-        $qf_req_tcp($ii) set cwnd_ 0
-        $qf_res_tcp($ii) set cwnd_ 0
-        $ns at [expr $now + 0.01] "query"
+          #set cwnd_ 0 for tcp_trace
+          set ii [expr -$i]
+          $qf_req_tcp($ii) set cwnd_ 0
+          $qf_res_tcp($ii) set cwnd_ 0
+          $ns at [expr $now + 0.01] "query"
       }
     }
 }
 
-$ns at .1 "query"
+$ns at .0 "query"
 
 #short (message) flow: update control state on the workers 100KB-1MB
 

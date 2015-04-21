@@ -199,7 +199,7 @@ def plot_ql_cdf(s, output_file_name):
 #plot cwnd by time
 #input: s(models.Simulation)
 def plot_cw_cdf(s, output_file_name):
-    cwnd_list = s.cwnd_set.all()
+    cwnd_list = s.cwnd_set.all().order_by('time')
     #print 'qrcord.len = ' , len(qrecord)
     time_list = []
     qf_list = []
@@ -207,7 +207,7 @@ def plot_cw_cdf(s, output_file_name):
     lf_list = []
     af_list = []
     for c in cwnd_list:
-        time_list.append(c.time)
+        time_list.append(c.time/1000)
         qf_list.append(c.qf)
         sf_list.append(c.sf)
         lf_list.append(c.lf)
@@ -218,9 +218,9 @@ def plot_cw_cdf(s, output_file_name):
     plt.plot(time_list, af_list, label="all flow cwnd", )
 
     #plt.xlim([0, 4])
-    #plt.ylim([0, 300])
+    #plt.ylim([0, 100])
     plt.title('congestion window')
-    plt.xlabel('time')
+    plt.xlabel('time(ms)')
     plt.ylabel('cwnd')
     plt.legend(loc = 'upper right')
     if output_file_name:

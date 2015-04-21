@@ -1342,6 +1342,14 @@ TcpAgent::slowdown(int how)
             double p = pow(dctcp_alpha_, d2tcp_d_);
 		    ssthresh_ = (int) ((1 - p/2.0) * windowd());
         }
+        if(sdn_ && incast_ > 0){
+            if(ftype_ == FTYPE_L){
+                //printf("ssthresh_ set 1\n");
+		        //ssthresh_ = (int) (1);
+            }else if(ftype_ == FTYPE_Q){
+		        //ssthresh_ = (int) (4);
+            }
+        }
     }
         else if (how & THREE_QUARTER_SSTHRESH)
 		if (ssthresh_ < 3*cwnd_/4)
@@ -1360,6 +1368,14 @@ TcpAgent::slowdown(int how)
         if(d2tcp_){
             double p = pow(dctcp_alpha_, d2tcp_d_);
 		    cwnd_ = (1 - p/2.0) * windowd();
+        }
+        if(sdn_ && incast_ > 0){
+            if(ftype_ == FTYPE_L){
+                //printf("cwnd_ set 1\n");
+		        //cwnd_ = (int) (1);
+            }else if(ftype_ == FTYPE_Q){
+		        //cwnd_ = (int) (4);
+            }
         }
     }
         else if (how & CWND_HALF_WITH_MIN) {
