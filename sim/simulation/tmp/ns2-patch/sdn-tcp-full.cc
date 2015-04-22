@@ -1536,10 +1536,10 @@ FullTcpAgent::recv(Packet *pkt, Handler*)
         //printf("sdn_ && incast_\n");
         if(ftype_ == FTYPE_L){
             fh->ecnecho() = 1;
+            fh->ce() = 1;
         }else if(ftype_ == FTYPE_Q){
-            fh->ecnecho() = 0;
+            //fh->ecnecho() = 0;
         }
-        fh->ecnecho() = 1;
     }
 
 //if (state_ != TCPS_ESTABLISHED || (tiflags&(TH_SYN|TH_FIN))) {

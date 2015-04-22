@@ -95,9 +95,9 @@ proc avoid_incast { incast } {
     global lfc
     global lf_req_tcp lf_res_tcp
     global ns
-    puts "[$ns now]:set large flow $incast to avoid incasnt"
-    for {set i 1} {$i < $lfc} {incr i 1} {
+    for {set i 0} {$i < $lfc} {incr i 1} {
         set lfid $i
+        #puts "[$ns now]:set large flow $lfid incast = $incast"
         $lf_req_tcp($lfid) set incast_ $incast
         $lf_res_tcp($lfid) set incast_ $incast
     }
@@ -122,11 +122,11 @@ Application/TcpApp instproc recv {i} {
 
     set now [expr [$ns now] + 0.00000]
     set res_time [expr $now + [$jitter value]]
-    set res_time [expr $now + 0.08]
+    set res_time [expr $now + 0.05]
+    #puts "sdnd2tcp = $sdnd2tcp, incast_avoid = $incast_avoid"
     if { $sdnd2tcp && $incast_avoid == false } {
-        $ns at [expr $now + 0.01] "avoid_incast 0"
-        $ns at [expr $now + 0.03] "avoid_incast 2"
-        #avoid_incast 2
+        $ns at [expr $now + 0.001] "avoid_incast 0"
+        $ns at [expr $now + 0.048] "avoid_incast 2"
         set incast_avoid true
     }
     set size [expr $res_pkts * $packetSize]
@@ -146,12 +146,12 @@ Application/TcpApp instproc recv {i} {
     }
 }
 
-$ns at .0 "query"
+$ns at .5 "query"
 
 #short (message) flow: update control state on the workers 100KB-1MB
 
 #large flow: copy fresh data to workers 1MB-100MB
-for {set i 1} {$i < $sc} {incr i 4} {
+for {set i 1} {$i < $sc} {incr i 8} {
       #lfid start with 0
       set lfid $lfc
       set fid $fc
@@ -160,8 +160,8 @@ for {set i 1} {$i < $sc} {incr i 4} {
       #Transmission Layer
       set lf_req_tcp($lfid) [new Agent/TCP/FullTcp/Sack]
       set lf_res_tcp($lfid) [new Agent/TCP/FullTcp/Sack]
-      $ns attach-agent $server(0)  $lf_req_tcp($lfid)
-      $ns attach-agent $server($i) $lf_res_tcp($lfid)
+      $ns attach-agent $server($i)  $lf_req_tcp($lfid)
+      $ns attach-agent $server(0) $lf_res_tcp($lfid)
       $ns connect $lf_req_tcp($lfid) $lf_res_tcp($lfid)
       $lf_req_tcp($lfid) set fid_ $fid
       $lf_res_tcp($lfid) set fid_ $fid
@@ -174,7 +174,7 @@ for {set i 1} {$i < $sc} {incr i 4} {
       $lf_req_app($lfid) connect $lf_res_app($lfid)
       set size [expr 2000000000]
       puts $flow_file "flow:$fid|ftype:l|deadline:-1|src:0|dst:$i|size:$size"
-      $ns at 0.0 "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {$INT_MIN}}"
+      $ns at [expr 0.05 * $i] "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {$INT_MIN}}"
 }
 
 

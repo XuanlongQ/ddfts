@@ -25,9 +25,13 @@ def plot_fd_cdf(s, output_file_name=None):
     ftype_list = ['q', ] #query, 
     for i, ftype in zip(range(1,5), ftype_list):
         if ftype == 'a':
-            flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True) ]
+            #flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True) ]
+            flow_delay_list = [ float(f.end - f.start)/1000 for f in filter(lambda ff: ff.finished == True, s.flow_list) ]
         else:
-            flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True).filter(ftype=ftype) ]
+            #flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True).filter(ftype=ftype) ]
+            flow_list = filter(lambda ff: ff.finished == True, s.flow_list)
+            flow_list = filter(lambda ff: ff.ftype == ftype, flow_list)
+            flow_delay_list = [ float(f.end - f.start)/1000 for f in flow_list ]
 
         #flow_delay_list = filter(lambda d: d < 100, flow_delay_list)
 
@@ -169,7 +173,8 @@ def plot_cc_cdf(s, output_file_name):
 #plot cdf of queue length by time
 #input: s(models.Simulation)
 def plot_ql_cdf(s, output_file_name):
-    qrecord = s.qrecord_set.all()
+    #qrecord = s.qrecord_set.all()
+    qrecord = s.qrecord_list
     #print 'qrcord.len = ' , len(qrecord)
     time_dict = {}
     qlen_dict = {}
@@ -182,7 +187,7 @@ def plot_ql_cdf(s, output_file_name):
         qlen_dict[qid].append(q.pktcnt) 
     for qid in time_dict:
         #print 'qid = ', qid
-        time_list = time_dict[qid]
+        time_list = map(lambda t: t/1000, time_dict[qid])
         qlen_list = qlen_dict[qid]
         plt.plot(time_list, qlen_list)
 
@@ -199,7 +204,8 @@ def plot_ql_cdf(s, output_file_name):
 #plot cwnd by time
 #input: s(models.Simulation)
 def plot_cw_cdf(s, output_file_name):
-    cwnd_list = s.cwnd_set.all().order_by('time')
+    #cwnd_list = s.cwnd_set.all().order_by('time')
+    cwnd_list = s.cwnd_list
     #print 'qrcord.len = ' , len(qrecord)
     time_list = []
     qf_list = []
@@ -217,12 +223,12 @@ def plot_cw_cdf(s, output_file_name):
     plt.plot(time_list, lf_list, label="large flow cwnd", )
     plt.plot(time_list, af_list, label="all flow cwnd", )
 
-    #plt.xlim([0, 4])
-    #plt.ylim([0, 100])
+    #plt.xlim([450, 850])
+    plt.ylim([0, 330])
     plt.title('congestion window')
     plt.xlabel('time(ms)')
     plt.ylabel('cwnd')
-    plt.legend(loc = 'upper right')
+    plt.legend(loc = 'upper left')
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
 

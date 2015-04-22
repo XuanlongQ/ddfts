@@ -6,8 +6,7 @@ import threading, time
 from models import *
 from tool import performance
 LEVEL = 'DEBUG'
-SG = 1 #count of server group
-SC = 44 #count of server in every group
+sim_list = []
 
 def cur_file_dir():
     path = sys.path[0]
@@ -55,8 +54,6 @@ def simulate(s):
     s, flow_list, qrecord_list, cwnd_list = get_sim_result(s, tcl_output_dir)
     t2 = time.time()
     s.time = t2 - t1
-    s.save()
-
     #remove tcl output bucause it's too big!!
     #(status, output) = commands.getstatusoutput('rm -rf %s/tcl'%(out_dir))
     #print status, output
@@ -67,6 +64,7 @@ def simulate(s):
 SIM_DAEMON =  None
 
 def simulate_daemon(args):
+    global sim_list
     current_thread = threading.currentThread()
     while True:
             UNDONE = 0
@@ -96,7 +94,11 @@ def simulate_daemon(args):
                 '''
                 sim.status = DONE
                 sim.save()
-                print '[At %s: %03d] Simulation %s is finished' % (current_thread, int(time.time())%100, sim.sid,)
+                sim.flow_list = flow_list
+                sim.qrecord_list = qrecord_list
+                sim.cwnd_list = cwnd_list
+                sim_list.append(sim)
+                print '[At %s: %03d] Simulation %s is finished, qfc = %d' % (current_thread, int(time.time())%100, sim.sid, sim.qfc, )
             time.sleep(10)
 
             daemon = threading.Thread(target=simulate_daemon, args=('simulate daemon',))

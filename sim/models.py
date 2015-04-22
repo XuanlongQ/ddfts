@@ -15,6 +15,10 @@ class Simulation(models.Model):
     status = models.IntegerField(default=False)
     time = models.IntegerField(default=0)
 
+    flow_list = None
+    qrecord_list = None
+    cwnd_list = None
+
     def __unicode__(self,):
         STATUS = ['UDONE', 'SIMING', 'DONE']
         return '[simulation %03d[%s] has %s query flow, %d short flow, and %d large flow, which totally has %d flow, and it\' simulation is %s]' % (self.sid, self.tcptype, self.qfc, self.sfc, self.lfc, self.afc, STATUS[self.status])

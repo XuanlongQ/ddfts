@@ -193,7 +193,7 @@ def get_sim_result(s, output_dir):
     s.lfc = lfc
     s.afc = afc
     s.save()
-    #print 's = %s' % s
+    print 'qfc = %d' % s.qfc
     #using python script now
     fid_list, stime_dict, etime_dict, drcnt_dict, thrput_dict, pktcnt_dict = packet_tracer(input_file_name = '%s/packet.tr' % output_dir)
     flow_list = []
@@ -228,8 +228,8 @@ def get_sim_result(s, output_dir):
     for c in cwnd_list:
         c.sim = s
         #c.save()
-    print flow_list[0]
-    print qrecord_list[0]
-    print cwnd_list[0]
+    #print flow_list[0]
+    #print qrecord_list[0]
+    #print cwnd_list[0]
 
     return s, flow_list, qrecord_list, cwnd_list

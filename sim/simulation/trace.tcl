@@ -56,7 +56,7 @@ proc tcp_trace { } {
         set req_cwnd  [$lf_req_tcp($i) set cwnd_]
         set req_alpha [$lf_req_tcp($i) set dctcp_alpha_]
         set res_cwnd  [$lf_res_tcp($i) set cwnd_]
-        set cwnd [expr $req_cwnd + $res_cwnd]
+        set cwnd [expr $req_cwnd]
         set lf_cwnd_sum [expr $lf_cwnd_sum + $cwnd]
     }
     puts -nonewline $tcp_file [format " %.2lf" $lf_cwnd_sum]
