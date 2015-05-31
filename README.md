@@ -1,2 +1,2 @@
-# ddfts
-deadline-aware flow transmit strategy
+# DDFTS
+Deadline Driven Flow Transmission Strategy
