@@ -100,20 +100,24 @@ def plot(request):
             img_url = '%s/%s_img_%s.png' % (img_tmp_url, cdf, sim.sid)
             #print img
             #print img_url
-            plot(sim, img)
             if img_url.find('fd') >= 0 and True:
+                plot(sim_list, img)
                 img_list.append(img_url)
                 pass
             elif img_url.find('ql') >= 0 and True:
+                plot(sim_list, img)
                 img_list.append(img_url)
                 pass
             elif img_url.find('cw') >= 0 and True:
+                plot(sim_list, img)
                 img_list.append(img_url)
                 pass
             else:
+                plot(sim, img)
                 #img_list.append(img_url)
                 pass
         img_dict[sim] = img_list
+        break
 
     return render(request, 'sim/plot.html', {'sim_list':sim_list, 'img_dict':img_dict} )
 

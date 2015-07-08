@@ -1,5 +1,4 @@
 #!/usr/bin/python
-#-*-coding:utf-8-*-
 import sys
 import numpy as np
 import simtool
@@ -20,32 +19,34 @@ def getbinspdfcdf(sample_list):
     
 
 #ss: Simulation List
-def plot_fd_cdf(ss, output_file_name=None):
+def plot_fd_cdf(s, output_file_name=None):
 
-    i = 1
-    sub_title = ['0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',]
-    for s in ss:
-        ftype_list = ['q', ] #query, 
-        ftype = 'q' #query, 
-        #flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True).filter(ftype=ftype) ]
-        flow_list = filter(lambda ff: ff.finished == True, s.flow_list)
-        flow_list = filter(lambda ff: ff.ftype == ftype, flow_list)
-        flow_delay_list = [ float(f.end - f.start)/1000 for f in flow_list ]
+    ftype_list = ['a', 'q', 's', 'l'] # all, query, short, large
+    ftype_list = ['q', ] #query, 
+    for i, ftype in zip(range(1,5), ftype_list):
+        if ftype == 'a':
+            #flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True) ]
+            flow_delay_list = [ float(f.end - f.start)/1000 for f in filter(lambda ff: ff.finished == True, s.flow_list) ]
+        else:
+            #flow_delay_list = [ float(f.end - f.start)/1000 for f in s.flow_set.filter(finished=True).filter(ftype=ftype) ]
+            flow_list = filter(lambda ff: ff.finished == True, s.flow_list)
+            flow_list = filter(lambda ff: ff.ftype == ftype, flow_list)
+            flow_delay_list = [ float(f.end - f.start)/1000 for f in flow_list ]
+
         #flow_delay_list = filter(lambda d: d < 100, flow_delay_list)
+
         bins, pdf, cdf = getbinspdfcdf(flow_delay_list)
-        plt.subplot(2, 2, i)
-        #plt.plot(bins, pdf, label='%s flow delay pdf' % (ftype,))
-        plt.plot(bins, pdf, label='')
+        #plt.subplot(2, 2, i)
+        plt.plot(bins, pdf, label='%s flow delay pdf' % (ftype,))
         #plt.plot(bins, cdf, label='%s flow delay cdf' % (ftype,))
-        plt.xlim([50, 55])
-        plt.ylim([0, 0.1])
+
+        #plt.xlim([100, 500])
+        plt.ylim([0, 1])
+        #plt.title('%s flow delay CDF' % (ftype,))
         plt.xlabel('flow delay(ms)')
         #plt.ylabel('CDF')
         plt.legend(loc = 'upper right', ) #fontsize=8)
-        plt.title('(%s) %s' % (sub_title[i], s.tcptype), loc='center')
-        i += 1
-    #plt.suptitle('PDF of Small Flow Delay')
-    plt.tight_layout()
+
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
 
@@ -171,77 +172,64 @@ def plot_cc_cdf(s, output_file_name):
 
 #plot cdf of queue length by time
 #input: s(models.Simulation)
-def plot_ql_cdf(ss, output_file_name):
-    i = 1
-    sub_title = ['0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',]
-    for s in ss:
-        #qrecord = s.qrecord_set.all()
-        qrecord = s.qrecord_list
-        #print 'qrcord.len = ' , len(qrecord)
-        time_dict = {}
-        qlen_dict = {}
-        for q in qrecord:
-            qid = '%d,%d' % (q.rack, q.server)
-            if not (qid in qlen_dict):
-                time_dict[qid] = []
-                qlen_dict[qid] = []
-            time_dict[qid].append(q.time) 
-            qlen_dict[qid].append(q.pktcnt) 
-        plt.subplot(2, 2, i)
-        for qid in time_dict:
-            #print 'qid = ', qid
-            time_list = map(lambda t: t/1000000.0, time_dict[qid])
-            qlen_list = qlen_dict[qid]
-            plt.plot(time_list, qlen_list)
+def plot_ql_cdf(s, output_file_name):
+    #qrecord = s.qrecord_set.all()
+    qrecord = s.qrecord_list
+    #print 'qrcord.len = ' , len(qrecord)
+    time_dict = {}
+    qlen_dict = {}
+    for q in qrecord:
+        qid = '%d,%d' % (q.rack, q.server)
+        if not (qid in qlen_dict):
+            time_dict[qid] = []
+            qlen_dict[qid] = []
+        time_dict[qid].append(q.time) 
+        qlen_dict[qid].append(q.pktcnt) 
+    for qid in time_dict:
+        #print 'qid = ', qid
+        time_list = map(lambda t: t/1000, time_dict[qid])
+        qlen_list = qlen_dict[qid]
+        plt.plot(time_list, qlen_list)
 
-        #plt.xlim([0, 4])
-        #plt.ylim([0, 300])
-        #plt.title('PDF of queue length')
-        plt.title('(%s) %s'% (sub_title[i], s.tcptype))
-        plt.xlabel('time(s)')
-        plt.ylabel('PDF fo queue length')
-        i += 1
-    
-    plt.tight_layout()
+    #plt.xlim([0, 4])
+    #plt.ylim([0, 300])
+    plt.title('PDF of queue length')
+    plt.xlabel('time')
+    plt.ylabel('PDF fo queue length')
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
+
     plt.clf()
 
 #plot cwnd by time
 #input: s(models.Simulation)
-def plot_cw_cdf(ss, output_file_name):
-    i = 1
-    sub_title = ['0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',]
-    for s in ss:
-        #cwnd_list = s.cwnd_set.all().order_by('time')
-        cwnd_list = s.cwnd_list
-        #print 'qrcord.len = ' , len(qrecord)
-        time_list = []
-        qf_list = []
-        sf_list = []
-        lf_list = []
-        af_list = []
-        for c in cwnd_list:
-            time_list.append(c.time/1000000.0)
-            qf_list.append(c.qf)
-            sf_list.append(c.sf)
-            lf_list.append(c.lf)
-            af_list.append(c.qf+c.lf)
+def plot_cw_cdf(s, output_file_name):
+    #cwnd_list = s.cwnd_set.all().order_by('time')
+    cwnd_list = s.cwnd_list
+    #print 'qrcord.len = ' , len(qrecord)
+    time_list = []
+    qf_list = []
+    sf_list = []
+    lf_list = []
+    af_list = []
+    for c in cwnd_list:
+        time_list.append(c.time/1000)
+        qf_list.append(c.qf)
+        sf_list.append(c.sf)
+        lf_list.append(c.lf)
+        af_list.append(c.qf+c.lf)
 
-        plt.subplot(2, 2, i)
-        plt.plot(time_list, qf_list, label='small flow cwnd', )
-        plt.plot(time_list, lf_list, label='large flow cwnd', )
-        plt.plot(time_list, af_list, label='flow cwnd', )
+    plt.plot(time_list, qf_list, label="query flow cwnd", )
+    plt.plot(time_list, lf_list, label="large flow cwnd", )
+    plt.plot(time_list, af_list, label="all flow cwnd", )
 
-        #plt.xlim([450, 850])
-        plt.ylim([0, 450])
-        plt.title('(%s) %s'% (sub_title[i], s.tcptype))
-        plt.xlabel('time(s)')
-        plt.ylabel('congestion window')
-        plt.legend(loc = 'upper left', fontsize = 8)
-        i += 1
-
-    plt.tight_layout()
+    #plt.xlim([450, 850])
+    #plt.ylim([0, 330])
+    plt.title('congestion window')
+    plt.xlabel('time(ms)')
+    plt.ylabel('cwnd')
+    plt.legend(loc = 'upper left')
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
+
     plt.clf()
