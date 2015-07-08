@@ -245,3 +245,47 @@ def plot_cw_cdf(ss, output_file_name):
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
     plt.clf()
+
+#plot throughput
+#input: ss(models.Simulation list)
+def plot_thrput(ss, output_file_name):
+
+    lf_thrput_list = []
+    qf_thrput_list = []
+    tcptype_list = []
+    ind = [ i*1. for i in range(len(ss))]
+    width = 0.35
+    for s in ss:
+        tcptype_list.append(s.tcptype)
+        lf_thrput = 0
+        qf_thrput = 0
+        large_flow_list = filter(lambda ff: ff.ftype == 'l', s.flow_list)
+        query_flow_list = filter(lambda ff: ff.ftype == 'q', s.flow_list)
+        for f in large_flow_list:
+            lf_thrput += f.thrput
+        for f in query_flow_list:
+            qf_thrput += f.thrput
+        lf_thrput_list.append(lf_thrput / (1024.*1024.))
+        qf_thrput_list.append(qf_thrput / (1024.*1024.))
+
+    #print 'len(ind):', ind
+    #print 'len(lf_thrput_list):', len(lf_thrput_list)
+    #print 'len(qf_thrput_list):', len(qf_thrput_list)
+    print '(lf_thrput_list):', lf_thrput_list
+    print '(qf_thrput_list):', qf_thrput_list
+    lf = plt.bar(ind, lf_thrput_list, width, color='#9999ff')
+    qf = plt.bar(ind, qf_thrput_list, width, bottom=lf_thrput_list, color='#ff9999')
+    ind_ = [ i + width/2. for i in ind]
+    plt.xticks(ind_ , tcptype_list )
+    #plt.xlim([0, 10])
+    plt.ylim([0, 120])
+
+    plt.legend( (lf[0], qf[0]), ('Large Flow', 'Small Flow'), loc = 'upper right')
+    plt.ylabel('Throughput(MB)')
+
+    plt.tight_layout()
+    if output_file_name:
+        plt.savefig(output_file_name, dip=72)
+
+    #plt.show()
+    plt.clf()
