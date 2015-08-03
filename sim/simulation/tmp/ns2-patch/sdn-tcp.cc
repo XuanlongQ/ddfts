@@ -1362,6 +1362,20 @@ TcpAgent::slowdown(int how)
 		} else cwnd_ = decreasewin;
 	else if (how & CLOSE_CWND_DCTCP) {
 		cwnd_ = (1 - dctcp_alpha_/2.0) * windowd();
+        //////////////////////////
+        double curtime;
+        Scheduler& s = Scheduler::instance();
+        curtime = &s ? s.clock() : 0;
+
+        FILE *pFile;
+        pFile=fopen("/tmp/cwnd.log", "a");
+        if(pFile==NULL) {
+        }
+        else {
+           fprintf(pFile, "%lf\t%lf\t%lf\n", curtime, (double)dctcp_alpha_, (double)cwnd_);
+        }
+        fclose(pFile);
+        ////////////////////////
         //if d2tcp enabled
         //printf("dctcp_=%d, d2tcp_g_=%lf, SSTHRESH\n", dctcp_, dctcp_g_);
         //printf("d2tcp_=%d, d2tcp_d_=%lf, CWND\n", d2tcp_, d2tcp_d_);
