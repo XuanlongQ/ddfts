@@ -122,11 +122,11 @@ Application/TcpApp instproc recv {i} {
 
     set now [expr [$ns now] + 0.00000]
     set res_time [expr $now + [$jitter value]]
-    set res_time [expr $now + 0.05]
+    set res_time [expr $now + 0.001]
     #puts "sdnd2tcp = $sdnd2tcp, incast_avoid = $incast_avoid"
     if { $sdnd2tcp && $incast_avoid == false } {
-        $ns at [expr $now + 0.001] "avoid_incast 0"
-        $ns at [expr $now + 0.048] "avoid_incast 2"
+        $ns at [expr $now + 0.0001] "avoid_incast 0"
+        $ns at [expr $now + 0.0003] "avoid_incast 2"
         set incast_avoid true
     }
     set size [expr $res_pkts * $packetSize]
@@ -141,17 +141,17 @@ Application/TcpApp instproc recv {i} {
           set ii [expr -$i]
           $qf_req_tcp($ii) set cwnd_ 0
           $qf_res_tcp($ii) set cwnd_ 0
-          $ns at [expr $now + 0.01] "query"
+          $ns at [expr $now + 0.001] "query"
       }
     }
 }
 
-$ns at .5 "query"
+#$ns at .001 "query"
 
 #short (message) flow: update control state on the workers 100KB-1MB
 
 #large flow: copy fresh data to workers 1MB-100MB
-for {set i 1} {$i < $sc} {incr i 8} {
+for {set i 1} {$i < $sc} {incr i 18} {
       #lfid start with 0
       set lfid $lfc
       set fid $fc
@@ -173,8 +173,9 @@ for {set i 1} {$i < $sc} {incr i 8} {
       set lf_res_app($lfid) [new Application/TcpApp $lf_res_tcp($lfid)]
       $lf_req_app($lfid) connect $lf_res_app($lfid)
       set size [expr 2000000000]
-      puts $flow_file "flow:$fid|ftype:l|deadline:-1|src:0|dst:$i|size:$size"
-      $ns at [expr 0.05 * $i] "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {$INT_MIN}}"
+      puts $flow_file "flow:$fid|ftype:l|deadline:-1|src:$i|dst:0|size:$size"
+      #$ns at [expr 0.5 - $i*0.0001] "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {$INT_MIN}}"
+      $ns at [expr 0.0] "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {$INT_MIN}}"
 }
 
 

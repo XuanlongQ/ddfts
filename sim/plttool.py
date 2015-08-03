@@ -5,9 +5,18 @@ import numpy as np
 import simtool
 
 import matplotlib
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 matplotlib.use('Agg')
 print 'matplotlib.use("Agg")'
 import matplotlib.pyplot as plt
+xmajorLocator   = MultipleLocator(5) #将x主刻度标签设置为20的倍数
+xmajorFormatter = FormatStrFormatter('%5d') #设置x轴标签文本的格式
+xminorLocator   = MultipleLocator(0.5) #将x轴次刻度标签设置为5的倍数
+
+
+ymajorLocator   = MultipleLocator(10) #将y轴主刻度标签设置为0.5的倍数
+ymajorFormatter = FormatStrFormatter('%10d') #设置y轴标签文本的格式
+yminorLocator   = MultipleLocator(1) #将此y轴次刻度标签设置为0.1的倍数
 
 def getbinspdfcdf(sample_list):
     if len(sample_list) <= 0: 
@@ -190,15 +199,15 @@ def plot_ql_cdf(ss, output_file_name):
         plt.subplot(2, 2, i)
         for qid in time_dict:
             #print 'qid = ', qid
-            time_list = map(lambda t: t/1000000.0, time_dict[qid])
+            time_list = map(lambda t: t/1000.0, time_dict[qid])
             qlen_list = qlen_dict[qid]
             plt.plot(time_list, qlen_list)
 
-        #plt.xlim([0, 4])
+        plt.xlim([0, 1.5])
         #plt.ylim([0, 300])
         #plt.title('PDF of queue length')
         plt.title('(%s) %s'% (sub_title[i], s.tcptype))
-        plt.xlabel('time(s)')
+        plt.xlabel('time(ms)')
         plt.ylabel('PDF fo queue length')
         i += 1
     
@@ -222,28 +231,43 @@ def plot_cw_cdf(ss, output_file_name):
         lf_list = []
         af_list = []
         for c in cwnd_list:
-            time_list.append(c.time/1000000.0)
+            time_list.append(c.time/1000.0)
             qf_list.append(c.qf)
             sf_list.append(c.sf)
             lf_list.append(c.lf)
             af_list.append(c.qf+c.lf)
 
-        plt.subplot(2, 2, i)
-        plt.plot(time_list, qf_list, label='small flow cwnd', )
+        ax = plt.subplot(2, 2, i)
+        #plt.plot(time_list, qf_list, label='small flow cwnd', )
         plt.plot(time_list, lf_list, label='large flow cwnd', )
-        plt.plot(time_list, af_list, label='flow cwnd', )
+        #plt.plot(time_list, af_list, label='flow cwnd', )
 
-        #plt.xlim([450, 850])
-        plt.ylim([0, 450])
+        #plt.xlim([0.0, 1.5])
+        plt.ylim([0, 55])
         plt.title('(%s) %s'% (sub_title[i], s.tcptype))
-        plt.xlabel('time(s)')
+        plt.xlabel('time(ms)')
         plt.ylabel('congestion window')
         plt.legend(loc = 'upper left', fontsize = 8)
         i += 1
 
+        #设置主刻度标签的位置,标签文本的格式
+        ax.xaxis.set_major_locator(xmajorLocator)
+        ax.xaxis.set_major_formatter(xmajorFormatter)
+
+        ax.yaxis.set_major_locator(ymajorLocator)
+        ax.yaxis.set_major_formatter(ymajorFormatter)
+
+        #显示次刻度标签的位置,没有标签文本
+        ax.xaxis.set_minor_locator(xminorLocator)
+        ax.yaxis.set_minor_locator(yminorLocator)
+
+        ax.xaxis.grid(True, which='major') #x坐标轴的网格使用主刻度
+        ax.yaxis.grid(True, which='minor') #y坐标轴的网格使用次刻度
+
     plt.tight_layout()
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
+        plt.savefig('%s.pdf' % (output_file_name), dip=72)
     plt.clf()
 
 #plot throughput

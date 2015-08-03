@@ -40,7 +40,7 @@ set link_lt 20us
 set trace_sampling_interval 0.00005
 
 #simulation end time
-set sim_end_time .81
+set sim_end_time .021
 
 set packetSize 1460
 
@@ -51,7 +51,7 @@ proc init_param { } {
     global K
     global queue_alg
 
-    set DCTCP_g_  [expr 1.0/16]; #@DCTCP 1.0/16
+    set DCTCP_g_  [expr 16.0/16]; #@DCTCP 1.0/16
     set ackRatio 1 
 
     Agent/TCP set ecn_ 1

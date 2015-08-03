@@ -43,11 +43,11 @@ proc tcp_trace { } {
         set cwnd [expr $req_cwnd + $res_cwnd]
         set qf_cwnd_sum [expr $qf_cwnd_sum + $cwnd]
     }
-    puts -nonewline $tcp_file [format " %.2lf" $qf_cwnd_sum]
+    #puts -nonewline $tcp_file [format " %.2lf" $qf_cwnd_sum]
 
     #short flow
     set sf_cwnd_sum 0
-    puts -nonewline $tcp_file [format " %.2lf" $sf_cwnd_sum]
+    #puts -nonewline $tcp_file [format " %.2lf" $sf_cwnd_sum]
 
     #large flow
     set lf_cwnd_sum 0
@@ -58,8 +58,12 @@ proc tcp_trace { } {
         set res_cwnd  [$lf_res_tcp($i) set cwnd_]
         set cwnd [expr $req_cwnd]
         set lf_cwnd_sum [expr $lf_cwnd_sum + $cwnd]
+        puts -nonewline $tcp_file [format " %.2lf" $cwnd]
+        if { $i>0 } {
+            puts -nonewline $tcp_file [format " %.2lf" $cwnd]
+        } 
     }
-    puts -nonewline $tcp_file [format " %.2lf" $lf_cwnd_sum]
+    #puts -nonewline $tcp_file [format " %.2lf" $lf_cwnd_sum]
 
     puts $tcp_file ""
 
