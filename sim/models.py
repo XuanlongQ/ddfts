@@ -12,6 +12,9 @@ class Simulation(models.Model):
     sfc = models.IntegerField(default=0)
     lfc = models.IntegerField(default=0)
     afc = models.IntegerField(default=0)
+    sc = models.IntegerField(default=0) #count of server 
+    qf_thrput = models.IntegerField(default=0)
+    lf_thrput = models.IntegerField(default=0)
     status = models.IntegerField(default=False)
     time = models.IntegerField(default=0)
 
@@ -21,7 +24,7 @@ class Simulation(models.Model):
 
     def __unicode__(self,):
         STATUS = ['UDONE', 'SIMING', 'DONE']
-        return '[simulation %03d[%s] has %s query flow, %d short flow, and %d large flow, which totally has %d flow, and it\' simulation is %s]' % (self.sid, self.tcptype, self.qfc, self.sfc, self.lfc, self.afc, STATUS[self.status])
+        return '[simulation %03d[%s,snd:%s,lfc:%s] %s query, %d short, and %d large,total:  %d flow, and it\' simulation is %s]' % (self.sid, self.tcptype, self.sc - 1, self.lfc, self.qfc, self.sfc, self.lfc, self.afc, STATUS[self.status])
 
     def query_flow_set(self,):
         return self.flow_set.filter(ftype='q')

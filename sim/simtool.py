@@ -20,25 +20,27 @@ def cur_file_dir():
         return os.path.dirname(path)
     '''
 
-@performance(LEVEL)
-def ns_simulation(sid, tcptype, tcl_output_dir):
+#@performance(LEVEL)
+def ns_simulation(sid, tcptype, sc, lfc, tcl_output_dir):
     #simulate network using tcl script
     sim = ['simulation.tcl', 'incast_simulation.tcl']
-    (status, output) = commands.getstatusoutput('/home/lqx/bin/ns-allinone-2.35/bin/ns sim/simulation/%s %s %s'%(sim[1], tcptype, tcl_output_dir))
+    (status, output) = commands.getstatusoutput('/home/lqx/bin/ns-allinone-2.35/bin/ns sim/simulation/%s %s %s %s %s'%(sim[1], tcptype, sc, lfc, tcl_output_dir))
     #(status, output) = commands.getstatusoutput('/home/lqx/bin/ns-allinone-2.35/bin/ns sim/simulation/%s %s %s'%(sim[0], tcptype, tcl_output_dir))
-    print 'network simulation has generated: ' + tcl_output_dir
+    #print 'network simulation has generated: ' + tcl_output_dir
     print status, output
 
 #input s: model.Simulation
 #output s, flow_list: model.Flow
-@performance(LEVEL)
+#@performance(LEVEL)
 def simulate(s):
     sid = s.sid
     tcptype = s.tcptype
+    sc = s.sc
+    lfc = s.lfc
     
     path = cur_file_dir()
     out_dir = '%s/sim/out/%s' % (path, sid)
-    print 'out_dir = %s' % (out_dir,)
+    #print 'out_dir = %s' % (out_dir,)
     #return
 
     #(status, output) = commands.getstatusoutput('rm -rf %s/sim/out' % (path,) )
@@ -49,7 +51,7 @@ def simulate(s):
     tcl_output_dir = '%s/tcl/'%(out_dir,) 
     #print tcl_output_dir
     t1 = time.time()
-    ns_simulation(sid, tcptype, tcl_output_dir)
+    ns_simulation(sid, tcptype, sc, lfc, tcl_output_dir)
     from sim_result import get_sim_result
     s, flow_list, qrecord_list, cwnd_list = get_sim_result(s, tcl_output_dir)
     t2 = time.time()
@@ -63,6 +65,7 @@ def simulate(s):
 
 SIM_DAEMON =  None
 
+@performance(LEVEL)
 def simulate_daemon(args):
     global sim_list
     current_thread = threading.currentThread()
@@ -71,34 +74,30 @@ def simulate_daemon(args):
             SIMING = 1
             DONE = 2
             #check if simulate thread is already started 
-            #print 'len(siming):', len(siming)
-            #print 'len(sim): ', len(Simulation.objects.all())
-            #print 'len(sim undone): ', len(Simulation.objects.filter(status=UNDONE))
-            #print 'len(sim siming): ', len(Simulation.objects.filter(status=SIMING))
-            #print 'len(sim done): ', len(Simulation.objects.filter(status=DONE))
-            undone = Simulation.objects.filter(status=UNDONE) 
+            undone = [ s for s in sim_list if s.status == UNDONE ]
             if len(undone) == 0:
                 print '[At %s: %03d] There is no undone simulation now' % (current_thread, int(time.time())%100,)
             for sim in undone:
-                print '[At %s: %03d] Simulate simulation %s' % (current_thread, int(time.time())%100, sim.sid,)
+                print '[At %s: %03d] Simulate simulation %s[sc:%s, lfc:%s, %s]' \
+                    % (current_thread, int(time.time())%100, sim.sid, sim.sc, sim.lfc, sim.tcptype,)
                 sim.status = SIMING
-                sim.save()
                 sim, flow_list, qrecord_list, cwnd_list = simulate(sim)
-                '''
-                for flow in flow_list:
-                  flow.save()
-                for q in qrecord_list:
-                  q.save()
-                for c in cwnd_list:
-                  c.save()
-                '''
+
                 sim.status = DONE
-                sim.save()
-                sim.flow_list = flow_list
-                sim.qrecord_list = qrecord_list
-                sim.cwnd_list = cwnd_list
-                sim_list.append(sim)
-                print '[At %s: %03d] Simulation %s is finished, qfc = %d' % (current_thread, int(time.time())%100, sim.sid, sim.qfc, )
+                #sim.flow_list = flow_list
+                #sim.qrecord_list = qrecord_list
+                #sim.cwnd_list = cwnd_list
+                sim.lf_thrput = 0
+                sim.qf_thrput = 0
+                for f in flow_list:
+                   if f.ftype == 'l':
+                       sim.lf_thrput += f.thrput
+                   elif f.ftype == 'q':
+                       sim.qf_thrput += f.thrput
+                print '[At %s: %03d] Simulation %s is finished,\n \
+                    qfc = %d, qf_thrput = %d, lf_thrput = %d, thrput = %d\n\n' \
+                    % (current_thread, int(time.time())%100, sim.sid, sim.qfc,\
+                    sim.qf_thrput, sim.lf_thrput, (sim.qf_thrput + sim.lf_thrput),)
             time.sleep(10)
 
             daemon = threading.Thread(target=simulate_daemon, args=('simulate daemon',))

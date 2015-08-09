@@ -8,6 +8,12 @@ set i 0
 set tcptype [lindex $argv $i]
 	#puts "tcp_type=$tcp_type"
 incr i
+set sc [lindex $argv $i]
+	#puts "sender_count=$sc"
+incr i
+set _lfc [lindex $argv $i]
+	#puts "_lfc=${_lfc}"
+incr i
 set output_dir [lindex $argv $i]
 	#puts "output_dir=$output_dir"
 incr i
@@ -39,8 +45,16 @@ set link_lt 20us
 #trace parameters
 set trace_sampling_interval 0.00005
 
-#simulation end time
-set sim_end_time .81
+#time
+set lf_start_time .01
+set qf_start_time .31
+set qf_process_time 0.05
+set qf_interval_time 0.01
+#0.0475 s = 475 ms
+set incast_avoid_start_time [expr $qf_process_time - 0.0025]
+#0.0495
+set incast_avoid_end_time [expr $qf_process_time - 0.0005]
+set sim_end_time .91
 
 set packetSize 1460
 

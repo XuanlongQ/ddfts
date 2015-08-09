@@ -7,7 +7,7 @@ source "$path/random.tcl"
 #########initial parameters#############
 source "$path/init_param.tcl"
 init_param
-puts "queue algorithm: $queue_alg"
+#puts "queue algorithm: $queue_alg"
 
 #######################
 # Creating New Simulator
@@ -20,7 +20,6 @@ set tcp_file [open $output_dir/tcp.tr w]
 $ns trace-all $packet_file
 
 ##topology
-set sc 35
 set tor [$ns node]
 for {set i 0} {$i < $sc} {incr i 1} {
     set server($i) [$ns node]
@@ -69,8 +68,8 @@ proc query { } {
         #Transmission Layer
         set qf_req_tcp($qfid) [new Agent/TCP/FullTcp/Sack]
         set qf_res_tcp($qfid) [new Agent/TCP/FullTcp/Sack]
-        $qf_req_tcp($qfid) set d2tcp_d_ [expr 1000]
-        $qf_res_tcp($qfid) set d2tcp_d_ [expr 1000]
+        $qf_req_tcp($qfid) set d2tcp_d_ [expr 2]
+        $qf_res_tcp($qfid) set d2tcp_d_ [expr 2]
         $qf_req_tcp($qfid) set ftype_ FTYPE_Q
         $qf_res_tcp($qfid) set ftype_ FTYPE_Q
         $ns attach-agent $server(0)  $qf_req_tcp($qfid)
@@ -111,6 +110,7 @@ Application/TcpApp instproc recv {i} {
     global packetSize
     global qf_req_tcp qf_res_tcp
     global qf_req_app qf_res_app
+    global qf_process_time qf_interval_time incast_avoid_start_time incast_avoid_end_time
     global req_count
     global res_count
     global jitter
@@ -121,12 +121,13 @@ Application/TcpApp instproc recv {i} {
     global sdnd2tcp
 
     set now [expr [$ns now] + 0.00000]
-    set res_time [expr $now + [$jitter value]]
-    set res_time [expr $now + 0.05]
+    #set res_time [expr $now + [$jitter value]]
+    set res_time [expr $now + $qf_process_time]
     #puts "sdnd2tcp = $sdnd2tcp, incast_avoid = $incast_avoid"
     if { $sdnd2tcp && $incast_avoid == false } {
         $ns at [expr $now + 0.00001] "avoid_incast 0"
-        $ns at [expr $now + 0.047] "avoid_incast 2"
+        $ns at [expr $now + $incast_avoid_start_time] "avoid_incast 2"
+        $ns at [expr $now + $incast_avoid_end_time] "avoid_incast 0"
         set incast_avoid true
     }
     set size [expr $res_pkts * $packetSize]
@@ -136,23 +137,23 @@ Application/TcpApp instproc recv {i} {
     }
     if { $i<0 && $i>$INT_MIN } {
       incr res_count
+      $ns at [expr $now ] "avoid_incast 0"
       if { $res_count >= $req_count } {
           #set cwnd_ 0 for tcp_trace
           set ii [expr -$i]
           $qf_req_tcp($ii) set cwnd_ 0
           $qf_res_tcp($ii) set cwnd_ 0
-          $ns at [expr $now ] "avoid_incast 0"
-          $ns at [expr $now + 0.00001] "query"
+          $ns at [expr $now + $qf_interval_time] "query"
       }
     }
 }
 
-$ns at .5 "query"
+$ns at $qf_start_time "query"
 
 #short (message) flow: update control state on the workers 100KB-1MB
 
 #large flow: copy fresh data to workers 1MB-100MB
-for {set i 1} {$i < $sc} {incr i 10} {
+for {set i 1} {$i <= ${_lfc}} {incr i 1} {
       #lfid start with 0
       set lfid $lfc
       set fid $fc
@@ -175,7 +176,7 @@ for {set i 1} {$i < $sc} {incr i 10} {
       $lf_req_app($lfid) connect $lf_res_app($lfid)
       set size [expr 2000000000]
       puts $flow_file "flow:$fid|ftype:l|deadline:-1|src:0|dst:$i|size:$size"
-      $ns at [expr 0.05 + 0.00001*$i] "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {$INT_MIN}}"
+      $ns at [expr $lf_start_time + 0.00001*$i] "$lf_req_app($lfid) send $size {$lf_res_app($lfid) recv {$INT_MIN}}"
 }
 
 

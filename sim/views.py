@@ -34,13 +34,27 @@ def log(f):
         return f(*args, **argskw)
     return fn
 
+def add_sim_grp():
+    tcptypes = ["tcp", "dctcp", "d2tcp", "sdnd2tcp"]
+    for sc in xrange(32, 39, 2):
+        for lfc in xrange(1, 5):
+            for tcptype in tcptypes:
+                s = Simulation()
+                s.tcptype = tcptype.lower()
+                if simtool.sim_list == None:
+                    simtool.sim_list = []
+                s.sid = len(simtool.sim_list) + 1
+                s.lfc = lfc
+                s.sc =  sc 
+                simtool.sim_list.append(s)
+
 @log
 @check_sim_daemon
 def home(request):
     print 'sim home'
-
-    flow_list = Flow.objects.all()
-    sim_list = Simulation.objects.all()
+    if simtool.sim_list == None or len(simtool.sim_list) == 0:
+        add_sim_grp()
+    sim_list = simtool.sim_list
     return render(request, 'sim/index.html', {'sim_list':sim_list} )
     #return render_to_response('sim/index.html',)
 
@@ -52,7 +66,10 @@ def addsim(request):
         s = Simulation()
         tcptype = request.POST['tcptype']
         s.tcptype = tcptype.lower()
-        s.save()
+        if simtool.sim_list == None:
+            simtool.sim_list = []
+        s.sid = len(simtool.sim_list) + 1
+        simtool.sim_list.append(s)
     #return home(request)
     return HttpResponseRedirect('/sim')
 
@@ -60,8 +77,6 @@ def addsim(request):
 @check_sim_daemon
 def flow(request):
     print 'sim flow'
-    DONE = 2
-    #sim_list = Simulation.objects.filter(status = DONE)
     sim_list = simtool.sim_list
     return render(request, 'sim/flow.html', {'sim_list':sim_list} )
 
@@ -72,17 +87,18 @@ from plttool import *
 def plot(request):
     print 'sim plot'
     DONE = 2
-    sim_list = Simulation.objects.filter(status = DONE).exclude(flow = None)
     sim_list = simtool.sim_list
     img_tmp_dir, img_tmp_url = get_img_pos()
     img_dict = {}
     for sim in sim_list:
         cdf_plot = {}
         #flow delay cdf/pdf by flow
-        cdf_plot['fd'] = plot_fd_cdf
-        cdf_plot['ql'] = plot_ql_cdf
-        cdf_plot['cw'] = plot_cw_cdf
-        cdf_plot['tp'] = plot_thrput
+        #cdf_plot['fd'] = plot_fd_cdf
+        #cdf_plot['ql'] = plot_ql_cdf
+        #cdf_plot['cw'] = plot_cw_cdf
+        #cdf_plot['tp'] = plot_thrput
+        cdf_plot['tp2'] = plot_thrput_2
+        cdf_plot['qc'] = plot_qc
         '''
         #query arrival time cdf/pdf by query flow
         cdf_plot['qat'] = plot_qat_cdf
@@ -110,6 +126,10 @@ def plot(request):
                 img_list.append(img_url)
                 pass
             elif img_url.find('cw') >= 0 and True:
+                plot(sim_list, img)
+                img_list.append(img_url)
+                pass
+            elif img_url.find('qc') >= 0 and True:
                 plot(sim_list, img)
                 img_list.append(img_url)
                 pass
