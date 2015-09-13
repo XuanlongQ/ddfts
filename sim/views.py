@@ -35,12 +35,12 @@ def log(f):
     return fn
 
 def add_sim_grp():
-    tcptypes = ["tcp", "dctcp", "d2tcp", "sdnd2tcp"]
+    tcptypes = ["TCP", "DCTCP", "D2TCP", "SDN-D2TCP"]
     for sc in xrange(32, 39, 2):
         for lfc in xrange(1, 5):
             for tcptype in tcptypes:
                 s = Simulation()
-                s.tcptype = tcptype.lower()
+                s.tcptype = tcptype
                 if simtool.sim_list == None:
                     simtool.sim_list = []
                 s.sid = len(simtool.sim_list) + 1

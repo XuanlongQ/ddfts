@@ -294,36 +294,49 @@ def plot_thrput(ss, output_file_name):
 #input: ssss(models.Simulation list)
 def plot_thrput_2(sss, output_file_name):
     i = 1
-    width = 0.18
+    width = 0.35
     sub_title = ['0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',]
     colors = ['#9999ff','#ffff99','#5555aa','#aaaa55',]
+    colors = ['#333333','#777777','#BBBBBB','#FFFFFF',]
+    colors = ['#FFFFFF','#777777','#FFFFFF','#000000',]
+    hatchs = ['/','-','\\','o', '*',]
     for lfc in xrange(1, 5):
         plt.subplot(2, 2, i)
         line_dict = {}
         bars = []
-        tcptypes = ['tcp', 'dctcp', 'd2tcp', 'sdnd2tcp']
+        tcptypes = ['TCP', 'DCTCP', 'D2TCP', 'SDN-D2TCP']
         for j in xrange(0, len(tcptypes)):
             tcptype = tcptypes[j]
             color = colors[j]
+            hatch = hatchs[j]
             ss = filter(lambda s: s.lfc == lfc and s.tcptype == tcptype, sss)
             ss = sorted(ss, key=lambda s:s.sc)
             if len(ss) == 0:
                 continue
             sndc_list = [ (s.sc - 1) for s in ss] #count of sender
-            thrput_list = [ (s.qf_thrput + s.lf_thrput) / (1024.*1024.) for s in ss]
+            thrput_list = [ (s.qf_thrput + s.lf_thrput) / (1024.*1024.) - 110.0 for s in ss]
             #print 'sndc_list:', sndc_list
             #print 'thrput_list:', thrput_list
             line_dict[tcptype] = {'x':sndc_list, 'y':thrput_list}
             sndc_list_ = [ k + (j-2)*width for k in sndc_list]
-            line_dict[tcptype]['bar'] = plt.bar(sndc_list_, thrput_list, width, color = color)
+            #line_dict[tcptype]['bar'] = plt.bar(sndc_list_, thrput_list, width, color = color)
+            line_dict[tcptype]['bar'] = plt.bar(sndc_list_, thrput_list, width, color = color, hatch = hatch)
             bars.append(line_dict[tcptype]['bar'][0])
             #plt.plot(sndc_list, thrput_list, label=tcptype, )
 
+        ax=plt.gca()
         plt.xlim([30, 42])
-        plt.ylim([107, 111.5])
+        ax.set_xticks(np.linspace(30, 42, 13))
+        ax.set_xticklabels( ('', '31', '', '33', '',  '35',  '',  '37', '',  '39', '',  '41',  '',))
+
+        plt.ylim([0.0, 1.0])
+        ax.set_yticks(np.linspace(0.0, 1.0, 11))
+        ax.set_yticklabels( ('110.0', '110.1', '110.2', '110.3', '110.4', '110.5', '110.6', '110.7',
+          '110.8', '110.9', '111.0',)) 
+
         plt.title('(%s) %d large flow(s)'% (sub_title[i], lfc))
         plt.legend( bars, tcptypes, loc = 'upper right', fontsize = 7)
-        plt.xlabel('number of sender')
+        plt.xlabel('number of workers')
         plt.ylabel('all flow throughput(MB)')
         #plt.legend(loc = 'upper right', fontsize = 8)
         i += 1
@@ -331,24 +344,28 @@ def plot_thrput_2(sss, output_file_name):
     plt.tight_layout()
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
-        plt.savefig('%s.pdf' % (output_file_name), dip=72)
+        plt.savefig('%s.eps' % (output_file_name), dip=72)
     plt.clf()
 
 #plot query count
 #input: ssss(models.Simulation list)
 def plot_qc(sss, output_file_name):
     i = 1
-    width = 0.18
+    width = 0.35
     sub_title = ['0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',]
     colors = ['#9999ff','#ffff99','#5555aa','#aaaa55',]
+    colors = ['#333333','#777777','#BBBBBB','#FFFFFF',]
+    colors = ['#FFFFFF','#777777','#FFFFFF','#000000',]
+    hatchs = ['/','-','\\','o', '*',]
     for lfc in xrange(1, 5):
         plt.subplot(2, 2, i)
         line_dict = {}
         bars = []
-        tcptypes = ['tcp', 'dctcp', 'd2tcp', 'sdnd2tcp']
+        tcptypes = ['TCP', 'DCTCP', 'D2TCP', 'SDN-D2TCP']
         for j in xrange(0, len(tcptypes)):
             tcptype = tcptypes[j]
             color = colors[j]
+            hatch = hatchs[j]
             ss = filter(lambda s: s.lfc == lfc and s.tcptype == tcptype, sss)
             ss = sorted(ss, key=lambda s:s.sc)
             if len(ss) == 0:
@@ -357,21 +374,26 @@ def plot_qc(sss, output_file_name):
             qc_list = [ (s.qfc)*1.0 / (s.sc - 1) for s in ss]
             line_dict[tcptype] = {'x':sndc_list, 'y':qc_list}
             sndc_list_ = [ k + (j-2)*width for k in sndc_list]
-            line_dict[tcptype]['bar'] = plt.bar(sndc_list_, qc_list, width, color = color)
+            #line_dict[tcptype]['bar'] = plt.bar(sndc_list_, qc_list, width, color = color)
+            line_dict[tcptype]['bar'] = plt.bar(sndc_list_, qc_list, width, color = color, hatch = hatch)
             bars.append(line_dict[tcptype]['bar'][0])
             #plt.plot(sndc_list, qc_list, label=tcptype, )
 
+        ax=plt.gca()
         plt.xlim([30, 42])
+        ax.set_xticks(np.linspace(30, 42, 13))
+        ax.set_xticklabels( ('', '31', '', '33', '',  '35',  '',  '37', '',  '39', '',  '41',  '',))
         plt.ylim([0, 11])
+
         plt.title('(%s) %d large flow(s)'% (sub_title[i], lfc))
         plt.legend( bars, tcptypes, loc = 'upper right', fontsize = 7)
-        plt.xlabel('number of sender')
+        plt.xlabel('number of workers')
         plt.ylabel('count of query')
-        plt.legend(loc = 'upper right', fontsize = 8)
+        #plt.legend(loc = 'upper right', fontsize = 8)
         i += 1
 
     plt.tight_layout()
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
-        plt.savefig('%s.pdf' % (output_file_name), dip=72)
+        plt.savefig('%s.eps' % (output_file_name), dip=72)
     plt.clf()

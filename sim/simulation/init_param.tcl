@@ -22,15 +22,15 @@ incr i
 set dctcp false
 set d2tcp false
 set sdnd2tcp false
-if { $tcptype == "dctcp" } {
+if { $tcptype == "DCTCP" } {
     set dctcp true
 }
 
-if { $tcptype == "d2tcp" } {
+if { $tcptype == "D2TCP" } {
     set d2tcp true
 }
 
-if { $tcptype == "sdnd2tcp" } {
+if { $tcptype == "SDN-D2TCP" } {
     set sdnd2tcp true
 }
 
