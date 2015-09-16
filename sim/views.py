@@ -36,8 +36,13 @@ def log(f):
 
 def add_sim_grp():
     tcptypes = ["TCP", "DCTCP", "D2TCP", "SDN-D2TCP"]
-    for sc in xrange(32, 39, 2):
-        for lfc in xrange(1, 5):
+    scs = range(32, 39, 2)
+    lfcs = range(1, 5)
+    if simtool.SINGLE_COMPARE:
+        scs = [37,]
+        lfcs = [3,]
+    for sc in scs:
+        for lfc in lfcs:
             for tcptype in tcptypes:
                 s = Simulation()
                 s.tcptype = tcptype
@@ -92,13 +97,15 @@ def plot(request):
     img_dict = {}
     for sim in sim_list:
         cdf_plot = {}
-        #flow delay cdf/pdf by flow
-        #cdf_plot['fd'] = plot_fd_cdf
-        #cdf_plot['ql'] = plot_ql_cdf
-        #cdf_plot['cw'] = plot_cw_cdf
-        #cdf_plot['tp'] = plot_thrput
-        cdf_plot['tp2'] = plot_thrput_2
-        cdf_plot['qc'] = plot_qc
+        if simtool.SINGLE_COMPARE:
+            #flow delay cdf/pdf by flow
+            cdf_plot['fd'] = plot_fd_cdf
+            cdf_plot['ql'] = plot_ql_cdf
+            cdf_plot['cw'] = plot_cw_cdf
+            #cdf_plot['tp'] = plot_thrput
+        else :
+            cdf_plot['tp2'] = plot_thrput_2
+            cdf_plot['qc'] = plot_qc
         '''
         #query arrival time cdf/pdf by query flow
         cdf_plot['qat'] = plot_qat_cdf

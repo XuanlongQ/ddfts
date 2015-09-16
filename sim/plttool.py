@@ -35,12 +35,12 @@ def plot_fd_cdf(ss, output_file_name=None):
         bins, pdf, cdf = getbinspdfcdf(flow_delay_list)
         plt.subplot(2, 2, i)
         #plt.plot(bins, pdf, label='%s flow delay pdf' % (ftype,))
-        plt.plot(bins, pdf, label='')
+        plt.plot(bins, pdf, label='', color='#000000',)
         #plt.plot(bins, cdf, label='%s flow delay cdf' % (ftype,))
-        plt.xlim([50, 55])
-        plt.ylim([0, 0.1])
+        #plt.xlim([50, 55])
+        #plt.ylim([0, 0.1])
         plt.xlabel('flow delay(ms)')
-        #plt.ylabel('CDF')
+        plt.ylabel('PDF of flow delay')
         plt.legend(loc = 'upper right', ) #fontsize=8)
         plt.title('(%s) %s' % (sub_title[i], s.tcptype), loc='center')
         i += 1
@@ -48,6 +48,7 @@ def plot_fd_cdf(ss, output_file_name=None):
     plt.tight_layout()
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
+        plt.savefig('%s.eps' % (output_file_name), dip=72)
 
     #plt.show()
     plt.clf()
@@ -100,6 +101,7 @@ def plot_bat_cdf(s, output_file_name=None):
 
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
+        plt.savefig('%s.eps' % (output_file_name), dip=72)
 
     #plt.show()
     plt.clf()
@@ -124,6 +126,7 @@ def plot_bfs_cdf(s, output_file_name):
 
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
+        plt.savefig('%s.eps' % (output_file_name), dip=72)
 
     #plt.show()
     plt.clf()
@@ -165,6 +168,7 @@ def plot_cc_cdf(s, output_file_name):
 
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
+        plt.savefig('%s.eps' % (output_file_name), dip=72)
 
     #plt.show()
     plt.clf()
@@ -192,18 +196,19 @@ def plot_ql_cdf(ss, output_file_name):
             #print 'qid = ', qid
             time_list = map(lambda t: t/1000000.0, time_dict[qid])
             qlen_list = qlen_dict[qid]
-            plt.plot(time_list, qlen_list)
+            plt.plot(time_list, qlen_list, color='#777777',)
 
         #plt.xlim([0, 4])
         #plt.ylim([0, 300])
         #plt.title('PDF of queue length')
         plt.title('(%s) %s'% (sub_title[i], s.tcptype))
         plt.xlabel('time(s)')
-        plt.ylabel('PDF fo queue length')
+        plt.ylabel('queue length')
         i += 1
     
     plt.tight_layout()
     if output_file_name:
+        plt.savefig('%s.eps' % (output_file_name), dip=72)
         plt.savefig(output_file_name, dip=72)
     plt.clf()
 
@@ -229,9 +234,9 @@ def plot_cw_cdf(ss, output_file_name):
             af_list.append(c.qf+c.lf)
 
         plt.subplot(2, 2, i)
-        plt.plot(time_list, qf_list, label='small flow cwnd', )
-        plt.plot(time_list, lf_list, label='large flow cwnd', )
-        plt.plot(time_list, af_list, label='flow cwnd', )
+        plt.plot(time_list, qf_list, label='query flow cwnd', marker='.', color='#000000')
+        plt.plot(time_list, lf_list, label='large flow cwnd', color='#777777')
+        #plt.plot(time_list, af_list, label='flow cwnd', marker='+')
 
         #plt.xlim([450, 850])
         plt.ylim([0, 450])
@@ -244,6 +249,7 @@ def plot_cw_cdf(ss, output_file_name):
     plt.tight_layout()
     if output_file_name:
         plt.savefig(output_file_name, dip=72)
+        plt.savefig('%s.eps' % (output_file_name), dip=72)
     plt.clf()
 
 #plot throughput
@@ -315,6 +321,8 @@ def plot_thrput_2(sss, output_file_name):
                 continue
             sndc_list = [ (s.sc - 1) for s in ss] #count of sender
             thrput_list = [ (s.qf_thrput + s.lf_thrput) / (1024.*1024.) - 110.0 for s in ss]
+            if thrput_list[0] < 0:
+                thrput_list = [0] * len(thrput_list)
             #print 'sndc_list:', sndc_list
             #print 'thrput_list:', thrput_list
             line_dict[tcptype] = {'x':sndc_list, 'y':thrput_list}
@@ -333,6 +341,8 @@ def plot_thrput_2(sss, output_file_name):
         ax.set_yticks(np.linspace(0.0, 1.0, 11))
         ax.set_yticklabels( ('110.0', '110.1', '110.2', '110.3', '110.4', '110.5', '110.6', '110.7',
           '110.8', '110.9', '111.0',)) 
+        """
+        """
 
         plt.title('(%s) %d large flow(s)'% (sub_title[i], lfc))
         plt.legend( bars, tcptypes, loc = 'upper right', fontsize = 7)
