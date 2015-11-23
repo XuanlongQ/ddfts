@@ -6,7 +6,7 @@ import threading, time
 from models import *
 from tool import performance
 LEVEL = 'DEBUG'
-SINGLE_COMPARE = True
+SINGLE_COMPARE = False
 sim_list = []
 
 def cur_file_dir():
@@ -86,8 +86,9 @@ def simulate_daemon(args):
 
                 sim.status = DONE
                 sim.flow_list = flow_list
-                sim.qrecord_list = qrecord_list
-                sim.cwnd_list = cwnd_list
+                if SINGLE_COMPARE:
+                    sim.qrecord_list = qrecord_list
+                    sim.cwnd_list = cwnd_list
                 sim.lf_thrput = 0
                 sim.qf_thrput = 0
                 for f in flow_list:

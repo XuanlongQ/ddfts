@@ -39,10 +39,11 @@ def plot_fd_cdf(ss, output_file_name=None):
         #plt.plot(bins, cdf, label='%s flow delay cdf' % (ftype,))
         #plt.xlim([50, 55])
         #plt.ylim([0, 0.1])
-        plt.xlabel('flow delay(ms)')
+        #plt.xlabel('flow delay(ms)')
+        plt.xlabel('flow delay(ms)\n(%s) %s' % (sub_title[i], s.tcptype))
         plt.ylabel('PDF of flow delay')
         plt.legend(loc = 'upper right', ) #fontsize=8)
-        plt.title('(%s) %s' % (sub_title[i], s.tcptype), loc='center')
+        #plt.title('(%s) %s' % (sub_title[i], s.tcptype), loc='center')
         i += 1
     #plt.suptitle('PDF of Small Flow Delay')
     plt.tight_layout()
@@ -201,8 +202,9 @@ def plot_ql_cdf(ss, output_file_name):
         #plt.xlim([0, 4])
         #plt.ylim([0, 300])
         #plt.title('PDF of queue length')
-        plt.title('(%s) %s'% (sub_title[i], s.tcptype))
-        plt.xlabel('time(s)')
+        #plt.title('(%s) %s'% (sub_title[i], s.tcptype))
+        #plt.xlabel('time(s)')
+        plt.xlabel('time(s)\n(%s) %s'% (sub_title[i], s.tcptype))
         plt.ylabel('queue length')
         i += 1
     
@@ -240,8 +242,8 @@ def plot_cw_cdf(ss, output_file_name):
 
         #plt.xlim([450, 850])
         plt.ylim([0, 450])
-        plt.title('(%s) %s'% (sub_title[i], s.tcptype))
-        plt.xlabel('time(s)')
+        #plt.title('(%s) %s'% (sub_title[i], s.tcptype))
+        plt.xlabel('time(s)\n(%s) %s'% (sub_title[i], s.tcptype)) 
         plt.ylabel('congestion window')
         plt.legend(loc = 'upper left', fontsize = 8)
         i += 1
@@ -344,9 +346,10 @@ def plot_thrput_2(sss, output_file_name):
         """
         """
 
-        plt.title('(%s) %d large flow(s)'% (sub_title[i], lfc))
+        #plt.title('(%s) %d large flow(s)'% (sub_title[i], lfc))
         plt.legend( bars, tcptypes, loc = 'upper right', fontsize = 7)
-        plt.xlabel('number of workers')
+        #plt.xlabel('number of workers')
+        plt.xlabel('number of workers\n(%s) %d large flow(s)'% (sub_title[i], lfc))
         plt.ylabel('all flow throughput(MB)')
         #plt.legend(loc = 'upper right', fontsize = 8)
         i += 1
@@ -395,9 +398,9 @@ def plot_qc(sss, output_file_name):
         ax.set_xticklabels( ('', '31', '', '33', '',  '35',  '',  '37', '',  '39', '',  '41',  '',))
         plt.ylim([0, 11])
 
-        plt.title('(%s) %d large flow(s)'% (sub_title[i], lfc))
+        #plt.title('(%s) %d large flow(s)'% (sub_title[i], lfc))
         plt.legend( bars, tcptypes, loc = 'upper right', fontsize = 7)
-        plt.xlabel('number of workers')
+        plt.xlabel('number of workers\n(%s) %d large flow(s)'% (sub_title[i], lfc))
         plt.ylabel('count of query')
         #plt.legend(loc = 'upper right', fontsize = 8)
         i += 1
